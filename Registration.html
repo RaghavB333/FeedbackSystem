@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback System - Registrationa</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Student Registration</h1>
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <form id="student-form">
+                <div class="mb-4">
+                    <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Name:</label>
+                    <input type="text" id="name" name="name" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Enter your name">
+                </div>
+                
+                <div class="mb-4">
+                    <label for="rollNumber" class="block text-gray-700 text-sm font-bold mb-2">Roll Number:</label>
+                    <input type="text" id="rollNumber" name="rollNumber" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Enter your roll number">
+                </div>
+                
+                <div class="mb-4">
+                    <label for="contact" class="block text-gray-700 text-sm font-bold mb-2">Contact Number:</label>
+                    <input type="tel" id="contact" name="contact" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Enter your contact number">
+                </div>
+                
+                <div class="flex items-center justify-between">
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                        Register
+                    </button>
+                </div>
+            </form>
+            <div id="message" class="mt-4 text-center text-green-500"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

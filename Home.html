@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback System - Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Custom styles for a more premium look */
+        .hero {
+            background-image: url('https://images.unsplash.com/photo-1558631534-3ff9ac4a46a1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDV8fGJhY2tncm91bmQlMjBmaW5hbHxlbnwwfHx8fDE2OTI3NjU5MDE&ixlib=rb-1.2.1&q=80&w=1080');
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+
+    <header class="hero h-64 flex items-center justify-center">
+        <div class="bg-black bg-opacity-50 p-6 rounded-lg">
+            <h1 class="text-4xl font-bold text-white text-center">Welcome to the Feedback System</h1>
+            <p class="mt-2 text-lg text-gray-300 text-center">Your opinions matter! Share your feedback and help us improve.</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">How It Works</h2>
+        <div class="flex flex-col md:flex-row justify-around mb-8">
+            <div class="bg-white shadow-lg rounded-lg p-6 mb-4 md:mb-0 w-full md:w-1/3 transition-transform transform hover:scale-105">
+                <h3 class="text-lg font-bold mb-2">1. Register</h3>
+                <p class="text-gray-600 mb-4">Create your account to provide feedback.</p>
+                <a href="index.html" class="block text-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    Register Now
+                </a>
+            </div>
+            <div class="bg-white shadow-lg rounded-lg p-6 mb-4 md:mb-0 w-full md:w-1/3 transition-transform transform hover:scale-105">
+                <h3 class="text-lg font-bold mb-2">2. Give Feedback</h3>
+                <p class="text-gray-600 mb-4">Share your thoughts on courses and instructors.</p>
+                <a href="feedback.html" class="block text-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    Give Feedback
+                </a>
+            </div>
+            <div class="bg-white shadow-lg rounded-lg p-6 w-full md:w-1/3 transition-transform transform hover:scale-105">
+                <h3 class="text-lg font-bold mb-2">3. View Insights</h3>
+                <p class="text-gray-600 mb-4">Analyze feedback data to enhance the learning experience.</p>
+                <a href="insights.html" class="block text-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    View Insights
+                </a>
+            </div>
+        </div>
+
+        <footer class="text-center mt-10">
+            <p class="text-gray-600">© 2024 Feedback System. All rights reserved.</p>
+        </footer>
+    </main>
+
+</body>
+</html>
