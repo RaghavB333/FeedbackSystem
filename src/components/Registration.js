@@ -1,5 +1,6 @@
 // src/Registration.js
 import React, { useState } from 'react';
+import axios from 'axios';
 
 const Registration = () => {
     const [formData, setFormData] = useState({
@@ -13,22 +14,32 @@ const Registration = () => {
         semester: '',
     });
 
+    const [message, setMessage] = useState('');
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('Form Data Submitted:', formData);
-        document.getElementById('message').textContent = 'Registration successful!';
+        setMessage(''); // Reset message before submit
+
+        try {
+            const response = await axios.post('http://localhost:5000/register', formData);
+            setMessage(response.data); // Set success message from response
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            const errorMessage = `Failed to register. ${error.response ? error.response.data : error.message} Please try again.`;
+            setMessage(errorMessage);            // setMessage('Failed to register. Please try again.');
+        }
     };
 
     const departmentOptions = {
-        BTECHCSE: Array.from({ length: 8 }, (_, i) => `Semester ${i + 1}`), // BTECH CSE
-        BTECHME: Array.from({ length: 8 }, (_, i) => `Semester ${i + 1}`), // BTECH CE
-        BTECHCE: Array.from({ length: 8 }, (_, i) => `Semester ${i + 1}`), // BTECH ME
-        BCA: Array.from({ length: 6 }, (_, i) => `Semester ${i + 1}`), // BCA
+        BTECHCSE: Array.from({ length: 8 }, (_, i) => `${i + 1}`),
+        BTECHME: Array.from({ length: 8 }, (_, i) => `${i + 1}`),
+        BTECHCE: Array.from({ length: 8 }, (_, i) => `${i + 1}`),
+        BCA: Array.from({ length: 6 }, (_, i) => `${i + 1}`),
     };
 
     return (
@@ -44,6 +55,7 @@ const Registration = () => {
                             id="name"
                             name="name"
                             required
+                            value={formData.name}
                             onChange={handleChange}
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             placeholder="Enter your name"
@@ -58,6 +70,7 @@ const Registration = () => {
                             id="fname"
                             name="fname"
                             required
+                            value={formData.fname}
                             onChange={handleChange}
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             placeholder="Enter your father's name"
@@ -72,6 +85,7 @@ const Registration = () => {
                             id="rollNumber"
                             name="rollNumber"
                             required
+                            value={formData.rollNumber}
                             onChange={handleChange}
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             placeholder="Enter your roll number"
@@ -86,6 +100,7 @@ const Registration = () => {
                             id="contact"
                             name="contact"
                             required
+                            value={formData.contact}
                             onChange={handleChange}
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             placeholder="Enter your contact number"
@@ -100,6 +115,7 @@ const Registration = () => {
                             id="email"
                             name="email"
                             required
+                            value={formData.email}
                             onChange={handleChange}
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             placeholder="Enter your email address"
@@ -114,6 +130,7 @@ const Registration = () => {
                             id="address"
                             name="address"
                             required
+                            value={formData.address}
                             onChange={handleChange}
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             placeholder="Enter your full address"
@@ -122,9 +139,7 @@ const Registration = () => {
 
                     {/* Department Dropdown */}
                     <div className="mb-4 relative">
-                        <label htmlFor="department" className="block text-gray-700 text-sm font-bold mb-2">
-                            Department:
-                        </label>
+                        <label htmlFor="department" className="block text-gray-700 text-sm font-bold mb-2">Department:</label>
                         <select
                             id="department"
                             name="department"
@@ -152,9 +167,7 @@ const Registration = () => {
 
                     {/* Semester Dropdown */}
                     <div className="mb-4 relative">
-                        <label htmlFor="semester" className="block text-gray-700 text-sm font-bold mb-2">
-                            Semester:
-                        </label>
+                        <label htmlFor="semester" className="block text-gray-700 text-sm font-bold mb-2">Semester:</label>
                         <select
                             id="semester"
                             name="semester"
@@ -166,9 +179,7 @@ const Registration = () => {
                         >
                             <option value="" disabled hidden>Select your semester</option>
                             {formData.department && departmentOptions[formData.department]?.map((sem, index) => (
-                                <option key={index} value={sem}>
-                                    {sem}
-                                </option>
+                                <option key={index} value={sem}>{sem}</option>
                             ))}
                         </select>
                         <div className="absolute inset-y-0 right-0 top-6 flex items-center px-2 pointer-events-none">
@@ -182,15 +193,21 @@ const Registration = () => {
                         </div>
                     </div>
 
-
                     {/* Submit Button */}
                     <div className="flex items-center justify-between">
-                        <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                        <button
+                            type="submit"
+                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        >
                             Register
                         </button>
                     </div>
+
+                    {/* Message Display */}
+                    {message && (
+                        <div className="mt-4 text-center text-red-500 font-bold">{message}</div>
+                    )}
                 </form>
-                <div id="message" className="mt-4 text-center text-green-500"></div>
             </div>
         </div>
     );

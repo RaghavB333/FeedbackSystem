@@ -21,9 +21,16 @@ const Home = () => {
               Register Now
             </a>
           </div>
+          <div className="bg-white shadow-lg rounded-lg mx-10 p-6 mb-4 md:mb-0 w-full md:w-1/2 transition-transform transform hover:scale-105">
+            <h3 className="text-lg font-bold mb-2">2. Student Dashboard</h3>
+            <p className="text-gray-600 mb-4">Create your account to provide feedback.</p>
+            <a href="/dashboard" className="block text-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+              View Dashboard
+            </a>
+          </div>
          
           <div className="bg-white shadow-lg rounded-lg mx-10 p-6 w-full md:w-1/2 transition-transform transform hover:scale-105">
-            <h3 className="text-lg font-bold mb-2">2. View Insights</h3>
+            <h3 className="text-lg font-bold mb-2">3. View Insights</h3>
             <p className="text-gray-600 mb-4">Analyze feedback data to enhance the learning experience.</p>
             <a href="/insights" className="block text-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
               View Insights
