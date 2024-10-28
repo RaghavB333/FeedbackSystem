@@ -1,6 +1,7 @@
 // src/Registration.js
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Registration = () => {
     const [formData, setFormData] = useState({
@@ -13,8 +14,8 @@ const Registration = () => {
         department: '',
         semester: '',
     });
-
     const [message, setMessage] = useState('');
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -24,17 +25,23 @@ const Registration = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setMessage(''); // Reset message before submit
-
+    
         try {
             const response = await axios.post('http://localhost:5000/register', formData);
             setMessage(response.data); // Set success message from response
+    
+            // Save roll number in session storage
+            sessionStorage.setItem('rollNumber', formData.rollNumber);
+            
+            navigate('/setPassword'); // Redirect to set password page
         } catch (error) {
-            console.error('Error submitting form:', error);
             const errorMessage = `Failed to register. ${error.response ? error.response.data : error.message} Please try again.`;
-            setMessage(errorMessage);            // setMessage('Failed to register. Please try again.');
+            setMessage(errorMessage);
         }
     };
+    
 
+    // Department and Semester Options
     const departmentOptions = {
         BTECHCSE: Array.from({ length: 8 }, (_, i) => `${i + 1}`),
         BTECHME: Array.from({ length: 8 }, (_, i) => `${i + 1}`),
