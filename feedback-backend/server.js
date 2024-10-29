@@ -81,27 +81,63 @@ app.post('/set-password', async (req, res) => {
     }
 });
 
-// Login route
 app.post('/login', async (req, res) => {
     const { rollNumber, password } = req.body;
 
     if (!rollNumber || !password) {
-        return res.status(400).send('Roll Number and Password are required.');
+        return res.status(400).json({ error: 'Roll Number and Password are required.' });
     }
 
     try {
         const db = await getDbConnection();
-        const [results] = await db.query('SELECT * FROM students WHERE rollNumber = ? AND password = ?', [rollNumber, password]);
+        const [results] = await db.query('SELECT * FROM students WHERE rollNumber = ?', [rollNumber]);
 
         if (results.length === 0) {
-            return res.status(401).send('Invalid roll number or password.');
+            return res.status(401).json({ error: 'Invalid roll number or password.' });
         }
-        res.json(results[0]);
+
+        const student = results[0];
+
+        // Directly compare the password
+        if (student.password !== password) {
+            return res.status(401).json({ error: 'Invalid roll number or password.' });
+        }
+
+        res.json(student); // Return the student data upon successful login
     } catch (error) {
         console.error('Error during login:', error);
-        res.status(500).send('Internal server error during login.');
+        res.status(500).json({ error: 'Internal server error during login.' });
     }
 });
+
+app.post('/updateStudent', async (req, res) => {
+    const { rollNumber, name, fname, contact, email, address, department, semester } = req.body;
+
+    if (!rollNumber) {
+        return res.status(400).send('Roll Number is required.');
+    }
+
+    try {
+        const db = await getDbConnection();
+        const sql = `
+            UPDATE students SET 
+                name = ?, fname = ?, contact = ?, email = ?, 
+                address = ?, department = ?, semester = ? 
+            WHERE rollNumber = ?
+        `;
+        const [result] = await db.query(sql, [name, fname, contact, email, address, department, semester, rollNumber]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).send('Student not found.');
+        }
+        res.send('Profile updated successfully.');
+    } catch (error) {
+        console.error('Error updating student:', error);
+        res.status(500).send('Internal server error while updating student.');
+    }
+});
+
+
 
 // Feedback submission route
 app.post('/submitFeedback', async (req, res) => {

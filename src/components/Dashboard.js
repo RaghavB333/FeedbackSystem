@@ -1,23 +1,28 @@
-// src/StudentDashboard.js
 import React, { useState } from 'react';
-import axios from 'axios';
 
-const Dashboard = () => {
-    const [rollNumber, setRollNumber] = useState('');
-    const [password, setPassword] = useState(''); // New state for password
-    const [studentData, setStudentData] = useState(null);
+const Dashboard = ({ studentData, onLogout, onUpdate }) => {
+    const [isEditing, setIsEditing] = useState(false);
+    const [formData, setFormData] = useState({ ...studentData });
     const [message, setMessage] = useState('');
 
-    const handleLogin = async () => {
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+    };
+
+    const handleEditToggle = () => {
+        setIsEditing(!isEditing);
         setMessage('');
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         try {
-            // Send login request to the server
-            const response = await axios.post('http://localhost:5000/login', { rollNumber, password });
-            setStudentData(response.data); // Set the received student data
+            await onUpdate(formData);
+            setMessage('Profile updated successfully!');
+            setIsEditing(false);
         } catch (error) {
-            console.error('Error during login:', error);
-            setMessage('Login failed. Please check your credentials.');
-            setStudentData(null); // Reset student data
+            setMessage('Failed to update profile. Please try again.');
         }
     };
 
@@ -25,44 +30,25 @@ const Dashboard = () => {
         <div className="container mx-auto px-4 py-8">
             <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Student Dashboard</h1>
             <div className="bg-white shadow-md rounded-lg p-6">
-                <div className="mb-4">
-                    <label htmlFor="rollNumber" className="block text-gray-700 text-sm font-bold mb-2">Roll Number:</label>
-                    <input
-                        type="text"
-                        id="rollNumber"
-                        value={rollNumber}
-                        onChange={(e) => setRollNumber(e.target.value)}
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        placeholder="Enter roll number"
-                    />
-                </div>
-                <div className="mb-4">
-                    <label htmlFor="password" className="block text-gray-700 text-sm font-bold mb-2">Password:</label>
-                    <input
-                        type="password"
-                        id="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        placeholder="Enter password"
-                    />
-                </div>
-                <div className="flex items-center justify-between">
-                    <button
-                        onClick={handleLogin} // Change to handleLogin
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                    >
-                        Login
-                    </button>
-                </div>
-
-                {message && (
-                    <div className="mt-4 text-center text-red-500 font-bold">{message}</div>
-                )}
-
-                {studentData && (
-                    <div className="mt-6">
-                        <h2 className="text-2xl font-bold">Student Details</h2>
+                <h2 className="text-2xl font-bold">Student Details</h2>
+                {isEditing ? (
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        {['name', 'fname', 'contact', 'email', 'address', 'department', 'semester'].map((field) => (
+                            <div key={field}>
+                                <label className="block font-semibold">{field.charAt(0).toUpperCase() + field.slice(1)}:</label>
+                                <input
+                                    type="text"
+                                    name={field}
+                                    value={formData[field]}
+                                    onChange={handleChange}
+                                    className="w-full p-2 border border-gray-300 rounded-md"
+                                />
+                            </div>
+                        ))}
+                        <button type="submit" className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">Save Changes</button>
+                    </form>
+                ) : (
+                    <>
                         <p><strong>Name:</strong> {studentData.name}</p>
                         <p><strong>Father's Name:</strong> {studentData.fname}</p>
                         <p><strong>Roll Number:</strong> {studentData.rollNumber}</p>
@@ -71,8 +57,11 @@ const Dashboard = () => {
                         <p><strong>Address:</strong> {studentData.address}</p>
                         <p><strong>Department:</strong> {studentData.department}</p>
                         <p><strong>Semester:</strong> {studentData.semester}</p>
-                    </div>
+                        <button onClick={handleEditToggle} className="bg-blue-500 text-white py-2 px-4 mr-4 mt-4 rounded-md hover:bg-blue-700">Edit</button>
+                    </>
                 )}
+                {message && <p className="text-center mt-4 text-green-500">{message}</p>}
+                <button onClick={onLogout} className="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Logout</button>
             </div>
         </div>
     );
