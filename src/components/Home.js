@@ -30,7 +30,7 @@ const Home = () => {
           <div className="bg-white shadow-lg rounded-lg mx-10 p-6 w-full md:w-1/2 transition-transform transform hover:scale-105">
             <h3 className="text-lg font-bold mb-2">3. View Insights</h3>
             <p className="text-gray-600 mb-4">Analyze feedback data to enhance the learning experience.</p>
-            <a href="/insights" className="block text-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            <a href="/admin-login" className="block text-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
               View Insights
             </a>
           </div>

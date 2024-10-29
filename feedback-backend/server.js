@@ -213,6 +213,133 @@ app.post('/submitFeedback', async (req, res) => {
     }
 });
 
+
+// Tanpreet's code 
+
+app.get('/api/students', async (req, res) => {
+    const { branch, semester } = req.query;
+  
+    // console.log(branch,semester[0]);
+  
+    try {
+        // Execute the query and log the result
+        const result = await db.query(
+            'SELECT * FROM student WHERE branch = ? AND semester = ?',
+            [branch, semester[0]]
+        );
+  
+        // Access rows correctly based on `mysql2` response structure
+        const rows = result;
+        res.json(rows);
+  
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error fetching student data');
+    }
+  });
+  
+  
+  
+  // const insertdata = async()=>{
+  //   const sql = 'INSERT INTO student (Roll_No, name, fname, branch, semester, email, contact, address) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+  
+  //   try {
+  //     const result = await db.query(sql, [2225032, "Sohit", "Ram", "BCA", 3, "Mohit@gmail.com", 756456567, "hoshiarpur"]);
+  //     console.log('Inserted data with ID:', result.insertId);
+  //   } catch (error) {
+  //     console.error('Error inserting data:', error);
+  //   }
+  // }
+  // insertdata();
+  
+  
+  // Close the connection
+  // db.end();
+  
+  // Nodemailer email function
+  const sendEmail = async (toEmail,link) => {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: 'tanpreetjhally300@gmail.com',
+        pass: 'cprqlpgucugigkcc',
+      },
+    });
+  
+  
+    const mailOptions = {
+      from: 'tanpreetjhally300@gmail.com',
+      to: toEmail,
+      subject: 'Feedback Link',
+      text: `Please click the following link to provide feedback: ${link}`,
+    };
+  
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log(`Feedback link sent to ${toEmail}`);
+    } catch (error) {
+      console.error(`Error sending email to ${toEmail}:`, error);
+    }
+  };
+  
+  
+  // Function to send feedback links to students
+  const sendFeedbackLinks = async (emails,students,subject,teacher) => {
+    const expiryTime = Date.now() + 60 * 1000;
+    students.forEach((student) => {
+      const feedbackLink = `http://localhost:5173/feedback?roll_no=${student.Roll_No}&name=${encodeURIComponent(student.name)}&subject=${encodeURIComponent(subject)}&teacher=${encodeURIComponent(teacher)}&expiryTime=${expiryTime}`;
+      if (student.email) {
+        // Send feedback link via email
+        console.log(student.email);
+        sendEmail(student.email,feedbackLink);
+      }
+    });
+  };
+  
+  // Endpoint to trigger sending feedback links
+  app.post('/send-feedback-link', async (req, res) => {
+    const { emails,students,subject,teacher } = req.body;  // Expecting an array of students with email or phone and token
+    
+    // console.log("emails:",emails," students:" , students)
+    try {
+      await sendFeedbackLinks(emails,students,subject,teacher);
+      res.status(200).json({ message: 'Feedback links sent to selected students' });
+    } catch (error) {
+      console.error('Error sending feedback links:', error);
+      res.status(500).json({ message: 'Error sending feedback links', error });
+    }
+  });
+  
+  // Admin Login
+  app.post('/admin-login', async (req, res) => {
+    const { username, password} = req.body;  // Expecting an array of students with email or phone and token
+    
+      const result = await db.query(
+        'SELECT * FROM adminlogin WHERE username = ? AND password = ?',
+        [username, password]
+    );
+      if(result)
+      {
+        res.status(200).json(result);
+      }
+  });
+  
+  // fetch teachers 
+  app.post('/fetch-teacher', async (req, res) => {
+    const { branch} = req.body;  // Expecting an array of students with email or phone and token
+    
+      const result = await db.query(
+        'SELECT teacher_name,teacher_id FROM teacher WHERE department = ?',
+        [branch]
+    );
+      if(result)
+      {
+        res.status(200).json(result);
+      }
+  });
+
+  // End of Tanpreet's code 
+
 // Start the server
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);

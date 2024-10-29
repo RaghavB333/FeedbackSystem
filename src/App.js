@@ -5,6 +5,8 @@ import Registration from './components/Registration';
 import Dashboard from './components/Dashboard';
 import SetPassword from './components/SetPassword';
 import FeedbackForm from './components/FeedbackForm';
+import Admin_login from './components/Admin_login';
+import Feedback_selection from './components/Feedback_selection';
 import Login from './components/login';
 import axios from 'axios';
 
@@ -89,6 +91,8 @@ function App() {
                     } 
                 />
                 <Route path="/setPassword" element={<SetPassword />} /> 
+                <Route path="/admin-login" element={<Admin_login />} /> 
+                <Route path="/feedbackselection" element={<Feedback_selection />} /> 
                 <Route 
                     path="/feedbackForm" 
                     element={
