@@ -7,8 +7,12 @@ import SetPassword from './components/SetPassword';
 import FeedbackForm from './components/FeedbackForm';
 import Admin_login from './components/Admin_login';
 import Feedback_selection from './components/Feedback_selection';
+import Feedback_taken from './components/Feedback_taken';
 import Login from './components/login';
+import Admin_home from './components/Admin_home';
+import Display_result from './components/Display_result';
 import axios from 'axios';
+import EvaluationPage from './components/Evaluation';
 
 function App() {
     const [teacherOptions, setTeacherOptions] = useState([]);
@@ -93,6 +97,11 @@ function App() {
                 <Route path="/setPassword" element={<SetPassword />} /> 
                 <Route path="/admin-login" element={<Admin_login />} /> 
                 <Route path="/feedbackselection" element={<Feedback_selection />} /> 
+                <Route path="/feedbacktaken" element={<Feedback_taken />} /> 
+                <Route path="/admin-home" element={<Admin_home />} /> 
+                <Route path="/teachers-result" element={<Display_result />} /> 
+                <Route path="/evaluation" element={<EvaluationPage />} /> 
+
                 <Route 
                     path="/feedbackForm" 
                     element={

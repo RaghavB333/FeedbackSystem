@@ -15,27 +15,23 @@ const Admin_login = () => {
     const handleLogin = async (e) => {
           e.preventDefault();
         
-          // const response = await axios.post(
-          //   "http://localhost:3000/admin-login",
-          //   { username,password}
-          // );
-
-          setMessage('Login Successful!');
+          const response = await axios.post(
+            "http://localhost:5000/admin-login",
+            { username,password}
+          );
+          let data = response.data[0];
+          console.log(data[0]);
+          if(data[0] && data[0].username === username && data[0].password === password )
+            {
+              setMessage('Login Successful!');
               setTimeout(() => {
-                navigate('/feedbackselection');
+                navigate('/admin-home');
               }, 2000);
-
-          // if(response.data[0] && response.data[0].username === username && response.data[0].password === password )
-          //   {
-          //     setMessage('Login Successful!');
-          //     setTimeout(() => {
-          //       navigate('/feedbackselection');
-          //     }, 2000);
-          //   }
-          //   else
-          //   {
-          //     setMessage('Invalid username and password');
-            // } 
+            }
+            else
+            {
+              setMessage('Invalid username and password');
+            } 
 
       };
 

@@ -12,6 +12,7 @@ const Feedback_selection = () => {
     const [teacher, setTeacher] = useState('');
 
     const [Teachers,setTeachers] = useState([]);
+    const [Subjects,setSubjects] = useState([]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -20,21 +21,39 @@ const Feedback_selection = () => {
     };
 
 
-    // useEffect(() => {
+    useEffect(() => {
         
-    //     const fetchteachers = async()=>{
+        const fetchteachers = async()=>{
 
-    //         const response = await axios.post(
-    //             "http://localhost:5000/fetch-teacher",
-    //             { branch}
-    //           );
-    //           setTeachers(response.data);
-    //     }
+            const response = await axios.post(
+                "http://localhost:5000/fetch-teacher",
+                { branch}
+              );
+              console.log(response.data[0]);
+              setTeachers(response.data[0]);
+        }
 
-    //     fetchteachers();
+        fetchteachers();
 
         
-    // }, [branch])
+    }, [branch]);
+
+    useEffect(() => {
+        
+        const fetchsubject = async()=>{
+
+            const response = await axios.post(
+                "http://localhost:5000/fetch-subjects",
+                { branch,semester}
+              );
+              console.log(response.data[0]);
+              setSubjects(response.data[0]);
+        }
+
+        fetchsubject();
+
+        
+    }, [semester]);
     
 
     
@@ -98,11 +117,15 @@ const Feedback_selection = () => {
                     style={styles.select}
                 >
                     <option value="" disabled>Select Subject</option>
-                    <option value="Mathematics">Mathematics</option>
+                    {/* <option value="Mathematics">Mathematics</option>
                     <option value="Physics">Physics</option>
                     <option value="Chemistry">Chemistry</option>
                     <option value="Computer Science">Computer Science</option>
-                    <option value="Mechanical Engineering">Mechanical Engineering</option>
+                    <option value="Mechanical Engineering">Mechanical Engineering</option> */}
+
+                        {Subjects.map((subject)=>(
+                        <option key={subject.subject_id} value={subject.name}>{subject.name}</option>
+                    ))}
                 </select>
 
                 {/* Teacher Selection */}
@@ -118,7 +141,7 @@ const Feedback_selection = () => {
                     <option value="Dr. Lee">Dr. Lee</option>
                     <option value="Dr. Williams">Dr. Williams</option> */}
                     {Teachers.map((teacher)=>(
-                        <option key={teacher.teacher_id} value={teacher.teacher_name}>{teacher.teacher_name}</option>
+                        <option key={teacher.id} value={teacher.name}>{teacher.name}</option>
                     ))}
                 </select>
 

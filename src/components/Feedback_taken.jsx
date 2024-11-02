@@ -34,11 +34,11 @@ const Feedback_taken = () => {
         if (branch && semester) {
             const fetchStudents = async () => {
                 try {
-                    const response = await axios.get('http://localhost:3000/api/students', {
+                    const response = await axios.get('http://localhost:5000/api/students', {
                         params: { branch, semester }
                     });
-                    // console.log(await response.data);
-                    setStudents(response.data);
+                    console.log(response.data[0]);
+                    setStudents(response.data[0]);
                 } catch (error) {
                     console.error('Error fetching student data:', error);
                 }
@@ -52,7 +52,7 @@ const Feedback_taken = () => {
     try {
         console.log(emails);
       const response = await axios.post(
-        "http://localhost:3000/send-feedback-link",
+        "http://localhost:5000/send-feedback-link",
         { emails,students,subject,teacher }
       );
       alert(response.data.message);
@@ -85,12 +85,12 @@ const Feedback_taken = () => {
                     <tbody>
                         {students.map((student) => (
                             <tr key={student.Roll_No}>
-                                <td style={styles.td}>{student.Roll_No}</td>
+                                <td style={styles.td}>{student.rollNumber}</td>
                                 <td style={styles.td}>{student.name}</td>
                                 <td style={styles.td}>{student.fname}</td>
                                 <td style={styles.td}>{student.email}</td>
                                 <td style={styles.td}>{student.contact}</td>
-                                <td style={styles.td}>{student.branch}</td>
+                                <td style={styles.td}>{student.department}</td>
                                 <td style={styles.td}>{student.semester}</td>
                                 <td style={styles.td}>
                                     <button style={styles.dlt_btn}>Delete</button>
