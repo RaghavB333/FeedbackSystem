@@ -3,6 +3,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const mysql = require('mysql2/promise');
 const Sentiment = require('sentiment');
+const nodemailer = require('nodemailer');
 
 
 const app = express();
@@ -16,7 +17,7 @@ app.use(bodyParser.json());
 const dbConfig = {
     host: 'localhost',
     user: 'root',
-    password: '3235',
+    password: '@Tanpreet#07',
     database: 'registration_db'
 };
 
@@ -143,10 +144,56 @@ app.post('/updateStudent', async (req, res) => {
 });
 
 
-app.post('/api/updateFeedback', async (req, res) => {
-    const { teacher_id, ratings } = req.body;
+// change student password
 
-    if (!teacher_id || !ratings) {
+app.post('/stu-pass-change', async(req,res)=>{
+    const {username, newPassword} = req.body;
+    const db = await getDbConnection();
+    const query = `
+            UPDATE students SET 
+                password = ? WHERE rollNumber = ?
+        `;
+    
+        const [result] = await db.query(query, [newPassword,username]);
+
+        res.status(200).json(result);
+})
+
+
+app.post('/api/admin-pass-change', async(req,res)=>{
+    const {newPassword} = req.body;
+    const db = await getDbConnection();
+
+    const query = `UPDATE admin SET password = ? WHERE username = ?`;
+    const result = await db.query(query,[newPassword,"admin"]);
+
+    res.send(result);
+})
+
+
+app.post('/api/feedback-created', async(req,res)=>{
+    const {teacherid,subjectid} = req.body;
+
+    const db = await getDbConnection();
+
+    const query = `
+    INSERT INTO TeacherEvaluationSummary (teacher_id, subject_id, avg_subject_knowledge, avg_communication_effectiveness, avg_communication_clarity,
+               avg_engagement, avg_participation, avg_responsiveness_approachability, avg_responsiveness_effectiveness,
+               avg_punctuality, avg_preparedness, avg_critical_thinking, total_feedback_count) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
+    `;
+
+    const [result] = await db.query(query, [teacherid,subjectid,0,0,0,0,0,0,0,0,0,0,0]);
+
+    res.send(result);
+    
+})
+
+app.post('/api/updateFeedback', async (req, res) => {
+    const { feedback_id, ratings,} = req.body;
+
+    console.log(feedback_id);
+
+    if (!feedback_id || !ratings) {
         return res.status(400).json({ success: false, message: 'Missing required fields' });
     }
 
@@ -155,7 +202,7 @@ app.post('/api/updateFeedback', async (req, res) => {
                avg_engagement, avg_participation, avg_responsiveness_approachability, avg_responsiveness_effectiveness,
                avg_punctuality, avg_preparedness, avg_critical_thinking, total_feedback_count 
         FROM TeacherEvaluationSummary
-        WHERE teacher_id = ?
+        WHERE feedback_id = ?
     `;
 
     // Define weights for each parameter
@@ -176,9 +223,9 @@ app.post('/api/updateFeedback', async (req, res) => {
         const db = await getDbConnection();
 
         // Fetch current values for the teacher
-        const [rows] = await db.query(query, [teacher_id]);
+        const [rows] = await db.query(query, [feedback_id]);
         if (rows.length === 0) {
-            return res.status(404).json({ success: false, message: 'Teacher not found.' });
+            return res.status(404).json({ success: false, message: 'feedback not found.' });
         }
 
         const currentData = rows[0];
@@ -204,7 +251,7 @@ app.post('/api/updateFeedback', async (req, res) => {
                 avg_subject_knowledge = ?, avg_communication_effectiveness = ?, avg_communication_clarity = ?,
                 avg_engagement = ?, avg_participation = ?, avg_responsiveness_approachability = ?, avg_responsiveness_effectiveness = ?,
                 avg_punctuality = ?, avg_preparedness = ?, avg_critical_thinking = ?, total_feedback_count = ?, last_updated = NOW()
-            WHERE teacher_id = ?
+            WHERE feedback_id = ?
         `;
 
         await db.query(updateQuery, [
@@ -219,7 +266,7 @@ app.post('/api/updateFeedback', async (req, res) => {
             updatedData.avg_preparedness,
             updatedData.avg_critical_thinking,
             updatedData.total_feedback_count,
-            teacher_id
+            feedback_id
         ]);
 
         res.json({ success: true, message: 'Feedback updated successfully', data: updatedData });
@@ -232,23 +279,49 @@ app.post('/api/updateFeedback', async (req, res) => {
 // Remove sentiment import as it is no longer needed
 // const Sentiment = require('sentiment');
 
+
+app.get('/api/fetch-feedbacks', async(req,res)=>{
+    const db = await getDbConnection();
+
+    // const query = `SELECT * FROM teacherevaluationsummary`;
+
+    const query = `SELECT 
+    tes.*, 
+    t.name, 
+    s.name
+FROM 
+    teacherevaluationsummary tes
+INNER JOIN 
+    teachers t ON tes.teacher_id = t.id
+INNER JOIN 
+    subjects s ON tes.subject_id = s.subject_id;
+`;
+
+    const result = await db.query(query);
+    
+    const rows = result;
+    // console.log(rows);
+    res.json(rows);
+})
+
 app.post('/api/fetchFeedback', async (req, res) => {
     const db = await getDbConnection();
 
     try {
-        const { teacher_id } = req.body;
+        const { feedback_id } = req.body;
 
         const sql = `
             SELECT avg_subject_knowledge, avg_communication_effectiveness, avg_communication_clarity,
                    avg_engagement, avg_participation, avg_responsiveness_approachability, avg_responsiveness_effectiveness,
-                   avg_punctuality, avg_preparedness, avg_critical_thinking, total_feedback_count
+                   avg_punctuality, avg_preparedness, avg_critical_thinking, total_feedback_count, last_updated
             FROM TeacherEvaluationSummary
-            WHERE teacher_id = 1
+            WHERE feedback_id = ?
         `;
 
-        const [results] = await db.query(sql);
+        const [results] = await db.query(sql,[feedback_id]);
 
         // Create an array to store parameter ratings
+        // console.log(results[0]);
         const ratings = [];
 
         if (results[0]) {
@@ -340,24 +413,6 @@ app.get('/api/students', async (req, res) => {
     }
   });
   
-  
-  
-  // const insertdata = async()=>{
-  //   const sql = 'INSERT INTO student (Roll_No, name, fname, branch, semester, email, contact, address) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
-  
-  //   try {
-  //     const result = await db.query(sql, [2225032, "Sohit", "Ram", "BCA", 3, "Mohit@gmail.com", 756456567, "hoshiarpur"]);
-  //     console.log('Inserted data with ID:', result.insertId);
-  //   } catch (error) {
-  //     console.error('Error inserting data:', error);
-  //   }
-  // }
-  // insertdata();
-  
-  
-  // Close the connection
-  // db.end();
-  
   // Nodemailer email function
   const sendEmail = async (toEmail,link) => {
     const transporter = nodemailer.createTransport({
@@ -386,10 +441,10 @@ app.get('/api/students', async (req, res) => {
   
   
   // Function to send feedback links to students
-  const sendFeedbackLinks = async (emails,students,subject,teacher) => {
-    const expiryTime = Date.now() + 60 * 1000;
+  const sendFeedbackLinks = async (feedbackid,students,subject,teacher) => {
+    const expiryTime = Date.now() + 60 * 60 * 1000;
     students.forEach((student) => {
-      const feedbackLink = `http://localhost:5173/feedback?roll_no=${student.Roll_No}&name=${encodeURIComponent(student.name)}&subject=${encodeURIComponent(subject)}&teacher=${encodeURIComponent(teacher)}&expiryTime=${expiryTime}`;
+      const feedbackLink = `http://localhost:3000/feedbackForm?feedbackid=${encodeURIComponent(feedbackid)}&name=${encodeURIComponent(student.name)}&subject=${encodeURIComponent(subject)}&teacher=${encodeURIComponent(teacher)}&expiryTime=${expiryTime}`;
       if (student.email) {
         // Send feedback link via email
         console.log(student.email);
@@ -402,11 +457,10 @@ app.get('/api/students', async (req, res) => {
   app.post('/send-feedback-link', async (req, res) => {
     const db = await getDbConnection();
 
-    const { emails,students,subject,teacher } = req.body;  // Expecting an array of students with email or phone and token
+    const {feedbackid,students,subject,teacher } = req.body;  // Expecting an array of students with email or phone and token
     
-    // console.log("emails:",emails," students:" , students)
     try {
-      await sendFeedbackLinks(emails,students,subject,teacher);
+      await sendFeedbackLinks(feedbackid,students,subject,teacher);
       res.status(200).json({ message: 'Feedback links sent to selected students' });
     } catch (error) {
       console.error('Error sending feedback links:', error);

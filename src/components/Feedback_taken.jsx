@@ -7,25 +7,10 @@ import axios from 'axios';
 const Feedback_taken = () => {
     
     const [students, setStudents] = useState([]);
-    const [Email, setEmail] = useState("");
-    // const emails = [{ email: Email, token: "token1" }];
-    const emails = Email;
+    const [feedbackid,setfeedbackid] = useState('');
     const location = useLocation();
-    const { branch, semester,subject,teacher } = location.state || {};
+    const { branch, semester,subject,teacher,teacherid,subjectid } = location.state || {};
 
-    // if (students.length > 0) {
-    //     const stu_emails = students.map((e) => e.email);
-    //     setEmail(stu_emails);
-    // }
-
-    useEffect(() => {
-        if (students.length > 0) {
-            const emailsList = students.map((e) => e.email);
-            setEmail(emailsList);
-        } else {
-            setEmail([]); // Clear emails if students array is empty
-        }
-    }, [students]);
 
     
 
@@ -37,7 +22,6 @@ const Feedback_taken = () => {
                     const response = await axios.get('http://localhost:5000/api/students', {
                         params: { branch, semester }
                     });
-                    console.log(response.data[0]);
                     setStudents(response.data[0]);
                 } catch (error) {
                     console.error('Error fetching student data:', error);
@@ -48,19 +32,41 @@ const Feedback_taken = () => {
     }, [branch, semester]);
 
 
-  const sendMessage = async () => {
-    try {
-        console.log(emails);
-      const response = await axios.post(
-        "http://localhost:5000/send-feedback-link",
-        { emails,students,subject,teacher }
-      );
-      alert(response.data.message);
-    } catch (error) {
-      console.error("Error sending messages:", error);
-      alert("Failed to send messages.");
+    const createfeedback = async(e)=>{
+        e.preventDefault();
+        try{
+
+            const response = await axios.post('http://localhost:5000/api/feedback-created', {teacherid,subjectid});
+            
+            setfeedbackid(await response.data.insertId);
+            
+
+        }catch(error){
+            console.error("Feedback not created",error);
+        }
     }
-  };
+
+    useEffect(() => {
+        const sendMessage = async () => {
+            try {
+              const response = await axios.post(
+                "http://localhost:5000/send-feedback-link",
+                { feedbackid,students,subject,teacher }
+              );
+              alert(response.data.message);
+            } catch (error) {
+              console.error("Error sending messages:", error);
+              alert("Failed to send messages.");
+            }
+          };
+          if(feedbackid)
+          {
+            sendMessage();
+          }
+    }, [feedbackid])
+    
+
+  
 
 
 
@@ -84,7 +90,7 @@ const Feedback_taken = () => {
                     </thead>
                     <tbody>
                         {students.map((student) => (
-                            <tr key={student.Roll_No}>
+                            <tr key={student.rollNumber}>
                                 <td style={styles.td}>{student.rollNumber}</td>
                                 <td style={styles.td}>{student.name}</td>
                                 <td style={styles.td}>{student.fname}</td>
@@ -102,7 +108,7 @@ const Feedback_taken = () => {
                 </table>
                 
                 <div>
-                    <button onClick={sendMessage} style={styles.send_btn}>Take Feedback</button>
+                    <button onClick={createfeedback} style={styles.send_btn}>Take Feedback</button>
                 </div>
                 </>
                 

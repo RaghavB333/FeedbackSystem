@@ -1,15 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useLocation } from 'react-router-dom';
 import EvaluationChart from './EvaluationChart';
 
-const EvaluationPage = ({ teacherId }) => {
+const EvaluationPage = () => {
     const [evaluationData, setEvaluationData] = useState(null);
     const [evaluationSummary, setEvaluationSummary] = useState(null);
+
+    const location = useLocation();
+    const { feedback_id,teacherid,subject } = location.state || {};
+
+   
+   
+    
 
     useEffect(() => {
         const fetchEvaluationData = async () => {
             try {
-                const response = await axios.post('http://localhost:5000/api/fetchFeedback', { teacher_id: teacherId });
+                const response = await axios.post('http://localhost:5000/api/fetchFeedback', { feedback_id: feedback_id });
 
                 if (response.data) {
                     const data = response.data;
@@ -36,10 +44,9 @@ const EvaluationPage = ({ teacherId }) => {
                     
 
                     setEvaluationData({
-                        teacherName: "Teacher Name", // Replace with actual teacher name if available
-                        subjectName: "Subject Name", // Replace with actual subject name if available
-                        evaluatorName: "Evaluator Name", // Replace with actual evaluator name if available
-                        evaluationDate: new Date().toLocaleDateString(),
+                        teacherID: teacherid, 
+                        subjectName: subject, 
+                        evaluationDate: data.last_updated,
                         totalScore: totalScore,
                         ratings: {
                             subject_knowledge: data.avg_subject_knowledge,
@@ -105,7 +112,7 @@ const EvaluationPage = ({ teacherId }) => {
         };
 
         fetchEvaluationData();
-    }, [teacherId]);
+    }, []);
 
     const getPerformanceStatement = (parameter, score) => {
         switch (parameter) {
@@ -200,8 +207,8 @@ const EvaluationPage = ({ teacherId }) => {
                 <>
                     <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Teacher Evaluation Report</h1>
                     <div className="text-center mb-6">
-                        <p className="text-lg font-semibold text-gray-700">Evaluator: <span className="font-normal">{evaluationData.evaluatorName}</span></p>
-                        <p className="text-lg font-semibold text-gray-700">Teacher: <span className="font-normal">{evaluationData.teacherName}</span></p>
+                        {/* <p className="text-lg font-semibold text-gray-700">Evaluator: <span className="font-normal">{evaluationData.evaluatorName}</span></p> */}
+                        <p className="text-lg font-semibold text-gray-700">Teacher ID: <span className="font-normal">{evaluationData.teacherID}</span></p>
                         <p className="text-lg font-semibold text-gray-700">Subject: <span className="font-normal">{evaluationData.subjectName}</span></p>
                         <p className="text-lg font-semibold text-gray-700">Date: <span className="font-normal">{evaluationData.evaluationDate}</span></p>
                     </div>

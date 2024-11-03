@@ -1,6 +1,20 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
 function FeedbackForm() {
+
+
+    const location = useLocation();
+
+  //   // Parse the query parameters directly from the URL
+    const queryParams = new URLSearchParams(location.search);
+    const feedbackid = queryParams.get('feedbackid');
+    const name = queryParams.get('name');
+    const subject = queryParams.get('subject');
+    const teacher = queryParams.get('teacher');
+    const expirytime = queryParams.get('expiryTime');
+
+
     const [formData, setFormData] = useState({
         teacher_id: 1, // Default teacher_id
         ratings: {
@@ -17,7 +31,6 @@ function FeedbackForm() {
         },
         // student_id: '' // Initially empty
     });
-    const [teacherOptions, setTeacherOptions] = useState([]);
 
     // Fetch the student ID and teacher list on mount
     // useEffect(() => {
@@ -47,7 +60,7 @@ function FeedbackForm() {
         if (loading) return; // Prevents submission if already loading
         setLoading(true);
         const feedbackData = {
-            teacher_id:1,
+            feedback_id:feedbackid,
             ratings: formData.ratings
         };
 
@@ -84,8 +97,16 @@ function FeedbackForm() {
     ];
 
     return (
+        <>
+        {Date.now() > expirytime ? <p> Expired link</p>:
         <form onSubmit={handleSubmit} className="max-w-xl mx-auto bg-white shadow-md rounded-lg p-8 space-y-6">
             <h3 className="text-2xl font-bold text-gray-800 text-center">Teacher Evaluation Form</h3>
+
+        <h2>Welcome, {name}</h2>
+        <p>We are taking the feedback for {subject} subject and {teacher} teacher</p>
+        <p><strong>Feedbackid:</strong> {feedbackid}</p>
+        {/* <p><strong>Subject:</strong> {subject}</p>
+       <p><strong>Teacher Name:</strong> {teacher}</p> */}
 
             {/* Rating Parameters */}
             {ratingParameters.map((param, index) => (
@@ -112,7 +133,8 @@ function FeedbackForm() {
             >
                 Submit Feedback
             </button>
-        </form>
+        </form>}
+        </>
     );
 }
 

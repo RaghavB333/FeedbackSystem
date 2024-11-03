@@ -32,6 +32,9 @@ const Admin_home = () => {
 
   return (
     <div style={styles.container}>
+      <div style={styles.card} onClick={() => navigate('/management')}>
+        Management
+      </div>
       <div style={styles.card} onClick={() => navigate('/teachers-result')}>
         View Result
       </div>

@@ -10,6 +10,8 @@ const Feedback_selection = () => {
     const [semester, setSemester] = useState('');
     const [subject, setSubject] = useState('');
     const [teacher, setTeacher] = useState('');
+    const [teacherid,setteacherid] = useState();
+    const [subjectid,setsubjectid] = useState();
 
     const [Teachers,setTeachers] = useState([]);
     const [Subjects,setSubjects] = useState([]);
@@ -17,7 +19,7 @@ const Feedback_selection = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         // Perform any actions here, like form validation
-        navigate('/feedbacktaken', { state: { branch, semester, subject,teacher } }); // Redirect to the Result page
+        navigate('/feedbacktaken', { state: { branch, semester, subject,teacher,teacherid,subjectid } }); // Redirect to the Result page
     };
 
 
@@ -54,6 +56,35 @@ const Feedback_selection = () => {
 
         
     }, [semester]);
+
+    useEffect(() => {
+
+        const selectedTeacher = Teachers.find(a => a.name == teacher);
+        if(selectedTeacher)
+        {
+            setteacherid(selectedTeacher.id);
+        }
+
+    }, [teacher]);
+
+    useEffect(() => {
+
+        const selectedSubject = Subjects.find(a => a.name == subject);
+        if(selectedSubject)
+        {
+            setsubjectid(selectedSubject.subject_id);
+        }
+
+    }, [subject])
+
+    useEffect(() => {
+      console.log(teacherid);
+    }, [teacherid]);
+    useEffect(() => {
+      console.log(subjectid);
+    }, [subjectid]);
+    
+    
     
 
     

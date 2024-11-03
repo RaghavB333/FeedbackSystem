@@ -1,9 +1,16 @@
 import React, { useState } from 'react';
+import {useNavigate } from 'react-router-dom';
+import Modal from 'react-modal';
+import axios from 'axios';
+
+Modal.setAppElement('#root');
 
 const Dashboard = ({ studentData, onLogout, onUpdate }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({ ...studentData });
     const [message, setMessage] = useState('');
+
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -26,7 +33,83 @@ const Dashboard = ({ studentData, onLogout, onUpdate }) => {
         }
     };
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+//   const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const handleChangePassword = async() => {
+    if (newPassword === confirmPassword) {
+      
+        let username = studentData.rollNumber;
+        const response = await axios.post('http://localhost:5000/stu-pass-change', {username, newPassword});
+
+        console.log(response.data);
+
+
+      setIsModalOpen(false); // Close modal after success
+    } else {
+      alert('New password and confirm password do not match!');
+    }
+  };
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    // setOldPassword('');
+    setNewPassword('');
+    setConfirmPassword('');
+  };
+
     return (
+        <>
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={handleCloseModal}
+        contentLabel="Change Password"
+        style={{
+          content: {
+            width: '30%',
+            height: '50%',
+            margin: 'auto',
+            padding: '20px',
+            borderRadius: '8px',
+            textAlign: 'center',
+          },
+        }}
+      >
+        <h2>Change Password</h2>
+        {/* <input
+          type="password"
+          placeholder="Old Password"
+          value={oldPassword}
+          onChange={(e) => setOldPassword(e.target.value)}
+          style={{ display: 'block', margin: '10px auto', padding: '8px' }}
+        /> */}
+        <input
+          type="password"
+          placeholder="New Password"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          style={{ display: 'block', border: '1px solid black', margin: '10px auto', padding: '8px' }}
+        />
+        <input
+          type="password"
+          placeholder="Confirm Password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          style={{ display: 'block', border: '1px solid black', margin: '10px auto', padding: '8px' }}
+        />
+        <button onClick={handleChangePassword} style={{ margin: '10px' }} className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+          Submit
+        </button>
+        <button onClick={handleCloseModal} style={{ margin: '10px' }} className="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+          Cancel
+        </button>
+      </Modal>
         <div className="container mx-auto px-4 py-8">
             <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Student Dashboard</h1>
             <div className="bg-white shadow-md rounded-lg p-6">
@@ -61,9 +144,11 @@ const Dashboard = ({ studentData, onLogout, onUpdate }) => {
                     </>
                 )}
                 {message && <p className="text-center mt-4 text-green-500">{message}</p>}
-                <button onClick={onLogout} className="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Logout</button>
+                <button onClick={() => setIsModalOpen(true)} className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Change Password</button>
+                <button onClick={onLogout} className="mt-4 ml-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Logout</button>
             </div>
         </div>
+        </>
     );
 };
 

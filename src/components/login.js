@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-const Login = ({ onLogin, referrer, clearReferrer }) => {
+const Login = ({ onLogin}) => {
     const [rollNumber, setRollNumber] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
@@ -16,11 +16,11 @@ const Login = ({ onLogin, referrer, clearReferrer }) => {
             onLogin(studentData);
 
             // Determine the target page based on referrer and navigate with replace
-            const targetPath = referrer === 'feedbackForm' ? '/feedbackForm' : '/dashboard';
-            navigate(targetPath, { replace: true });
+            // const targetPath = referrer === 'feedbackForm' ? '/feedbackForm' : '/dashboard';
+            navigate('/dashboard', { replace: true });
 
             // Clear the referrer to prevent accidental redirection loops
-            clearReferrer();
+            // clearReferrer();
         } catch (error) {
             console.error('Login error:', error);
             setMessage(error.response?.data?.error || 'Login failed. Please try again.');

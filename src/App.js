@@ -13,6 +13,8 @@ import Admin_home from './components/Admin_home';
 import Display_result from './components/Display_result';
 import axios from 'axios';
 import EvaluationPage from './components/Evaluation';
+import Stu_pass_change from './components/Stu_pass_change';
+import Management from './components/Management';
 
 function App() {
     const [teacherOptions, setTeacherOptions] = useState([]);
@@ -101,8 +103,11 @@ function App() {
                 <Route path="/admin-home" element={<Admin_home />} /> 
                 <Route path="/teachers-result" element={<Display_result />} /> 
                 <Route path="/evaluation" element={<EvaluationPage />} /> 
+                <Route path="/stu-pass-change" element={<Stu_pass_change />} /> 
+                <Route path="/management" element={<Management />} /> 
+                <Route path="/feedbackForm" element={<FeedbackForm />} /> 
 
-                <Route 
+                {/* <Route 
                     path="/feedbackForm" 
                     element={
                         <ProtectedRoute 
@@ -110,7 +115,7 @@ function App() {
                             referrerName="feedbackForm" 
                         />
                     } 
-                /> 
+                />  */}
             </Routes>
         </Router>
     );
