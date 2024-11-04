@@ -285,22 +285,36 @@ app.get('/api/fetch-feedbacks', async(req,res)=>{
 
     // const query = `SELECT * FROM teacherevaluationsummary`;
 
+//     const query = `SELECT 
+//     tes.*, 
+//     t.name, 
+//     s.name
+// FROM 
+//     teacherevaluationsummary tes
+// INNER JOIN 
+//     teachers t ON tes.teacher_id = t.id
+// INNER JOIN 
+//     subjects s ON tes.subject_id = s.subject_id;
+// `;
     const query = `SELECT 
     tes.*, 
     t.name, 
     s.name
 FROM 
     teacherevaluationsummary tes
-INNER JOIN 
+LEFT JOIN 
     teachers t ON tes.teacher_id = t.id
 INNER JOIN 
-    subjects s ON tes.subject_id = s.subject_id;
+    subjects s ON tes.subject_id = s.subject_id
+WHERE 
+    tes.teacher_id = 1;
+
 `;
 
     const result = await db.query(query);
     
     const rows = result;
-    // console.log(rows);
+    console.log(rows);
     res.json(rows);
 })
 
