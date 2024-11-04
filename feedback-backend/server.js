@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const mysql = require('mysql2/promise');
 const Sentiment = require('sentiment');
 const nodemailer = require('nodemailer');
+const session = require('express-session');
 
 
 const app = express();
@@ -17,7 +18,7 @@ app.use(bodyParser.json());
 const dbConfig = {
     host: 'localhost',
     user: 'root',
-    password: '@Tanpreet#07',
+    password: '3235',
     database: 'registration_db'
 };
 
@@ -206,19 +207,7 @@ app.post('/api/updateFeedback', async (req, res) => {
     `;
 
     // Define weights for each parameter
-    const weights = {
-        avg_subject_knowledge: 0.2,
-        avg_communication_effectiveness: 0.15,
-        avg_communication_clarity: 0.15,
-        avg_engagement: 0.1,
-        avg_participation: 0.1,
-        avg_responsiveness_approachability: 0.1,
-        avg_responsiveness_effectiveness: 0.1,
-        avg_punctuality: 0.05,
-        avg_preparedness: 0.05,
-        avg_critical_thinking: 0.05
-    };
-
+   
     try {
         const db = await getDbConnection();
 
@@ -233,18 +222,19 @@ app.post('/api/updateFeedback', async (req, res) => {
 
         // Calculate new weighted average for each rating
         const updatedData = {
-            avg_subject_knowledge: ((Number(currentData.avg_subject_knowledge) * currentData.total_feedback_count * weights.avg_subject_knowledge) + (Number(ratings.avg_subject_knowledge || 0) * weights.avg_subject_knowledge)) / newFeedbackCount,
-            avg_communication_effectiveness: ((Number(currentData.avg_communication_effectiveness) * currentData.total_feedback_count * weights.avg_communication_effectiveness) + (Number(ratings.avg_communication_effectiveness || 0) * weights.avg_communication_effectiveness)) / newFeedbackCount,
-            avg_communication_clarity: ((Number(currentData.avg_communication_clarity) * currentData.total_feedback_count * weights.avg_communication_clarity) + (Number(ratings.avg_communication_clarity || 0) * weights.avg_communication_clarity)) / newFeedbackCount,
-            avg_engagement: ((Number(currentData.avg_engagement) * currentData.total_feedback_count * weights.avg_engagement) + (Number(ratings.avg_engagement || 0) * weights.avg_engagement)) / newFeedbackCount,
-            avg_participation: ((Number(currentData.avg_participation) * currentData.total_feedback_count * weights.avg_participation) + (Number(ratings.avg_participation || 0) * weights.avg_participation)) / newFeedbackCount,
-            avg_responsiveness_approachability: ((Number(currentData.avg_responsiveness_approachability) * currentData.total_feedback_count * weights.avg_responsiveness_approachability) + (Number(ratings.avg_responsiveness_approachability || 0) * weights.avg_responsiveness_approachability)) / newFeedbackCount,
-            avg_responsiveness_effectiveness: ((Number(currentData.avg_responsiveness_effectiveness) * currentData.total_feedback_count * weights.avg_responsiveness_effectiveness) + (Number(ratings.avg_responsiveness_effectiveness || 0) * weights.avg_responsiveness_effectiveness)) / newFeedbackCount,
-            avg_punctuality: ((Number(currentData.avg_punctuality) * currentData.total_feedback_count * weights.avg_punctuality) + (Number(ratings.avg_punctuality || 0) * weights.avg_punctuality)) / newFeedbackCount,
-            avg_preparedness: ((Number(currentData.avg_preparedness) * currentData.total_feedback_count * weights.avg_preparedness) + (Number(ratings.avg_preparedness || 0) * weights.avg_preparedness)) / newFeedbackCount,
-            avg_critical_thinking: ((Number(currentData.avg_critical_thinking) * currentData.total_feedback_count * weights.avg_critical_thinking) + (Number(ratings.avg_critical_thinking || 0) * weights.avg_critical_thinking)) / newFeedbackCount,
+            avg_subject_knowledge: ((Number(currentData.avg_subject_knowledge) * currentData.total_feedback_count) + Number(ratings.avg_subject_knowledge || 0)) / newFeedbackCount,
+            avg_communication_effectiveness: ((Number(currentData.avg_communication_effectiveness) * currentData.total_feedback_count) + Number(ratings.avg_communication_effectiveness || 0)) / newFeedbackCount,
+            avg_communication_clarity: ((Number(currentData.avg_communication_clarity) * currentData.total_feedback_count) + Number(ratings.avg_communication_clarity || 0)) / newFeedbackCount,
+            avg_engagement: ((Number(currentData.avg_engagement) * currentData.total_feedback_count) + Number(ratings.avg_engagement || 0)) / newFeedbackCount,
+            avg_participation: ((Number(currentData.avg_participation) * currentData.total_feedback_count) + Number(ratings.avg_participation || 0)) / newFeedbackCount,
+            avg_responsiveness_approachability: ((Number(currentData.avg_responsiveness_approachability) * currentData.total_feedback_count) + Number(ratings.avg_responsiveness_approachability || 0)) / newFeedbackCount,
+            avg_responsiveness_effectiveness: ((Number(currentData.avg_responsiveness_effectiveness) * currentData.total_feedback_count) + Number(ratings.avg_responsiveness_effectiveness || 0)) / newFeedbackCount,
+            avg_punctuality: ((Number(currentData.avg_punctuality) * currentData.total_feedback_count) + Number(ratings.avg_punctuality || 0)) / newFeedbackCount,
+            avg_preparedness: ((Number(currentData.avg_preparedness) * currentData.total_feedback_count) + Number(ratings.avg_preparedness || 0)) / newFeedbackCount,
+            avg_critical_thinking: ((Number(currentData.avg_critical_thinking) * currentData.total_feedback_count) + Number(ratings.avg_critical_thinking || 0)) / newFeedbackCount,
             total_feedback_count: newFeedbackCount
         };
+        
 
         const updateQuery = `
             UPDATE TeacherEvaluationSummary SET
@@ -287,12 +277,12 @@ app.get('/api/fetch-feedbacks', async(req,res)=>{
 
     const query = `SELECT 
     tes.*, 
-    t.name, 
+    t.teacher_name, 
     s.name
 FROM 
     teacherevaluationsummary tes
 INNER JOIN 
-    teachers t ON tes.teacher_id = t.id
+    teachers t ON tes.teacher_id = t.teacher_id
 INNER JOIN 
     subjects s ON tes.subject_id = s.subject_id;
 `;
@@ -300,7 +290,7 @@ INNER JOIN
     const result = await db.query(query);
     
     const rows = result;
-    // console.log(rows);
+    console.log(rows);
     res.json(rows);
 })
 
@@ -491,8 +481,8 @@ app.get('/api/students', async (req, res) => {
     const { branch} = req.body;  // Expecting an array of students with email or phone and token
     
     const result = await db.query(
-        // 'SELECT t.id, t.name FROM teachers t INNER JOIN teacher_branch tb ON t.id = tb.teacher_id INNER JOIN branches b ON tb.branch_id = b.id WHERE b.name = ?',
-        'SELECT t.id, t.name FROM teachers t INNER JOIN teacher_branch tb ON t.id = tb.teacher_id INNER JOIN branches b ON tb.branch_id = b.branch_id WHERE b.name = ?',
+        // 'SELECT t.teacher_id, t.name FROM teachers t INNER JOIN teacher_branch tb ON t.teacher_id = tb.teacher_id INNER JOIN branches b ON tb.branch_id = b.id WHERE b.name = ?',
+        'SELECT t.teacher_id, t.teacher_name FROM teachers t INNER JOIN teacher_branch tb ON t.teacher_id = tb.teacher_id INNER JOIN branches b ON tb.branch_id = b.branch_id WHERE b.name = ?',
         [branch]
     );
       if(result)

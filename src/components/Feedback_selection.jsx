@@ -59,10 +59,10 @@ const Feedback_selection = () => {
 
     useEffect(() => {
 
-        const selectedTeacher = Teachers.find(a => a.name == teacher);
+        const selectedTeacher = Teachers.find(a => a.teacher_name == teacher);
         if(selectedTeacher)
         {
-            setteacherid(selectedTeacher.id);
+            setteacherid(selectedTeacher.teacher_id);
         }
 
     }, [teacher]);
@@ -172,7 +172,7 @@ const Feedback_selection = () => {
                     <option value="Dr. Lee">Dr. Lee</option>
                     <option value="Dr. Williams">Dr. Williams</option> */}
                     {Teachers.map((teacher)=>(
-                        <option key={teacher.id} value={teacher.name}>{teacher.name}</option>
+                        <option key={teacher.teacher_id} value={teacher.teacher_name}>{teacher.teacher_name}</option>
                     ))}
                 </select>
 

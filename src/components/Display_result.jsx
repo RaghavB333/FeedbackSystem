@@ -30,8 +30,9 @@ const Display_result = () => {
     <div>
       <h2 style={styles.h2}>Result List</h2>
       {feedbacks.map((feedback)=>(
-        <div key={feedback.feedback_id} style={styles.teacherCard} onClick={()=>navigate('/evaluation',{ state: { feedback_id: feedback.feedback_id,teacherid:feedback.teacher_id,subject:feedback.name } })}>
+        <div key={feedback.feedback_id} style={styles.teacherCard} onClick={()=>navigate('/evaluation',{ state: { feedback_id: feedback.feedback_id,teacherid:feedback.teacher_id,teacher_name:feedback.teacher_name,subject:feedback.name } })}>
         <h2 style={styles.header}>Teacher ID: {feedback.teacher_id}</h2>
+        <h2 style={styles.header}>Teacher Name: {feedback.teacher_name}</h2>
         <h3 style={styles.subheader}>Subject Name: {feedback.name}</h3>
         <h3 style={styles.subheader}>Date: {feedback.last_updated}</h3>
         <table style={styles.table}>

@@ -52,7 +52,8 @@ const Feedback_taken = () => {
               const response = await axios.post(
                 "http://localhost:5000/send-feedback-link",
                 { feedbackid,students,subject,teacher }
-              );
+                
+              );console.log(teacher);
               alert(response.data.message);
             } catch (error) {
               console.error("Error sending messages:", error);
