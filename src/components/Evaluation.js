@@ -8,7 +8,7 @@ const EvaluationPage = () => {
     const [evaluationSummary, setEvaluationSummary] = useState(null);
 
     const location = useLocation();
-    const { feedback_id,teacherid,subject } = location.state || {};
+    const { feedback_id,teacherid,subject,teacher_name } = location.state || {};
 
    
    
@@ -22,29 +22,37 @@ const EvaluationPage = () => {
                 if (response.data) {
                     const data = response.data;
 
+                    const weights = {
+                        avg_subject_knowledge: 0.2,
+                        avg_communication_effectiveness: 0.15,
+                        avg_communication_clarity: 0.15,
+                        avg_engagement: 0.1,
+                        avg_participation: 0.1,
+                        avg_responsiveness_approachability: 0.1,
+                        avg_responsiveness_effectiveness: 0.1,
+                        avg_punctuality: 0.05,
+                        avg_preparedness: 0.05,
+                        avg_critical_thinking: 0.05
+                    };
                     
-
-                    const totalScore = ((
-                        (Number(data.avg_subject_knowledge) ||
-                            0) +
-                        (Number(data.avg_communication_effectiveness) ||
-                            0) +
-                        (Number(data.avg_communication_clarity) ||
-                            0) +
-                        (Number(data.avg_engagement) || 0) +
-                        (Number(data.avg_participation) || 0) +
-                        (Number(data.avg_responsiveness_approachability) ||
-                            0) +
-                        (Number(data.avg_responsiveness_effectiveness) || 0) +
-                        (Number(data.avg_punctuality) || 0) +
-                        (Number(data.avg_preparedness) || 0) +
-                        (Number(data.avg_critical_thinking) || 0)
-                    ) / 10
+                    const totalScore = (
+                        (Number(data.avg_subject_knowledge) * weights.avg_subject_knowledge || 0) +
+                        (Number(data.avg_communication_effectiveness) * weights.avg_communication_effectiveness || 0) +
+                        (Number(data.avg_communication_clarity) * weights.avg_communication_clarity || 0) +
+                        (Number(data.avg_engagement) * weights.avg_engagement || 0) +
+                        (Number(data.avg_participation) * weights.avg_participation || 0) +
+                        (Number(data.avg_responsiveness_approachability) * weights.avg_responsiveness_approachability || 0) +
+                        (Number(data.avg_responsiveness_effectiveness) * weights.avg_responsiveness_effectiveness || 0) +
+                        (Number(data.avg_punctuality) * weights.avg_punctuality || 0) +
+                        (Number(data.avg_preparedness) * weights.avg_preparedness || 0) +
+                        (Number(data.avg_critical_thinking) * weights.avg_critical_thinking || 0)
                     ).toFixed(1);
+                    
                     
 
                     setEvaluationData({
                         teacherID: teacherid, 
+                        teacherName: teacher_name, 
                         subjectName: subject, 
                         evaluationDate: data.last_updated,
                         totalScore: totalScore,
@@ -209,6 +217,7 @@ const EvaluationPage = () => {
                     <div className="text-center mb-6">
                         {/* <p className="text-lg font-semibold text-gray-700">Evaluator: <span className="font-normal">{evaluationData.evaluatorName}</span></p> */}
                         <p className="text-lg font-semibold text-gray-700">Teacher ID: <span className="font-normal">{evaluationData.teacherID}</span></p>
+                        <p className="text-lg font-semibold text-gray-700">TeacherName: <span className="font-normal">{evaluationData.teacherName}</span></p>
                         <p className="text-lg font-semibold text-gray-700">Subject: <span className="font-normal">{evaluationData.subjectName}</span></p>
                         <p className="text-lg font-semibold text-gray-700">Date: <span className="font-normal">{evaluationData.evaluationDate}</span></p>
                     </div>
