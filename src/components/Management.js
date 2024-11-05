@@ -1,13 +1,9 @@
 import React from 'react'
 import { useState,useEffect } from 'react';
-<<<<<<< HEAD
 import axios from 'axios';
-=======
-import axios from 'axios'; 
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 
->>>>>>> 4d5c6651970374219081cfd5602e25dd3fc8638d
 const Management = () => {
 
     const [newPassword, setNewPassword] = useState('');

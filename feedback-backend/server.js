@@ -507,32 +507,11 @@ app.post('/admin-logout',adminAuth, (req, res) => {
     });
 });
 
-
-// fetch teachers 
-app.post('/fetch-teacher', async (req, res) => {
-    const db = await getDbConnection();
-
-<<<<<<< HEAD
-    const { username, password} = req.body;  // Expecting an array of students with email or phone and token
-    console.log(username,password);
-      const result = await db.query(
-        'SELECT * FROM admin WHERE username = ? AND password = ?',
-        [username, password]
-    );
-      if(result)
-      {
-        res.status(200).json(result);
-      }
-  });
-
   app.post('/api/add-new-teacher',async(req,res)=>{
     const db = await getDbConnection();
 
     const {newTeacher,branch} = req.body;
 
-    // const result = await db.query(
-    //     `INSERT INTO teachers (teacher_name) VALUES (?)`,[newTeacher]
-    // );
     await db.query('START TRANSACTION');
 
 // Insert into the `teachers` table with parameterized value
@@ -628,11 +607,7 @@ app.post('/api/add-brach-semester-subject', async(req,res)=>{
     const db = await getDbConnection();
 
     const { branch} = req.body; 
-    
-=======
-    const { branch } = req.body;  // Expecting an array of students with email or phone and token
 
->>>>>>> 4d5c6651970374219081cfd5602e25dd3fc8638d
     const result = await db.query(
         'SELECT t.teacher_id, t.teacher_name FROM teachers t INNER JOIN teacher_branch tb ON t.teacher_id = tb.teacher_id INNER JOIN branches b ON tb.branch_id = b.branch_id WHERE b.name = ?',
         [branch]
@@ -645,14 +620,8 @@ app.post('/api/add-brach-semester-subject', async(req,res)=>{
 
 app.post('/fetch-subjects', async (req, res) => {
     const db = await getDbConnection();
-
-<<<<<<< HEAD
     const { branch,semester} = req.body;
     
-=======
-    const { branch, semester } = req.body;  // Expecting an array of students with email or phone and token
-
->>>>>>> 4d5c6651970374219081cfd5602e25dd3fc8638d
     const result = await db.query(
         'SELECT s.subject_id, s.name FROM subjects s INNER JOIN branch_semester_subject bss ON s.subject_id = bss.subject_id INNER JOIN branches b ON bss.branch_id = b.branch_id INNER JOIN semesters sem ON bss.semester_id = sem.semester_id WHERE b.name = ? AND sem.name = ?',
         [branch, semester]);

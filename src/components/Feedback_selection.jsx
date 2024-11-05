@@ -79,18 +79,21 @@ const Feedback_selection = () => {
         <div style={styles.container}>
             {isAdmin ? (
                 <>
-                    <h2>Feedback Selection for branch</h2>
-                    <form onSubmit={handleSubmit} style={styles.form}>
-                        <label style={styles.label}>Select Branch:</label>
-                        <select value={branch} onChange={(e) => setBranch(e.target.value)} style={styles.select}>
-                            <option value="" disabled>Select Branch</option>
-                            <option value="CSE">B.Tech CSE</option>
-                            <option value="Civil">B.Tech Civil</option>
-                            <option value="ME">B.Tech ME</option>
-                            <option value="BCA">BCA</option>
-                        </select>
-
-                        <label style={styles.label}>Select Semester:</label>
+            <h2>Feedback Selection for branch</h2>
+            <form onSubmit={handleSubmit} style={styles.form}>
+                {/* Branch Selection */}
+                <label style={styles.label}>Select Branch:</label>
+                <select
+                    value={branch}
+                    onChange={(e) => setBranch(e.target.value)}
+                    style={styles.select}
+                >
+                    <option value="" disabled>Select Branch</option>
+                    {branches.map((branch)=>(
+                      <option key={branch.branch_id} value={branch.name}>{branch.name}</option>
+                    ))}
+                </select>
+                <label style={styles.label}>Select Semester:</label>
                         <select value={semester} onChange={(e) => setSemester(e.target.value)} style={styles.select}>
                             <option value="" disabled>Select Semester</option>
                             {branch !== "BCA" ? (
@@ -115,26 +118,6 @@ const Feedback_selection = () => {
                                 </>
                             )}
                         </select>
-
-<<<<<<< HEAD
-    
-  return (
-    <div style={styles.container}>
-            <h2>Feedback Selection for branch</h2>
-            <form onSubmit={handleSubmit} style={styles.form}>
-                {/* Branch Selection */}
-                <label style={styles.label}>Select Branch:</label>
-                <select
-                    value={branch}
-                    onChange={(e) => setBranch(e.target.value)}
-                    style={styles.select}
-                >
-                    <option value="" disabled>Select Branch</option>
-                    {branches.map((branch)=>(
-                      <option key={branch.branch_id} value={branch.name}>{branch.name}</option>
-                    ))}
-                </select>
-=======
                         <label style={styles.label}>Select Subject:</label>
                         <select value={subject} onChange={(e) => setSubject(e.target.value)} style={styles.select}>
                             <option value="" disabled>Select Subject</option>
@@ -142,7 +125,6 @@ const Feedback_selection = () => {
                                 <option key={subject.subject_id} value={subject.name}>{subject.name}</option>
                             ))}
                         </select>
->>>>>>> 4d5c6651970374219081cfd5602e25dd3fc8638d
 
                         <label style={styles.label}>Select Teacher:</label>
                         <select value={teacher} onChange={(e) => setTeacher(e.target.value)} style={styles.select}>
@@ -159,8 +141,8 @@ const Feedback_selection = () => {
                 <div>You are not authorized to access this page.</div>
             )}
         </div>
-    );
-};
+)};
+
 
 const styles = {
     container: {
