@@ -1,10 +1,22 @@
 import React from 'react'
-import { useState } from 'react';
-import axios from 'axios';
+import { useState,useEffect } from 'react';
+import axios from 'axios'; 
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from './AuthContext';
+
 const Management = () => {
 
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const navigate = useNavigate();
+    const { isAdmin } = useAuth(); // Get admin status from context
+
+
+    useEffect(() => {
+        if (!isAdmin) {
+            navigate('/admin-login'); // Redirect to login page if not authorized
+        }
+    }, [isAdmin, navigate]);
 
     const handleChangePassword = async(e)=>{
         e.preventDefault();

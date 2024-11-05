@@ -1,8 +1,29 @@
 import React from 'react';
-import {useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from './AuthContext';
 
 const Admin_home = () => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('/admin-logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        logout(); // Call the logout function from AuthContext
+        navigate('/admin-login'); // Redirect to admin login page
+      } else {
+        console.error('Logout failed');
+      }
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
+
 
   // Styles
   const styles = {
@@ -40,6 +61,9 @@ const Admin_home = () => {
       </div>
       <div style={styles.card} onClick={() => navigate('/feedbackselection')}>
         Take Feedback
+      </div>
+      <div style={styles.card} onClick={handleLogout}>
+        Logout
       </div>
     </div>
   );
