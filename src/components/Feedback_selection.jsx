@@ -1,20 +1,28 @@
-import React from 'react'
-import { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-const Feedback_selection = () => {
+import { useAuth } from './AuthContext';
 
+const Feedback_selection = () => {
     const navigate = useNavigate();
+    const { isAdmin } = useAuth(); // Get admin status from context
 
     const [branch, setBranch] = useState('');
     const [semester, setSemester] = useState('');
     const [subject, setSubject] = useState('');
     const [teacher, setTeacher] = useState('');
-    const [teacherid,setteacherid] = useState();
-    const [subjectid,setsubjectid] = useState();
+    const [teacherid, setteacherid] = useState();
+    const [subjectid, setsubjectid] = useState();
 
-    const [Teachers,setTeachers] = useState([]);
-    const [Subjects,setSubjects] = useState([]);
+    const [Teachers, setTeachers] = useState([]);
+    const [Subjects, setSubjects] = useState([]);
+
+    // Check if the user is authorized (e.g., check for admin status)
+    useEffect(() => {
+        if (!isAdmin) {
+            navigate('/admin-login'); // Redirect to login page if not authorized
+        }
+    }, [isAdmin, navigate]);
 
     const [branches,setbranches] = useState([]);
 
@@ -28,75 +36,87 @@ const Feedback_selection = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Perform any actions here, like form validation
-        navigate('/feedbacktaken', { state: { branch, semester, subject,teacher,teacherid,subjectid } }); // Redirect to the Result page
+        navigate('/feedbacktaken', { state: { branch, semester, subject, teacher, teacherid, subjectid } });
     };
 
-
     useEffect(() => {
-        
-        const fetchteachers = async()=>{
+        const fetchteachers = async () => {
+            const response = await axios.post("http://localhost:5000/fetch-teacher", { branch });
+            setTeachers(response.data[0]);
+        };
 
-            const response = await axios.post(
-                "http://localhost:5000/fetch-teacher",
-                { branch}
-              );
-              console.log(response.data[0]);
-              setTeachers(response.data[0]);
+        if (branch) {
+            fetchteachers();
         }
-
-        fetchteachers();
-
-        
     }, [branch]);
 
     useEffect(() => {
-        
-        const fetchsubject = async()=>{
+        const fetchsubject = async () => {
+            const response = await axios.post("http://localhost:5000/fetch-subjects", { branch, semester });
+            setSubjects(response.data[0]);
+        };
 
-            const response = await axios.post(
-                "http://localhost:5000/fetch-subjects",
-                { branch,semester}
-              );
-              console.log(response.data[0]);
-              setSubjects(response.data[0]);
+        if (branch && semester) {
+            fetchsubject();
         }
-
-        fetchsubject();
-
-        
-    }, [semester]);
+    }, [branch, semester]);
 
     useEffect(() => {
-
-        const selectedTeacher = Teachers.find(a => a.teacher_name == teacher);
-        if(selectedTeacher)
-        {
+        const selectedTeacher = Teachers.find(a => a.teacher_name === teacher);
+        if (selectedTeacher) {
             setteacherid(selectedTeacher.teacher_id);
         }
-
-    }, [teacher]);
+    }, [teacher, Teachers]);
 
     useEffect(() => {
-
-        const selectedSubject = Subjects.find(a => a.name == subject);
-        if(selectedSubject)
-        {
+        const selectedSubject = Subjects.find(a => a.name === subject);
+        if (selectedSubject) {
             setsubjectid(selectedSubject.subject_id);
         }
+    }, [subject, Subjects]);
 
-    }, [subject])
+    return (
+        <div style={styles.container}>
+            {isAdmin ? (
+                <>
+                    <h2>Feedback Selection for branch</h2>
+                    <form onSubmit={handleSubmit} style={styles.form}>
+                        <label style={styles.label}>Select Branch:</label>
+                        <select value={branch} onChange={(e) => setBranch(e.target.value)} style={styles.select}>
+                            <option value="" disabled>Select Branch</option>
+                            <option value="CSE">B.Tech CSE</option>
+                            <option value="Civil">B.Tech Civil</option>
+                            <option value="ME">B.Tech ME</option>
+                            <option value="BCA">BCA</option>
+                        </select>
 
-    useEffect(() => {
-      console.log(teacherid);
-    }, [teacherid]);
-    useEffect(() => {
-      console.log(subjectid);
-    }, [subjectid]);
-    
-    
-    
+                        <label style={styles.label}>Select Semester:</label>
+                        <select value={semester} onChange={(e) => setSemester(e.target.value)} style={styles.select}>
+                            <option value="" disabled>Select Semester</option>
+                            {branch !== "BCA" ? (
+                                <>
+                                    <option value="1">1st Semester</option>
+                                    <option value="2">2nd Semester</option>
+                                    <option value="3">3rd Semester</option>
+                                    <option value="4">4th Semester</option>
+                                    <option value="5">5th Semester</option>
+                                    <option value="6">6th Semester</option>
+                                    <option value="7">7th Semester</option>
+                                    <option value="8">8th Semester</option>
+                                </>
+                            ) : (
+                                <>
+                                    <option value="1">1st Semester</option>
+                                    <option value="2">2nd Semester</option>
+                                    <option value="3">3rd Semester</option>
+                                    <option value="4">4th Semester</option>
+                                    <option value="5">5th Semester</option>
+                                    <option value="6">6th Semester</option>
+                                </>
+                            )}
+                        </select>
 
+<<<<<<< HEAD
     
   return (
     <div style={styles.container}>
@@ -114,79 +134,30 @@ const Feedback_selection = () => {
                       <option key={branch.branch_id} value={branch.name}>{branch.name}</option>
                     ))}
                 </select>
+=======
+                        <label style={styles.label}>Select Subject:</label>
+                        <select value={subject} onChange={(e) => setSubject(e.target.value)} style={styles.select}>
+                            <option value="" disabled>Select Subject</option>
+                            {Subjects.map((subject) => (
+                                <option key={subject.subject_id} value={subject.name}>{subject.name}</option>
+                            ))}
+                        </select>
+>>>>>>> 4d5c6651970374219081cfd5602e25dd3fc8638d
 
-                {/* Semester Selection */}
-                <label style={styles.label}>Select Semester:</label>
-                <select
-                    value={semester}
-                    onChange={(e) => setSemester(e.target.value)}
-                    style={styles.select}
-                >
-                    <option value="" disabled>Select Semester</option>
-    {/* Render semesters based on branch */}
-    {branch !== "BCA" ? (
-        // Render semesters 1 to 8 for non-BCA branches
-        <>
-            <option value="1">1st Semester</option>
-            <option value="2">2nd Semester</option>
-            <option value="3">3rd Semester</option>
-            <option value="4">4th Semester</option>
-            <option value="5">5th Semester</option>
-            <option value="6">6th Semester</option>
-            <option value="7">7th Semester</option>
-            <option value="8">8th Semester</option>
-        </>
-    ) : (
-        // Render semesters 1 to 6 for BCA branch
-        <>
-            <option value="1">1st Semester</option>
-            <option value="2">2nd Semester</option>
-            <option value="3">3rd Semester</option>
-            <option value="4">4th Semester</option>
-            <option value="5">5th Semester</option>
-            <option value="6">6th Semester</option>
-        </>
-    )}
-                </select>
+                        <label style={styles.label}>Select Teacher:</label>
+                        <select value={teacher} onChange={(e) => setTeacher(e.target.value)} style={styles.select}>
+                            <option value="" disabled>Select Teacher</option>
+                            {Teachers.map((teacher) => (
+                                <option key={teacher.teacher_id} value={teacher.teacher_name}>{teacher.teacher_name}</option>
+                            ))}
+                        </select>
 
-                {/* Subject Selection */}
-                <label style={styles.label}>Select Subject:</label>
-                <select
-                    value={subject}
-                    onChange={(e) => setSubject(e.target.value)}
-                    style={styles.select}
-                >
-                    <option value="" disabled>Select Subject</option>
-                    {/* <option value="Mathematics">Mathematics</option>
-                    <option value="Physics">Physics</option>
-                    <option value="Chemistry">Chemistry</option>
-                    <option value="Computer Science">Computer Science</option>
-                    <option value="Mechanical Engineering">Mechanical Engineering</option> */}
-
-                        {Subjects.map((subject)=>(
-                        <option key={subject.subject_id} value={subject.name}>{subject.name}</option>
-                    ))}
-                </select>
-
-                {/* Teacher Selection */}
-                <label style={styles.label}>Select Teacher:</label>
-                <select
-                    value={teacher}
-                    onChange={(e) => setTeacher(e.target.value)}
-                    style={styles.select}
-                >
-                    <option value="" disabled>Select Teacher</option>
-                    {/* <option value="Dr. Smith">Dr. Smith</option>
-                    <option value="Prof. Johnson">Prof. Johnson</option>
-                    <option value="Dr. Lee">Dr. Lee</option>
-                    <option value="Dr. Williams">Dr. Williams</option> */}
-                    {Teachers.map((teacher)=>(
-                        <option key={teacher.teacher_id} value={teacher.teacher_name}>{teacher.teacher_name}</option>
-                    ))}
-                </select>
-
-                <button type="submit" style={styles.button}>Submit</button>
-            </form>
+                        <button type="submit" style={styles.button}>Submit</button>
+                    </form>
+                </>
+            ) : (
+                <div>You are not authorized to access this page.</div>
+            )}
         </div>
     );
 };
@@ -228,5 +199,4 @@ const styles = {
     }
 };
 
-
-export default Feedback_selection
+export default Feedback_selection;

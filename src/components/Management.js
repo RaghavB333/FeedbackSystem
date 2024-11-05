@@ -1,10 +1,26 @@
 import React from 'react'
 import { useState,useEffect } from 'react';
+<<<<<<< HEAD
 import axios from 'axios';
+=======
+import axios from 'axios'; 
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from './AuthContext';
+
+>>>>>>> 4d5c6651970374219081cfd5602e25dd3fc8638d
 const Management = () => {
 
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const navigate = useNavigate();
+    const { isAdmin } = useAuth(); // Get admin status from context
+
+
+    useEffect(() => {
+        if (!isAdmin) {
+            navigate('/admin-login'); // Redirect to login page if not authorized
+        }
+    }, [isAdmin, navigate]);
 
     const [newTeacher, setnewTeacher] = useState('');
     const [branch, setBranch] = useState([]);

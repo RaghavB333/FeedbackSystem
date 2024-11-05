@@ -5,6 +5,7 @@ const mysql = require('mysql2/promise');
 const Sentiment = require('sentiment');
 const nodemailer = require('nodemailer');
 const session = require('express-session');
+require('dotenv').config(); // Load environment variables from .env file
 
 
 const app = express();
@@ -23,6 +24,14 @@ const dbConfig = {
 };
 
 
+function adminAuth(req, res, next) {
+    if (req.session.isAdmin) {
+        next(); // Continue to the requested route
+    } else {
+        res.status(403).json({ message: 'Access denied' });
+    }
+}
+
 
 // Function to get a database connection
 async function getDbConnection() {
@@ -38,7 +47,8 @@ app.post('/register', async (req, res) => {
         return res.status(400).send('Name, Roll Number, and Email are required.');
     }
 
-    try {        const db = await getDbConnection();
+    try {
+        const db = await getDbConnection();
 
 
         // Check for existing roll number
@@ -147,33 +157,33 @@ app.post('/updateStudent', async (req, res) => {
 
 // change student password
 
-app.post('/stu-pass-change', async(req,res)=>{
-    const {username, newPassword} = req.body;
+app.post('/stu-pass-change', async (req, res) => {
+    const { username, newPassword } = req.body;
     const db = await getDbConnection();
     const query = `
             UPDATE students SET 
                 password = ? WHERE rollNumber = ?
         `;
-    
-        const [result] = await db.query(query, [newPassword,username]);
 
-        res.status(200).json(result);
+    const [result] = await db.query(query, [newPassword, username]);
+
+    res.status(200).json(result);
 })
 
 
-app.post('/api/admin-pass-change', async(req,res)=>{
-    const {newPassword} = req.body;
+app.post('/api/admin-pass-change', async (req, res) => {
+    const { newPassword } = req.body;
     const db = await getDbConnection();
 
     const query = `UPDATE admin SET password = ? WHERE username = ?`;
-    const result = await db.query(query,[newPassword,"admin"]);
+    const result = await db.query(query, [newPassword, "admin"]);
 
     res.send(result);
 })
 
 
-app.post('/api/feedback-created', async(req,res)=>{
-    const {teacherid,subjectid} = req.body;
+app.post('/api/feedback-created', async (req, res) => {
+    const { teacherid, subjectid } = req.body;
 
     const db = await getDbConnection();
 
@@ -183,14 +193,14 @@ app.post('/api/feedback-created', async(req,res)=>{
                avg_punctuality, avg_preparedness, avg_critical_thinking, total_feedback_count) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
     `;
 
-    const [result] = await db.query(query, [teacherid,subjectid,0,0,0,0,0,0,0,0,0,0,0]);
+    const [result] = await db.query(query, [teacherid, subjectid, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
 
     res.send(result);
-    
+
 })
 
 app.post('/api/updateFeedback', async (req, res) => {
-    const { feedback_id, ratings,} = req.body;
+    const { feedback_id, ratings, } = req.body;
 
     console.log(feedback_id);
 
@@ -207,7 +217,7 @@ app.post('/api/updateFeedback', async (req, res) => {
     `;
 
     // Define weights for each parameter
-   
+
     try {
         const db = await getDbConnection();
 
@@ -234,7 +244,7 @@ app.post('/api/updateFeedback', async (req, res) => {
             avg_critical_thinking: ((Number(currentData.avg_critical_thinking) * currentData.total_feedback_count) + Number(ratings.avg_critical_thinking || 0)) / newFeedbackCount,
             total_feedback_count: newFeedbackCount
         };
-        
+
 
         const updateQuery = `
             UPDATE TeacherEvaluationSummary SET
@@ -270,7 +280,7 @@ app.post('/api/updateFeedback', async (req, res) => {
 // const Sentiment = require('sentiment');
 
 
-app.get('/api/fetch-feedbacks', async(req,res)=>{
+app.get('/api/fetch-feedbacks', async (req, res) => {
     const db = await getDbConnection();
 
     const query = `SELECT 
@@ -287,7 +297,7 @@ INNER JOIN
     
 
     const result = await db.query(query);
-    
+
     const rows = result;
     res.json(rows);
 })
@@ -306,7 +316,7 @@ app.post('/api/fetchFeedback', async (req, res) => {
             WHERE feedback_id = ?
         `;
 
-        const [results] = await db.query(sql,[feedback_id]);
+        const [results] = await db.query(sql, [feedback_id]);
 
         // Create an array to store parameter ratings
         // console.log(results[0]);
@@ -372,6 +382,13 @@ app.post('/api/fetchFeedback', async (req, res) => {
 });
 
 
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'default-secret', // Provide a fallback for testing
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false } // Set to `true` if using HTTPS
+}));
+
 
 
 
@@ -381,85 +398,121 @@ app.get('/api/students', async (req, res) => {
     const db = await getDbConnection();
 
     const { branch, semester } = req.query;
-  
+
     // console.log(branch,semester[0]);
-  
+
     try {
         // Execute the query and log the result
         const result = await db.query(
             'SELECT * FROM students WHERE department = ? AND semester = ?',
             [branch, semester[0]]
         );
-  
+
         // Access rows correctly based on `mysql2` response structure
         const rows = result;
         res.json(rows);
-  
+
     } catch (error) {
         console.error(error);
         res.status(500).send('Error fetching student data');
     }
-  });
-  
-  // Nodemailer email function
-  const sendEmail = async (toEmail,link) => {
+});
+
+// Nodemailer email function
+const sendEmail = async (toEmail, link) => {
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: 'tanpreetjhally300@gmail.com',
-        pass: 'cprqlpgucugigkcc',
-      },
+        service: 'gmail',
+        auth: {
+            user: 'tanpreetjhally300@gmail.com',
+            pass: 'cprqlpgucugigkcc',
+        },
     });
-  
-  
+
+
     const mailOptions = {
-      from: 'tanpreetjhally300@gmail.com',
-      to: toEmail,
-      subject: 'Feedback Link',
-      text: `Please click the following link to provide feedback: ${link}`,
+        from: 'tanpreetjhally300@gmail.com',
+        to: toEmail,
+        subject: 'Feedback Link',
+        text: `Please click the following link to provide feedback: ${link}`,
     };
-  
+
     try {
-      await transporter.sendMail(mailOptions);
-      console.log(`Feedback link sent to ${toEmail}`);
+        await transporter.sendMail(mailOptions);
+        console.log(`Feedback link sent to ${toEmail}`);
     } catch (error) {
-      console.error(`Error sending email to ${toEmail}:`, error);
+        console.error(`Error sending email to ${toEmail}:`, error);
     }
-  };
-  
-  
-  // Function to send feedback links to students
-  const sendFeedbackLinks = async (feedbackid,students,subject,teacher) => {
+};
+
+
+// Function to send feedback links to students
+const sendFeedbackLinks = async (feedbackid, students, subject, teacher) => {
     const expiryTime = Date.now() + 60 * 60 * 1000;
     students.forEach((student) => {
-      const feedbackLink = `http://localhost:3000/feedbackForm?feedbackid=${encodeURIComponent(feedbackid)}&name=${encodeURIComponent(student.name)}&subject=${encodeURIComponent(subject)}&teacher=${encodeURIComponent(teacher)}&expiryTime=${expiryTime}`;
-      if (student.email) {
-        // Send feedback link via email
-        console.log(student.email);
-        sendEmail(student.email,feedbackLink);
-      }
+        const feedbackLink = `http://localhost:3000/feedbackForm?feedbackid=${encodeURIComponent(feedbackid)}&name=${encodeURIComponent(student.name)}&subject=${encodeURIComponent(subject)}&teacher=${encodeURIComponent(teacher)}&expiryTime=${expiryTime}`;
+        if (student.email) {
+            // Send feedback link via email
+            console.log(student.email);
+            sendEmail(student.email, feedbackLink);
+        }
     });
-  };
-  
-  // Endpoint to trigger sending feedback links
-  app.post('/send-feedback-link', async (req, res) => {
+};
+
+// Endpoint to trigger sending feedback links
+app.post('/send-feedback-link', async (req, res) => {
     const db = await getDbConnection();
 
-    const {feedbackid,students,subject,teacher } = req.body;  // Expecting an array of students with email or phone and token
-    
+    const { feedbackid, students, subject, teacher } = req.body;  // Expecting an array of students with email or phone and token
+
     try {
-      await sendFeedbackLinks(feedbackid,students,subject,teacher);
-      res.status(200).json({ message: 'Feedback links sent to selected students' });
+        await sendFeedbackLinks(feedbackid, students, subject, teacher);
+        res.status(200).json({ message: 'Feedback links sent to selected students' });
     } catch (error) {
-      console.error('Error sending feedback links:', error);
-      res.status(500).json({ message: 'Error sending feedback links', error });
+        console.error('Error sending feedback links:', error);
+        res.status(500).json({ message: 'Error sending feedback links', error });
     }
-  });
-  
-  // Admin Login
-  app.post('/admin-login', async (req, res) => {
+});
+
+app.post('/admin-login', async (req, res) => {
+    try {
+        const db = await getDbConnection();
+        const { username, password } = req.body;
+
+        const [result] = await db.query(
+            'SELECT * FROM admin WHERE username = ? AND password = ?',
+            [username, password]
+        );
+        console.log(result);
+
+        if (result.length > 0) {
+           
+            req.session.isAdmin = true; // Store admin status in session
+            res.status(200).json({ message: 'Login successful' });
+        } else {
+            res.status(401).json({ message: 'Invalid username or password' });
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
+app.post('/admin-logout',adminAuth, (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            return res.status(500).json({ message: 'Logout failed' });
+        }
+        res.status(200).json({ message: 'Logout successful' });
+    });
+});
+
+
+// fetch teachers 
+app.post('/fetch-teacher', async (req, res) => {
     const db = await getDbConnection();
 
+<<<<<<< HEAD
     const { username, password} = req.body;  // Expecting an array of students with email or phone and token
     console.log(username,password);
       const result = await db.query(
@@ -576,37 +629,44 @@ app.post('/api/add-brach-semester-subject', async(req,res)=>{
 
     const { branch} = req.body; 
     
+=======
+    const { branch } = req.body;  // Expecting an array of students with email or phone and token
+
+>>>>>>> 4d5c6651970374219081cfd5602e25dd3fc8638d
     const result = await db.query(
         'SELECT t.teacher_id, t.teacher_name FROM teachers t INNER JOIN teacher_branch tb ON t.teacher_id = tb.teacher_id INNER JOIN branches b ON tb.branch_id = b.branch_id WHERE b.name = ?',
-        [branch]
-    );
-      if(result)
-      {
+        [branch]
+    );
+    if (result) {
         res.status(200).json(result);
-      }
-  });
+    }
+});
 
 
-  app.post('/fetch-subjects', async (req, res) => {
+app.post('/fetch-subjects', async (req, res) => {
     const db = await getDbConnection();
 
+<<<<<<< HEAD
     const { branch,semester} = req.body;
     
+=======
+    const { branch, semester } = req.body;  // Expecting an array of students with email or phone and token
+
+>>>>>>> 4d5c6651970374219081cfd5602e25dd3fc8638d
     const result = await db.query(
         'SELECT s.subject_id, s.name FROM subjects s INNER JOIN branch_semester_subject bss ON s.subject_id = bss.subject_id INNER JOIN branches b ON bss.branch_id = b.branch_id INNER JOIN semesters sem ON bss.semester_id = sem.semester_id WHERE b.name = ? AND sem.name = ?',
-         [branch,semester]);
-      if(result)
-      {
+        [branch, semester]);
+    if (result) {
         res.status(200).json(result);
-      }
-  });
+    }
+});
 
 
 
-  // End of Tanpreet's code 
+// End of Tanpreet's code 
 
 // Start the server
 app.listen(port, () => {
-    
+
     console.log(`Server is running at http://localhost:${port}`);
 });

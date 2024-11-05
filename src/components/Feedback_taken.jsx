@@ -2,7 +2,8 @@ import React from 'react'
 import { useState,useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
-
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from './AuthContext';
 
 const Feedback_taken = () => {
     
@@ -10,7 +11,15 @@ const Feedback_taken = () => {
     const [feedbackid,setfeedbackid] = useState('');
     const location = useLocation();
     const { branch, semester,subject,teacher,teacherid,subjectid } = location.state || {};
+    const navigate = useNavigate();
+    const { isAdmin } = useAuth(); // Get admin status from context
 
+
+    useEffect(() => {
+        if (!isAdmin) {
+            navigate('/admin-login'); // Redirect to login page if not authorized
+        }
+    }, [isAdmin, navigate]);
 
     
 

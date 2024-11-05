@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from './AuthContext';
 
 function FeedbackForm() {
 
@@ -13,6 +15,15 @@ function FeedbackForm() {
     const subject = queryParams.get('subject');
     const teacher = queryParams.get('teacher');
     const expirytime = queryParams.get('expiryTime');
+    const navigate = useNavigate();
+    const { isAdmin } = useAuth(); // Get admin status from context
+
+
+    useEffect(() => {
+        if (!isAdmin) {
+            navigate('/admin-login'); // Redirect to login page if not authorized
+        }
+    }, [isAdmin, navigate]);
 
 
     const [formData, setFormData] = useState({
