@@ -16,6 +16,16 @@ const Feedback_selection = () => {
     const [Teachers,setTeachers] = useState([]);
     const [Subjects,setSubjects] = useState([]);
 
+    const [branches,setbranches] = useState([]);
+
+    useEffect(() => {
+      const fetchbranches = async()=>{
+        const response = await axios.get('http://localhost:5000/api/fetch-branches');
+        setbranches(await response.data[0]);
+      }
+      fetchbranches();
+    }, [])
+
     const handleSubmit = (e) => {
         e.preventDefault();
         // Perform any actions here, like form validation
@@ -100,10 +110,9 @@ const Feedback_selection = () => {
                     style={styles.select}
                 >
                     <option value="" disabled>Select Branch</option>
-                    <option value="CSE">B.Tech CSE</option>
-                    <option value="Civil">B.Tech Civil</option>
-                    <option value="ME">B.Tech ME</option>
-                    <option value="BCA">BCA</option>
+                    {branches.map((branch)=>(
+                      <option key={branch.branch_id} value={branch.name}>{branch.name}</option>
+                    ))}
                 </select>
 
                 {/* Semester Selection */}

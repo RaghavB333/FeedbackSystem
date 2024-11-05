@@ -18,7 +18,7 @@ app.use(bodyParser.json());
 const dbConfig = {
     host: 'localhost',
     user: 'root',
-    password: '3235',
+    password: '@Tanpreet#07',
     database: 'registration_db'
 };
 
@@ -273,43 +273,22 @@ app.post('/api/updateFeedback', async (req, res) => {
 app.get('/api/fetch-feedbacks', async(req,res)=>{
     const db = await getDbConnection();
 
-    // const query = `SELECT * FROM teacherevaluationsummary`;
-
-//     const query = `SELECT 
-//     tes.*, 
-//     t.name, 
-//     s.name
-// FROM 
-//     teacherevaluationsummary tes
-// INNER JOIN 
-//     teachers t ON tes.teacher_id = t.id
-// INNER JOIN 
-//     subjects s ON tes.subject_id = s.subject_id;
-// `;
     const query = `SELECT 
     tes.*, 
     t.teacher_name, 
     s.name
 FROM 
     teacherevaluationsummary tes
-<<<<<<< HEAD
-LEFT JOIN 
-    teachers t ON tes.teacher_id = t.id
-=======
 INNER JOIN 
     teachers t ON tes.teacher_id = t.teacher_id
->>>>>>> d6f5d3bcdb7e0f74db60f89b53a551c89d264263
 INNER JOIN 
-    subjects s ON tes.subject_id = s.subject_id
-WHERE 
-    tes.teacher_id = 1;
-
+    subjects s ON tes.subject_id = s.subject_id;
 `;
+    
 
     const result = await db.query(query);
     
     const rows = result;
-    console.log(rows);
     res.json(rows);
 })
 
@@ -492,15 +471,112 @@ app.get('/api/students', async (req, res) => {
         res.status(200).json(result);
       }
   });
+
+  app.post('/api/add-new-teacher',async(req,res)=>{
+    const db = await getDbConnection();
+
+    const {newTeacher,branch} = req.body;
+
+    // const result = await db.query(
+    //     `INSERT INTO teachers (teacher_name) VALUES (?)`,[newTeacher]
+    // );
+    await db.query('START TRANSACTION');
+
+// Insert into the `teachers` table with parameterized value
+const result = await db.query(
+    'INSERT INTO teachers (teacher_name) VALUES (?)',
+    [newTeacher]
+);
+
+// Retrieve the last inserted ID
+const teacherId = result[0].insertId;
+
+let data;
+
+for(let i=0;i<branch.length;i++)
+{
+    data = await db.query(
+        'INSERT INTO teacher_branch (teacher_id, branch_id) VALUES (?, ?)',
+        [teacherId, branch[i]]
+    );
+}
+
+// Commit the transaction
+await db.query('COMMIT');
+
+if(data)
+    {
+        res.status(200).json(data);
+    }
+    
+
+})
+
+
+app.post('/api/add-brach-semester-subject', async(req,res)=>{
+    const db = await getDbConnection();
+    const {newbranch,semester,subjectid,subject} = req.body;
+
+
+    const subjectresult = await db.query(
+        `INSERT INTO subjects (subject_id,name) VALUES (?,?)`,
+        [subjectid,subject]
+    );
+
+
+    const data = await db.query(
+        `SELECT branch_id FROM branches WHERE name = ?`,
+        [newbranch]
+    );
+
+    let branchresult;
+    let branchid;
+    if(data[0].length > 0)
+    {
+        branchid = data[0][0].branch_id;
+
+    }
+    else{
+        branchresult = await db.query(
+            `INSERT INTO branches (name) VALUES (?)`,
+            [newbranch]
+        );
+
+        branchid = branchresult[0].insertId;
+    }
+    
+    const result = await db.query(
+        `INSERT INTO branch_semester_subject (branch_id, semester_id, subject_id) VALUES (?, ?, ?)`,
+        [branchid,semester,subjectid]
+    )
+    
+    if(result)
+        {
+          res.status(200).json(result);
+        }
+
+})
+
+
+  app.get('/api/fetch-branches', async (req, res) => {
+    const db = await getDbConnection();
+
+    
+    const result = await db.query(
+        `SELECT * FROM branches`);
+      if(result)
+      {
+        res.status(200).json(result);
+      }
+  });
   
   // fetch teachers 
   app.post('/fetch-teacher', async (req, res) => {
     const db = await getDbConnection();
 
-    const { branch} = req.body;  // Expecting an array of students with email or phone and token
+    const { branch} = req.body; 
     
     const result = await db.query(
-        // 'SELECT t.teacher_id, t.name FROM teachers t INNER JOIN teacher_branch tb ON t.teacher_id = tb.teacher_id INNER JOIN branches b ON tb.branch_id = b.id WHERE b.name = ?',
         'SELECT t.teacher_id, t.teacher_name FROM teachers t INNER JOIN teacher_branch tb ON t.teacher_id = tb.teacher_id INNER JOIN branches b ON tb.branch_id = b.branch_id WHERE b.name = ?',
         [branch]
     );
@@ -514,10 +590,9 @@ app.get('/api/students', async (req, res) => {
   app.post('/fetch-subjects', async (req, res) => {
     const db = await getDbConnection();
 
-    const { branch,semester} = req.body;  // Expecting an array of students with email or phone and token
+    const { branch,semester} = req.body;
     
     const result = await db.query(
-        // 'SELECT s.id, s.name FROM subjects s INNER JOIN branch_semester_subject bss ON s.id = bss.subject_id INNER JOIN branches b ON bss.branch_id = b.id INNER JOIN semesters sem ON bss.semester_id = sem.id WHERE b.name = ? AND sem.name = ?',
         'SELECT s.subject_id, s.name FROM subjects s INNER JOIN branch_semester_subject bss ON s.subject_id = bss.subject_id INNER JOIN branches b ON bss.branch_id = b.branch_id INNER JOIN semesters sem ON bss.semester_id = sem.semester_id WHERE b.name = ? AND sem.name = ?',
          [branch,semester]);
       if(result)
