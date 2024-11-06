@@ -15,7 +15,6 @@ import Display_result from './components/Display_result';
 import EvaluationPage from './components/Evaluation';
 import Stu_pass_change from './components/Stu_pass_change';
 import Management from './components/Management';
-import { AuthProvider, useAuth } from './components/AuthContext'; // Import your AuthContext
 import axios from 'axios'; // Add this line to import axios
 
 
@@ -71,33 +70,31 @@ function App() {
     };
 
     const AdminProtectedRoute = ({ element }) => {
-        const { isAdmin } = useAuth();
+        const isAdmin = localStorage.getItem('isAdmin') === 'true'; // Check isAdmin from localStorage
         if (isAdmin) return element;
         return <Navigate to="/admin-login" replace />;
     };
-
+    
     return (
         <Router>
-            <AuthProvider>
-                <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/login" element={<Login onLogin={handleLogin} />} />
-                    <Route path="/registration" element={<Registration />} />
-                    <Route path="/dashboard" element={<ProtectedRoute element={<Dashboard onLogout={handleLogout} studentData={studentData} onUpdate={handleUpdate} />} />} />
-                    <Route path="/setPassword" element={<SetPassword />} />
-                    <Route path="/admin-login" element={<Admin_login />} />
-                    <Route path="/admin-home" element={<AdminProtectedRoute element={<Admin_home />} />} />
-                    <Route path="/feedbackselection" element={<Feedback_selection />} />
-                    <Route path="/feedbacktaken" element={<Feedback_taken />} />
-                    <Route path="/teachers-result" element={<Display_result />} />
-                    <Route path="/evaluation" element={<EvaluationPage />} />
-                    <Route path="/stu-pass-change" element={<Stu_pass_change />} />
-                    <Route path="/management" element={<Management />} />
-                    <Route path="/feedbackForm" element={<FeedbackForm />} />
-                </Routes>
-            </AuthProvider>
+            <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/login" element={<Login onLogin={handleLogin} />} />
+                <Route path="/registration" element={<Registration />} />
+                <Route path="/dashboard" element={<ProtectedRoute element={<Dashboard onLogout={handleLogout} studentData={studentData} onUpdate={handleUpdate} />} />} />
+                <Route path="/setPassword" element={<SetPassword />} />
+                <Route path="/admin-login" element={<Admin_login />} />
+                <Route path="/admin-home" element={<AdminProtectedRoute element={<Admin_home />} />} />
+                <Route path="/feedbackselection" element={<Feedback_selection />} />
+                <Route path="/feedbacktaken" element={<Feedback_taken />} />
+                <Route path="/teachers-result" element={<Display_result />} />
+                <Route path="/evaluation" element={<EvaluationPage />} />
+                <Route path="/stu-pass-change" element={<Stu_pass_change />} />
+                <Route path="/management" element={<Management />} />
+                <Route path="/feedbackForm" element={<FeedbackForm />} />
+            </Routes>
         </Router>
     );
-}
+}    
 
 export default App;

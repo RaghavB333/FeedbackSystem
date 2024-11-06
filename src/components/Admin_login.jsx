@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-import { useAuth } from './AuthContext';
-import { useNavigate } from 'react-router-dom'; // Step 1: Ensure this import is here
+import { useNavigate } from 'react-router-dom';
 
 const Admin_login = () => {
-    const { login } = useAuth();
-    const navigate = useNavigate(); // Step 2: Ensure this line is present and inside the component
+    const navigate = useNavigate();
     const [adminCredentials, setAdminCredentials] = useState({ username: '', password: '' });
 
     const handleInputChange = (e) => {
@@ -22,7 +20,7 @@ const Admin_login = () => {
         });
 
         if (response.ok) {
-            login(); // Call the login function from AuthContext
+            localStorage.setItem('isAdmin', 'true'); // Save login status in localStorage
             navigate('/admin-home'); // Redirect after successful login
         } else {
             console.error('Admin login failed');
@@ -88,14 +86,6 @@ const styles = {
         backgroundColor: '#007bff',
         color: '#fff',
         cursor: 'pointer',
-    },
-    error: {
-        color: 'red',
-        marginTop: '15px',
-    },
-    success: {
-        color: 'green',
-        marginTop: '15px',
     },
 };
 

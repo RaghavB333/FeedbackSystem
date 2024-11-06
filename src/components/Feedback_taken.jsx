@@ -1,19 +1,23 @@
 import React from 'react'
-import { useState,useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from './AuthContext';
+
 
 const Feedback_taken = () => {
-    
-    const [students, setStudents] = useState([]);
-    const [feedbackid,setfeedbackid] = useState('');
-    const location = useLocation();
-    const { branch, semester,subject,teacher,teacherid,subjectid } = location.state || {};
-    const navigate = useNavigate();
-    const { isAdmin } = useAuth(); // Get admin status from context
 
+    const [students, setStudents] = useState([]);
+    const [feedbackid, setfeedbackid] = useState('');
+    const location = useLocation();
+    const { branch, semester, subject, teacher, teacherid, subjectid } = location.state || {};
+    const navigate = useNavigate();
+    // Get admin status from context
+
+
+    const [isAdmin, setIsAdmin] = useState(() => {
+        return localStorage.getItem('isAdmin') === 'true'; // Retrieve value from localStorage
+    });
 
     useEffect(() => {
         if (!isAdmin) {
@@ -21,7 +25,6 @@ const Feedback_taken = () => {
         }
     }, [isAdmin, navigate]);
 
-    
 
     useEffect(() => {
         // Fetch students data if branch and semester are available
@@ -41,92 +44,91 @@ const Feedback_taken = () => {
     }, [branch, semester]);
 
 
-    const createfeedback = async(e)=>{
+    const createfeedback = async (e) => {
         e.preventDefault();
-        try{
+        try {
 
-            const response = await axios.post('http://localhost:5000/api/feedback-created', {teacherid,subjectid});
-            
+            const response = await axios.post('http://localhost:5000/api/feedback-created', { teacherid, subjectid });
+
             setfeedbackid(await response.data.insertId);
-            
 
-        }catch(error){
-            console.error("Feedback not created",error);
+
+        } catch (error) {
+            console.error("Feedback not created", error);
         }
     }
 
     useEffect(() => {
         const sendMessage = async () => {
             try {
-              const response = await axios.post(
-                "http://localhost:5000/send-feedback-link",
-                { feedbackid,students,subject,teacher }
-                
-              );console.log(teacher);
-              alert(response.data.message);
+                const response = await axios.post(
+                    "http://localhost:5000/send-feedback-link",
+                    { feedbackid, students, subject, teacher }
+
+                ); console.log(teacher);
+                alert(response.data.message);
             } catch (error) {
-              console.error("Error sending messages:", error);
-              alert("Failed to send messages.");
+                console.error("Error sending messages:", error);
+                alert("Failed to send messages.");
             }
-          };
-          if(feedbackid)
-          {
+        };
+        if (feedbackid) {
             sendMessage();
-          }
+        }
     }, [feedbackid])
-    
-
-  
 
 
 
-  return (
-    <div>
-        <h2 style={styles.heading}>Student List</h2>
-      {students.length > 0 ? (
+
+
+
+    return (
+        <div>
+            <h2 style={styles.heading}>Student List</h2>
+            {students.length > 0 ? (
                 <>
-                <table style={styles.table}>
-                    <thead>
-                        <tr>
-                            <th style={styles.th}>Roll Number</th>
-                            <th style={styles.th}>Name</th>
-                            <th style={styles.th}>Father Name</th>
-                            <th style={styles.th}>Email</th>
-                            <th style={styles.th}>Contact</th>
-                            <th style={styles.th}>Branch</th>
-                            <th style={styles.th}>Semester</th>
-                            <th style={styles.th}>Operations</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {students.map((student) => (
-                            <tr key={student.rollNumber}>
-                                <td style={styles.td}>{student.rollNumber}</td>
-                                <td style={styles.td}>{student.name}</td>
-                                <td style={styles.td}>{student.fname}</td>
-                                <td style={styles.td}>{student.email}</td>
-                                <td style={styles.td}>{student.contact}</td>
-                                <td style={styles.td}>{student.department}</td>
-                                <td style={styles.td}>{student.semester}</td>
-                                <td style={styles.td}>
-                                    <button style={styles.dlt_btn}>Delete</button>
-                                    <button style={styles.edit_btn}>Edit</button>
-                                </td>
+                    <table style={styles.table}>
+                        <thead>
+                            <tr>
+                                <th style={styles.th}>Roll Number</th>
+                                <th style={styles.th}>Name</th>
+                                <th style={styles.th}>Father Name</th>
+                                <th style={styles.th}>Email</th>
+                                <th style={styles.th}>Contact</th>
+                                <th style={styles.th}>Branch</th>
+                                <th style={styles.th}>Semester</th>
+                                <th style={styles.th}>Operations</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-                
-                <div>
-                    <button onClick={createfeedback} style={styles.send_btn}>Take Feedback</button>
-                </div>
+                        </thead>
+                        <tbody>
+                            {students.map((student) => (
+                                <tr key={student.rollNumber}>
+                                    <td style={styles.td}>{student.rollNumber}</td>
+                                    <td style={styles.td}>{student.name}</td>
+                                    <td style={styles.td}>{student.fname}</td>
+                                    <td style={styles.td}>{student.email}</td>
+                                    <td style={styles.td}>{student.contact}</td>
+                                    <td style={styles.td}>{student.department}</td>
+                                    <td style={styles.td}>{student.semester}</td>
+                                    <td style={styles.td}>
+                                        <button style={styles.dlt_btn}>Delete</button>
+                                        <button style={styles.edit_btn}>Edit</button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+
+                    <div>
+                        <button onClick={createfeedback} style={styles.send_btn}>Take Feedback</button>
+                    </div>
                 </>
-                
+
             ) : (
                 <p>No students found for the selected branch and semester.</p>
             )}
-    </div>
-  )
+        </div>
+    )
 };
 
 const styles = {

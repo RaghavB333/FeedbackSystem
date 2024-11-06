@@ -1,28 +1,31 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from './AuthContext';
 
 const Admin_home = () => {
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const [isAdmin, setIsAdmin] = useState(() => localStorage.getItem('isAdmin') === 'true');
+  useEffect(() => {
+    const checkAdminStatus = () => {
+      setIsAdmin(localStorage.getItem('isAdmin') === 'true');
+    };
 
-  const handleLogout = async () => {
-    try {
-      const response = await fetch('/admin-logout', {
-        method: 'POST',
-        credentials: 'include',
-      });
+    window.addEventListener('storage', checkAdminStatus);
+    return () => window.removeEventListener('storage', checkAdminStatus);
+  }, []);
 
-      if (response.ok) {
-        logout(); // Call the logout function from AuthContext
-        navigate('/admin-login'); // Redirect to admin login page
-      } else {
-        console.error('Logout failed');
-      }
-    } catch (error) {
-      console.error('Error logging out:', error);
+
+  useEffect(() => {
+    if (!isAdmin) {
+      navigate('/admin-login'); // Redirect to login page if not authorized
     }
+  }, [isAdmin, navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('isAdmin'); // Remove admin status from localStorage
+    setIsAdmin(false); // Update state
+    navigate('/admin-login'); // Immediately redirect to admin login page
   };
+
 
 
   // Styles
@@ -69,4 +72,4 @@ const Admin_home = () => {
   );
 };
 
-export default Admin_home
+export default Admin_home;
