@@ -59,6 +59,8 @@ const Login = ({ onLogin}) => {
                         Login
                     </button>
                     {message && <p className="text-red-600 text-center">{message}</p>}
+                    <p className="text-blue-600 text-center"><a href='http://localhost:3000/forget-password'>Forget Password</a></p>
+                    
                 </form>
             </div>
         </div>

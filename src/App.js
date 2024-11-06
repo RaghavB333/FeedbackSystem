@@ -13,7 +13,7 @@ import Login from './components/login';
 import Admin_home from './components/Admin_home';
 import Display_result from './components/Display_result';
 import EvaluationPage from './components/Evaluation';
-import Stu_pass_change from './components/Stu_pass_change';
+import ForgetPassword from './components/ForgetPassword';
 import Management from './components/Management';
 import { AuthProvider, useAuth } from './components/AuthContext'; // Import your AuthContext
 import axios from 'axios'; // Add this line to import axios
@@ -23,22 +23,22 @@ function App() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [studentData, setStudentData] = useState(null);
 
-    useEffect(() => {
-        const checkLoginStatus = async () => {
-            try {
-                const response = await fetch('/api/checkLogin', { credentials: 'include' });
-                if (response.ok) {
-                    const data = await response.json();
-                    setIsLoggedIn(true);
-                    setStudentData(data);
-                }
-            } catch (error) {
-                console.error("Error checking login status:", error);
-            }
-        };
+    // useEffect(() => {
+    //     const checkLoginStatus = async () => {
+    //         try {
+    //             const response = await fetch('/api/checkLogin', { credentials: 'include' });
+    //             if (response.ok) {
+    //                 const data = await response.json();
+    //                 setIsLoggedIn(true);
+    //                 setStudentData(data);
+    //             }
+    //         } catch (error) {
+    //             console.error("Error checking login status:", error);
+    //         }
+    //     };
 
-        checkLoginStatus();
-    }, []);
+    //     checkLoginStatus();
+    // }, []);
 
     const handleLogin = (data) => {
         setIsLoggedIn(true);
@@ -88,10 +88,10 @@ function App() {
                     <Route path="/admin-login" element={<Admin_login />} />
                     <Route path="/admin-home" element={<AdminProtectedRoute element={<Admin_home />} />} />
                     <Route path="/feedbackselection" element={<Feedback_selection />} />
-                    <Route path="/feedbacktaken" element={<Feedback_taken />} />
+                    <Route path="/feedbacktaken" element={<Feedback_taken onUpdate={handleUpdate}/>} />
                     <Route path="/teachers-result" element={<Display_result />} />
                     <Route path="/evaluation" element={<EvaluationPage />} />
-                    <Route path="/stu-pass-change" element={<Stu_pass_change />} />
+                    <Route path="/forget-password" element={<ForgetPassword />} />
                     <Route path="/management" element={<Management />} />
                     <Route path="/feedbackForm" element={<FeedbackForm />} />
                 </Routes>

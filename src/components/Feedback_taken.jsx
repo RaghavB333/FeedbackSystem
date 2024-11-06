@@ -5,10 +5,14 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 
-const Feedback_taken = () => {
+const Feedback_taken = ({onUpdate}) => {
     
     const [students, setStudents] = useState([]);
+    const [formData, setformData] = useState([]);
     const [feedbackid,setfeedbackid] = useState('');
+    const [isEditing, setisEditing] = useState(false);
+    const [change,setchange] = useState('');
+    const [rollNumber,setrollNumber] = useState(''); 
     const location = useLocation();
     const { branch, semester,subject,teacher,teacherid,subjectid } = location.state || {};
     const navigate = useNavigate();
@@ -38,7 +42,7 @@ const Feedback_taken = () => {
             };
             fetchStudents();
         }
-    }, [branch, semester]);
+    }, [branch, semester,change]);
 
 
     const createfeedback = async(e)=>{
@@ -62,7 +66,7 @@ const Feedback_taken = () => {
                 "http://localhost:5000/send-feedback-link",
                 { feedbackid,students,subject,teacher }
                 
-              );console.log(teacher);
+              );
               alert(response.data.message);
             } catch (error) {
               console.error("Error sending messages:", error);
@@ -75,7 +79,48 @@ const Feedback_taken = () => {
           }
     }, [feedbackid])
     
+    const deletestudent = async(rollno)=>{
+        try {
+            const response = await axios.post(
+              "http://localhost:5000/api/delete-student",
+              { rollno}
+            );
+            setchange(response.data);
+          } catch (error) {
+            console.error(error);
+          }
+    }
 
+    const editstudent = (rollno)=>{
+        setrollNumber(rollno);
+
+        for(let student=0;student<students.length;student++)
+        {
+            if(students[student].rollNumber == rollno)
+            {
+                setformData(students[student]);
+            }
+        }
+
+        setisEditing(true);
+    }
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        console.log(name,value);
+        setformData({ ...formData, [name]: value });
+    };
+
+    const handleSubmit = async(e)=>{
+        e.preventDefault();
+        try {
+            await onUpdate(formData);
+            setchange('');
+            setisEditing(false);
+        } catch (error) {
+            console.error(error)
+        }
+    }
   
 
 
@@ -85,7 +130,24 @@ const Feedback_taken = () => {
         <h2 style={styles.heading}>Student List</h2>
       {students.length > 0 ? (
                 <>
-                <table style={styles.table}>
+                {isEditing ?
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        {['name', 'fname', 'contact', 'email', 'address', 'department', 'semester'].map((field) => (
+                            <div key={field}>
+                                <label className="block font-semibold">{field.charAt(0).toUpperCase() + field.slice(1)}:</label>
+                                <input
+                                    type="text"
+                                    name={field}
+                                    value={formData[field]}
+                                    onChange={handleChange}
+                                    className="w-full p-2 border border-gray-300 rounded-md"
+                                />
+                            </div>
+                        ))}
+                        <button type="submit" className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">Save Changes</button>
+                    </form>
+                :<>
+                    <table style={styles.table}>
                     <thead>
                         <tr>
                             <th style={styles.th}>Roll Number</th>
@@ -109,8 +171,8 @@ const Feedback_taken = () => {
                                 <td style={styles.td}>{student.department}</td>
                                 <td style={styles.td}>{student.semester}</td>
                                 <td style={styles.td}>
-                                    <button style={styles.dlt_btn}>Delete</button>
-                                    <button style={styles.edit_btn}>Edit</button>
+                                    <button onClick={()=>deletestudent(student.rollNumber)} style={styles.dlt_btn}>Delete</button>
+                                    <button onClick={()=>editstudent(student.rollNumber)} style={styles.edit_btn}>Edit</button>
                                 </td>
                             </tr>
                         ))}
@@ -120,6 +182,8 @@ const Feedback_taken = () => {
                 <div>
                     <button onClick={createfeedback} style={styles.send_btn}>Take Feedback</button>
                 </div>
+                </>}
+                
                 </>
                 
             ) : (
