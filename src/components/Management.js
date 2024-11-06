@@ -39,6 +39,16 @@ const Management = () => {
     }
   }, [isAdmin, navigate]);
 
+
+  useEffect(() => {
+    const fetchbranches = async () => {
+      const response = await axios.get('http://localhost:5000/api/fetch-branches');
+      setbranches(await response.data[0]);
+    }
+    fetchbranches();
+  }, [])
+
+
   useEffect(() => {
     const fetchTeachers = async () => {
       try {
@@ -174,7 +184,7 @@ const Management = () => {
             className="w-full px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
           />
           <div className="space-y-2">
-            <label className="block text-gray-700 font-medium">Select Branch for Teacher:</label>
+            <label className="text-gray-700 font-medium">Select Branch for Teacher:</label>
             <div className="space-y-2">
               {branches.map((branchItem) => (
                 <div key={branchItem.branch_id} className="flex items-center space-x-2">

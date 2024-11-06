@@ -4,6 +4,9 @@ const bodyParser = require('body-parser');
 const mysql = require('mysql2/promise');
 const Sentiment = require('sentiment');
 const nodemailer = require('nodemailer');
+const session = require('express-session');
+
+
 require('dotenv').config(); // Load environment variables from .env file
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
@@ -21,7 +24,7 @@ app.use(bodyParser.json());
 const dbConfig = {
     host: 'localhost',
     user: 'root',
-    password: '3235',
+    password: '@Tanpreet#07',
     database: 'registration_db'
 };
 
@@ -127,8 +130,26 @@ app.post('/login', async (req, res) => {
     }
 });
 
+
+app.post('/api/forget-fetchstu-data', async(req,res)=>{
+    const db = await getDbConnection();
+
+    const {rollno} = req.body;
+
+    const result = await db.query(
+        `SELECT email FROM students WHERE RollNumber = ?`,
+        [rollno]
+    );
+
+    if(result[0].length > 0)
+    {
+        res.status(200).json(result);
+    }
+})
+
 app.post('/updateStudent', async (req, res) => {
     const { rollNumber, name, fname, contact, email, address, department, semester } = req.body;
+
 
     if (!rollNumber) {
         return res.status(400).send('Roll Number is required.');
@@ -158,9 +179,17 @@ app.post('/updateStudent', async (req, res) => {
 // change student password
 
 app.post('/stu-pass-change', async (req, res) => {
-    const { username, newPassword } = req.body;
 
-    if (!username || !newPassword) {
+    const { rollno, newPassword } = req.body;
+    const db = await getDbConnection();
+    const query = `
+            UPDATE students SET 
+                password = ? WHERE rollNumber = ?
+        `;
+
+    const [result] = await db.query(query, [newPassword, rollno]);
+
+    if (!rollno || !newPassword) {
         return res.status(400).json({ error: 'Username and new password are required.' });
     }
 
@@ -170,15 +199,81 @@ app.post('/stu-pass-change', async (req, res) => {
 
         const [result] = await db.query(
             'UPDATE students SET password = ? WHERE rollNumber = ?',
-            [newHashedPassword, username]
+            [newHashedPassword, rollno]
         );
-
         res.status(200).json(result);
     } catch (error) {
         console.error('Error changing student password:', error);
         res.status(500).json({ error: 'Failed to change password.' });
     }
 });
+
+
+app.post('/api/delete-student',async(req,res)=>{
+    const {rollno} = req.body;
+    const db = await getDbConnection();
+
+    const result = await db.query(
+        `DELETE FROM students WHERE rollNumber = ?`,
+        [rollno]
+    );
+    console.log(result);
+})
+
+// sending OTP 
+const sendOTPCode = async(email,otp)=>{
+
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: 'tanpreetjhally300@gmail.com',
+            pass: 'cprqlpgucugigkcc',
+        },
+    });
+
+    const mailOptions = {
+        from: 'tanpreetjhally300@gmail.com',
+        to: email,
+        subject: 'Forget OTP Code',
+        text: `Your OTP Code is - ${otp} Dont share the otp with anyone`,
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log(`OTP sent to ${email}`);
+    } catch (error) {
+        console.error(`Error sending email to ${email}:`, error);
+    }
+
+}
+
+app.post('/api/forget-stu-pass', async(req,res)=>{
+
+    const db = await getDbConnection();
+
+    const {email} = req.body;
+
+    let otp = '';
+
+    for(let i=1;i<=6;i++)
+    {
+        otp += Math.floor(Math.random() * 10).toString();
+    }
+
+
+    console.log(otp,email);
+
+    try {
+        // await sendOTPCode(email,otp);
+        const expiresAt = Date.now() + 2 * 60 * 1000;
+        res.status(200).json({ message: 'OTP Code Send',OTP:otp,expiresAt:expiresAt });
+    } catch (error) {
+        console.error('Error sending OTP:', error);
+        res.status(500).json({ message: 'Error sending OTP', error });
+    }
+})
+
+
 
 // Admin Password Change Route
 app.post('/api/admin-pass-change', async (req, res) => {

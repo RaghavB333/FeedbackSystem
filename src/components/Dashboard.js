@@ -41,8 +41,8 @@ const Dashboard = ({ studentData, onLogout, onUpdate }) => {
   const handleChangePassword = async() => {
     if (newPassword === confirmPassword) {
       
-        let username = studentData.rollNumber;
-        const response = await axios.post('http://localhost:5000/stu-pass-change', {username, newPassword});
+        let rollno = studentData.rollNumber;
+        const response = await axios.post('http://localhost:5000/stu-pass-change', {rollno, newPassword});
 
         console.log(response.data);
 
@@ -82,13 +82,6 @@ const Dashboard = ({ studentData, onLogout, onUpdate }) => {
         }}
       >
         <h2>Change Password</h2>
-        {/* <input
-          type="password"
-          placeholder="Old Password"
-          value={oldPassword}
-          onChange={(e) => setOldPassword(e.target.value)}
-          style={{ display: 'block', margin: '10px auto', padding: '8px' }}
-        /> */}
         <input
           type="password"
           placeholder="New Password"
