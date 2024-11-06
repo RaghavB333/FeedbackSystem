@@ -83,6 +83,7 @@ app.post('/set-password', async (req, res) => {
     try {
         const db = await getDbConnection();
         const hashedPassword = await bcrypt.hash(password, saltRounds);
+        
 
         const [result] = await db.query('UPDATE students SET password = ? WHERE rollNumber = ?', [hashedPassword, rollNumber]);
 
