@@ -2,17 +2,34 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import EvaluationChart from './EvaluationChart';
+import { useNavigate } from 'react-router-dom';
+ 
 
 const EvaluationPage = () => {
     const [evaluationData, setEvaluationData] = useState(null);
     const [evaluationSummary, setEvaluationSummary] = useState(null);
 
     const location = useLocation();
-    const { feedback_id,teacherid,subject,teacher_name } = location.state || {};
+    const { feedback_id, teacherid, subject, teacher_name } = location.state || {};
 
-   
-   
+    const navigate = useNavigate();
+       // Get admin status from context
+
+       const [isAdmin, setIsAdmin] = useState(() => {
+        return localStorage.getItem('isAdmin') === 'true'; // Retrieve value from localStorage
+    });
     
+    useEffect(() => {
+        if (!isAdmin) {
+            navigate('/admin-login'); // Redirect to login page if not authorized
+        }
+    }, [isAdmin, navigate]);
+
+    //capitalie first letters of parameters
+    const capitalizeWords = (str) => {
+        return str.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
+    };
+
 
     useEffect(() => {
         const fetchEvaluationData = async () => {
@@ -34,7 +51,7 @@ const EvaluationPage = () => {
                         avg_preparedness: 0.05,
                         avg_critical_thinking: 0.05
                     };
-                    
+
                     const totalScore = (
                         (Number(data.avg_subject_knowledge) * weights.avg_subject_knowledge || 0) +
                         (Number(data.avg_communication_effectiveness) * weights.avg_communication_effectiveness || 0) +
@@ -47,13 +64,13 @@ const EvaluationPage = () => {
                         (Number(data.avg_preparedness) * weights.avg_preparedness || 0) +
                         (Number(data.avg_critical_thinking) * weights.avg_critical_thinking || 0)
                     ).toFixed(1);
-                    
-                    
+
+
 
                     setEvaluationData({
-                        teacherID: teacherid, 
-                        teacherName: teacher_name, 
-                        subjectName: subject, 
+                        teacherID: teacherid,
+                        teacherName: teacher_name,
+                        subjectName: subject,
                         evaluationDate: data.last_updated,
                         totalScore: totalScore,
                         ratings: {
@@ -69,6 +86,7 @@ const EvaluationPage = () => {
                             encouragement_of_critical_thinking: data.avg_critical_thinking,
                         },
                     });
+
 
                     // Dynamic Summary Generation
                     const generateSummary = (score) => {
@@ -210,7 +228,7 @@ const EvaluationPage = () => {
     };
 
     return (
-        <div className="container mx-auto p-8 bg-white rounded-lg shadow-lg">
+        <div className="container w-[calc(100vw-12rem)] mx-24 p-8 bg-white rounded-lg shadow-lg">
             {evaluationData ? (
                 <>
                     <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Teacher Evaluation Report</h1>
@@ -221,7 +239,7 @@ const EvaluationPage = () => {
                         <p className="text-lg font-semibold text-gray-700">Subject: <span className="font-normal">{evaluationData.subjectName}</span></p>
                         <p className="text-lg font-semibold text-gray-700">Date: <span className="font-normal">{evaluationData.evaluationDate}</span></p>
                     </div>
-                   
+
                     <h2 className="text-xl font-semibold text-gray-800 mb-4">Overall Score: <span className="text-green-600">{evaluationData.totalScore}</span></h2>
                     {evaluationSummary && (
                         <div className="bg-gray-100 border-l-4 border-green-500 p-4 rounded-lg mb-6 shadow-inner">
@@ -237,7 +255,7 @@ const EvaluationPage = () => {
                             const { statement, suggestion } = getPerformanceStatement(parameter, score);
                             return (
                                 <li key={parameter} className="mb-4 text-gray-700">
-                                    <strong className="text-gray-800">{parameter.replace(/_/g, ' ')}:</strong> {statement} <br />
+                                    <strong className="text-gray-800">{capitalizeWords(parameter)}:</strong> {statement} <br />
                                     <span className="italic text-gray-600">Suggestion: {suggestion}</span>
                                 </li>
                             );
@@ -252,7 +270,7 @@ const EvaluationPage = () => {
             )}
         </div>
     );
-    
+
 };
 
 export default EvaluationPage;

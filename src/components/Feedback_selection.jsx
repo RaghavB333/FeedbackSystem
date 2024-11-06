@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useAuth } from './AuthContext';
+ 
 
 const Feedback_selection = () => {
     const navigate = useNavigate();
-    const { isAdmin } = useAuth(); // Get admin status from context
 
     const [branch, setBranch] = useState('');
     const [semester, setSemester] = useState('');
@@ -17,7 +16,10 @@ const Feedback_selection = () => {
     const [Teachers, setTeachers] = useState([]);
     const [Subjects, setSubjects] = useState([]);
 
-    // Check if the user is authorized (e.g., check for admin status)
+    const [isAdmin, setIsAdmin] = useState(() => {
+        return localStorage.getItem('isAdmin') === 'true'; // Retrieve value from localStorage
+    });
+    
     useEffect(() => {
         if (!isAdmin) {
             navigate('/admin-login'); // Redirect to login page if not authorized

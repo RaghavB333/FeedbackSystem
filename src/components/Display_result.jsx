@@ -3,7 +3,7 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from './AuthContext';
+ 
 
 
 const Display_result = () => {
@@ -11,13 +11,17 @@ const Display_result = () => {
   const [feedbacks, setfeedbacks] = useState([]);
   const navigate = useNavigate();
 
-  const { isAdmin } = useAuth(); // Get admin status from context
+     // Get admin status from context
 
 
+     const [isAdmin, setIsAdmin] = useState(() => {
+      return localStorage.getItem('isAdmin') === 'true'; // Retrieve value from localStorage
+  });
+  
   useEffect(() => {
-    if (!isAdmin) {
-      navigate('/admin-login'); // Redirect to login page if not authorized
-    }
+      if (!isAdmin) {
+          navigate('/admin-login'); // Redirect to login page if not authorized
+      }
   }, [isAdmin, navigate]);
   useEffect(() => {
 

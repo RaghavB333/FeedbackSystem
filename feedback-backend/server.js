@@ -5,7 +5,12 @@ const mysql = require('mysql2/promise');
 const Sentiment = require('sentiment');
 const nodemailer = require('nodemailer');
 const session = require('express-session');
-require('dotenv').config();
+
+
+require('dotenv').config(); // Load environment variables from .env file
+const crypto = require('crypto');
+const bcrypt = require('bcrypt');
+const saltRounds = 10; // Determines the strength of the hash
 
 
 const app = express();
@@ -24,13 +29,7 @@ const dbConfig = {
 };
 
 
-function adminAuth(req, res, next) {
-    if (req.session.isAdmin) {
-        next(); // Continue to the requested route
-    } else {
-        res.status(403).json({ message: 'Access denied' });
-    }
-}
+
 
 
 // Function to get a database connection
@@ -86,7 +85,9 @@ app.post('/set-password', async (req, res) => {
 
     try {
         const db = await getDbConnection();
-        const [result] = await db.query('UPDATE students SET password = ? WHERE rollNumber = ?', [password, rollNumber]);
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+        const [result] = await db.query('UPDATE students SET password = ? WHERE rollNumber = ?', [hashedPassword, rollNumber]);
 
         if (result.affectedRows === 0) {
             return res.status(404).send('Student not found.');
@@ -98,7 +99,7 @@ app.post('/set-password', async (req, res) => {
     }
 });
 
-
+// Login Route for Students
 app.post('/login', async (req, res) => {
     const { rollNumber, password } = req.body;
 
@@ -110,15 +111,15 @@ app.post('/login', async (req, res) => {
         const db = await getDbConnection();
         const [results] = await db.query('SELECT * FROM students WHERE rollNumber = ?', [rollNumber]);
 
-        if (results.length === 0) {
-            return res.status(401).json({ error: 'Invalid roll number or password.' });
+        if (!results.length) {
+            return res.status(401).json({ error: 'Invalid roll number.' });
         }
 
         const student = results[0];
+        const match = await bcrypt.compare(password, student.password);
 
-        // Directly compare the password
-        if (student.password !== password) {
-            return res.status(401).json({ error: 'Invalid roll number or password.' });
+        if (!match) {
+            return res.status(401).json({ error: 'Invalid password.' });
         }
 
         res.json(student); // Return the student data upon successful login
@@ -177,6 +178,7 @@ app.post('/updateStudent', async (req, res) => {
 // change student password
 
 app.post('/stu-pass-change', async (req, res) => {
+
     const { rollno, newPassword } = req.body;
     const db = await getDbConnection();
     const query = `
@@ -186,9 +188,24 @@ app.post('/stu-pass-change', async (req, res) => {
 
     const [result] = await db.query(query, [newPassword, rollno]);
 
-    res.status(200).json(result);
-})
+    if (!rollno || !newPassword) {
+        return res.status(400).json({ error: 'Username and new password are required.' });
+    }
 
+    try {
+        const db = await getDbConnection();
+        const newHashedPassword = await bcrypt.hash(newPassword, saltRounds);
+
+        const [result] = await db.query(
+            'UPDATE students SET password = ? WHERE rollNumber = ?',
+            [newHashedPassword, rollno]
+        );
+        res.status(200).json(result);
+    } catch (error) {
+        console.error('Error changing student password:', error);
+        res.status(500).json({ error: 'Failed to change password.' });
+    }
+});
 
 
 app.post('/api/delete-student',async(req,res)=>{
@@ -256,16 +273,27 @@ app.post('/api/forget-stu-pass', async(req,res)=>{
 })
 
 
+
+// Admin Password Change Route
 app.post('/api/admin-pass-change', async (req, res) => {
     const { newPassword } = req.body;
-    const db = await getDbConnection();
 
-    const query = `UPDATE admin SET password = ? WHERE username = ?`;
-    const result = await db.query(query, [newPassword, "admin"]);
+    if (!newPassword) {
+        return res.status(400).json({ error: 'New password is required.' });
+    }
 
-    res.send(result);
-})
+    try {
+        const db = await getDbConnection();
+        const newHashedPassword = await bcrypt.hash(newPassword, saltRounds);
 
+        const [result] = await db.query('UPDATE admin SET password = ? WHERE username = ?', [newHashedPassword, "admin"]);
+
+        res.status(200).send('Admin password updated successfully.');
+    } catch (error) {
+        console.error('Error changing admin password:', error);
+        res.status(500).json({ error: 'Failed to change admin password.' });
+    }
+});
 
 app.post('/api/feedback-created', async (req, res) => {
     const { teacherid, subjectid } = req.body;
@@ -284,16 +312,41 @@ app.post('/api/feedback-created', async (req, res) => {
 
 })
 
+app.post('/api/verify-student', async (req, res) => {
+    const { username, password } = req.body;
+
+    try {
+        const db = await getDbConnection();
+        const [rows] = await db.query('SELECT * FROM students WHERE rollNumber = ?', [username]);
+        
+        if (!rows.length) {
+            return res.json({ success: false, message: 'Incorrect username or password' });
+        }
+
+        const student = rows[0];
+        const match = await bcrypt.compare(password, student.password);
+
+        if (match) {
+            res.json({ success: true });
+        } else {
+            res.json({ success: false, message: 'Incorrect username or password' });
+        }
+    } catch (error) {
+        console.error('Server error:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+
 app.post('/api/updateFeedback', async (req, res) => {
-    const { feedback_id, ratings, } = req.body;
+    const { feedback_id, ratings } = req.body;
+    const { token } = req.query;
 
-    console.log(feedback_id);
-
-    if (!feedback_id || !ratings) {
+    if (!feedback_id || !ratings || !token) {
         return res.status(400).json({ success: false, message: 'Missing required fields' });
     }
 
-    const query = `
+    const selectQuery = `
         SELECT avg_subject_knowledge, avg_communication_effectiveness, avg_communication_clarity,
                avg_engagement, avg_participation, avg_responsiveness_approachability, avg_responsiveness_effectiveness,
                avg_punctuality, avg_preparedness, avg_critical_thinking, total_feedback_count 
@@ -301,21 +354,17 @@ app.post('/api/updateFeedback', async (req, res) => {
         WHERE feedback_id = ?
     `;
 
-    // Define weights for each parameter
-
     try {
         const db = await getDbConnection();
 
-        // Fetch current values for the teacher
-        const [rows] = await db.query(query, [feedback_id]);
+        const [rows] = await db.query(selectQuery, [feedback_id]);
         if (rows.length === 0) {
-            return res.status(404).json({ success: false, message: 'feedback not found.' });
+            return res.status(404).json({ success: false, message: 'Feedback not found.' });
         }
 
         const currentData = rows[0];
         const newFeedbackCount = Number(currentData.total_feedback_count) + 1;
 
-        // Calculate new weighted average for each rating
         const updatedData = {
             avg_subject_knowledge: ((Number(currentData.avg_subject_knowledge) * currentData.total_feedback_count) + Number(ratings.avg_subject_knowledge || 0)) / newFeedbackCount,
             avg_communication_effectiveness: ((Number(currentData.avg_communication_effectiveness) * currentData.total_feedback_count) + Number(ratings.avg_communication_effectiveness || 0)) / newFeedbackCount,
@@ -330,39 +379,34 @@ app.post('/api/updateFeedback', async (req, res) => {
             total_feedback_count: newFeedbackCount
         };
 
-
         const updateQuery = `
-            UPDATE TeacherEvaluationSummary SET
-                avg_subject_knowledge = ?, avg_communication_effectiveness = ?, avg_communication_clarity = ?,
-                avg_engagement = ?, avg_participation = ?, avg_responsiveness_approachability = ?, avg_responsiveness_effectiveness = ?,
-                avg_punctuality = ?, avg_preparedness = ?, avg_critical_thinking = ?, total_feedback_count = ?, last_updated = NOW()
+            UPDATE TeacherEvaluationSummary 
+            SET avg_subject_knowledge = ?, avg_communication_effectiveness = ?, avg_communication_clarity = ?, 
+                avg_engagement = ?, avg_participation = ?, avg_responsiveness_approachability = ?, 
+                avg_responsiveness_effectiveness = ?, avg_punctuality = ?, avg_preparedness = ?, 
+                avg_critical_thinking = ?, total_feedback_count = ?
             WHERE feedback_id = ?
         `;
 
         await db.query(updateQuery, [
-            updatedData.avg_subject_knowledge,
-            updatedData.avg_communication_effectiveness,
-            updatedData.avg_communication_clarity,
-            updatedData.avg_engagement,
-            updatedData.avg_participation,
-            updatedData.avg_responsiveness_approachability,
-            updatedData.avg_responsiveness_effectiveness,
-            updatedData.avg_punctuality,
-            updatedData.avg_preparedness,
-            updatedData.avg_critical_thinking,
-            updatedData.total_feedback_count,
-            feedback_id
+            updatedData.avg_subject_knowledge, updatedData.avg_communication_effectiveness, updatedData.avg_communication_clarity,
+            updatedData.avg_engagement, updatedData.avg_participation, updatedData.avg_responsiveness_approachability,
+            updatedData.avg_responsiveness_effectiveness, updatedData.avg_punctuality, updatedData.avg_preparedness,
+            updatedData.avg_critical_thinking, updatedData.total_feedback_count, feedback_id
         ]);
 
-        res.json({ success: true, message: 'Feedback updated successfully', data: updatedData });
-    } catch (err) {
-        console.error('Error updating feedback:', err);
-        res.status(500).json({ success: false, message: 'Error updating feedback' });
+        await db.query('DELETE FROM feedbacktokens WHERE token = ?', [token]);
+
+        res.json({ success: true, message: "Feedback updated successfully." });
+    } catch (error) {
+        console.error("Error updating feedback:", error);
+        res.status(500).json({ success: false, message: 'Error updating feedback.' });
     }
 });
 
-// Remove sentiment import as it is no longer needed
-// const Sentiment = require('sentiment');
+
+
+
 
 
 app.get('/api/fetch-feedbacks', async (req, res) => {
@@ -379,7 +423,7 @@ INNER JOIN
 INNER JOIN 
     subjects s ON tes.subject_id = s.subject_id;
 `;
-    
+
 
     const result = await db.query(query);
 
@@ -467,12 +511,7 @@ app.post('/api/fetchFeedback', async (req, res) => {
 });
 
 
-app.use(session({
-    secret: process.env.SESSION_SECRET || 'default-secret', // Provide a fallback for testing
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false } // Set to `true` if using HTTPS
-}));
+
 
 
 
@@ -532,22 +571,45 @@ const sendEmail = async (toEmail, link) => {
 
 // Function to send feedback links to students
 const sendFeedbackLinks = async (feedbackid, students, subject, teacher) => {
-    const expiryTime = Date.now() + 60 * 60 * 1000;
+    const db = await getDbConnection();
+    const expiryTime = Date.now() + 60 * 60 * 1000; // Set expiry time for the tokens
+    const promises = []; // Array to hold promises for database insertions
+
     students.forEach((student) => {
-        const feedbackLink = `http://localhost:3000/feedbackForm?feedbackid=${encodeURIComponent(feedbackid)}&name=${encodeURIComponent(student.name)}&subject=${encodeURIComponent(subject)}&teacher=${encodeURIComponent(teacher)}&expiryTime=${expiryTime}`;
+        // Generate a token for each student
+        let token = crypto.randomBytes(32).toString('hex'); // Generates a 64-character hex string
+        const query = 'INSERT INTO feedbacktokens (token) VALUES (?)';
+
+        // Push the database query promise to the array
+        promises.push(
+            new Promise((resolve, reject) => {
+                db.query(query, [token], (error, results) => {
+                    if (error) {
+                        return reject(error); // Reject the promise on error
+                    }
+                    resolve(results); // Resolve the promise on success
+                });
+            })
+        );
+
+        // Create the feedback link
+        const feedbackLink = `http://localhost:3000/feedbackForm?feedbackid=${encodeURIComponent(feedbackid)}&name=${encodeURIComponent(student.name)}&subject=${encodeURIComponent(subject)}&teacher=${encodeURIComponent(teacher)}&expiryTime=${expiryTime}&token=${token}`;
+
         if (student.email) {
             // Send feedback link via email
-            console.log(student.email);
+            console.log(`Sending feedback link to: ${student.email}`);
             sendEmail(student.email, feedbackLink);
         }
     });
+
+    // Wait for all tokens to be inserted into the database
+    await Promise.all(promises);
 };
 
 // Endpoint to trigger sending feedback links
 app.post('/send-feedback-link', async (req, res) => {
     const db = await getDbConnection();
-
-    const { feedbackid, students, subject, teacher } = req.body;  // Expecting an array of students with email or phone and token
+    const { feedbackid, students, subject, teacher } = req.body; // Expecting an array of students with email or phone
 
     try {
         await sendFeedbackLinks(feedbackid, students, subject, teacher);
@@ -558,23 +620,29 @@ app.post('/send-feedback-link', async (req, res) => {
     }
 });
 
+
 app.post('/admin-login', async (req, res) => {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+        return res.status(400).json({ message: 'Username and password are required.' });
+    }
+
     try {
         const db = await getDbConnection();
-        const { username, password } = req.body;
+        const [result] = await db.query('SELECT * FROM admin WHERE username = ?', [username]);
 
-        const [result] = await db.query(
-            'SELECT * FROM admin WHERE username = ? AND password = ?',
-            [username, password]
-        );
-        console.log(result);
+        if (!result.length) {
+            return res.status(401).json({ message: 'Invalid username or password.' });
+        }
 
-        if (result.length > 0) {
-           
-            req.session.isAdmin = true; // Store admin status in session
-            res.status(200).json({ message: 'Login successful' });
+        const admin = result[0];
+        const match = await bcrypt.compare(password, admin.password);
+
+        if (match) {
+            res.status(200).json({ message: 'Login successful', isAdmin: true });
         } else {
-            res.status(401).json({ message: 'Invalid username or password' });
+            res.status(401).json({ message: 'Invalid username or password.' });
         }
     } catch (error) {
         console.error('Login error:', error);
@@ -583,61 +651,66 @@ app.post('/admin-login', async (req, res) => {
 });
 
 
-app.post('/admin-logout',adminAuth, (req, res) => {
-    req.session.destroy((err) => {
-        if (err) {
-            return res.status(500).json({ message: 'Logout failed' });
-        }
-        res.status(200).json({ message: 'Logout successful' });
-    });
+// Example API endpoint in Node.js/Express
+app.get('/api/checkFeedbackSubmission', async (req, res) => {
+    const db = await getDbConnection();
+    const { token } = req.query;
+
+    try {
+        const [submission] = await db.query('SELECT * FROM feedbacktokens WHERE token = ?', [token]);
+        res.json({ submitted: submission.length > 0 });
+    } catch (error) {
+        console.error("Error checking feedback submission:", error);
+        res.status(500).json({ message: "Error checking feedback submission" });
+    }
 });
 
-  app.post('/api/add-new-teacher',async(req,res)=>{
+
+
+app.post('/api/add-new-teacher', async (req, res) => {
     const db = await getDbConnection();
 
-    const {newTeacher,branch} = req.body;
+    const { newTeacher, branch } = req.body;
 
     await db.query('START TRANSACTION');
 
-// Insert into the `teachers` table with parameterized value
-const result = await db.query(
-    'INSERT INTO teachers (teacher_name) VALUES (?)',
-    [newTeacher]
-);
-
-// Retrieve the last inserted ID
-const teacherId = result[0].insertId;
-
-let data;
-
-for(let i=0;i<branch.length;i++)
-{
-    data = await db.query(
-        'INSERT INTO teacher_branch (teacher_id, branch_id) VALUES (?, ?)',
-        [teacherId, branch[i]]
+    // Insert into the `teachers` table with parameterized value
+    const result = await db.query(
+        'INSERT INTO teachers (teacher_name) VALUES (?)',
+        [newTeacher]
     );
-}
 
-// Commit the transaction
-await db.query('COMMIT');
+    // Retrieve the last inserted ID
+    const teacherId = result[0].insertId;
 
-if(data)
-    {
+    let data;
+
+    for (let i = 0; i < branch.length; i++) {
+        data = await db.query(
+            'INSERT INTO teacher_branch (teacher_id, branch_id) VALUES (?, ?)',
+            [teacherId, branch[i]]
+        );
+    }
+
+    // Commit the transaction
+    await db.query('COMMIT');
+
+    if (data) {
         res.status(200).json(data);
     }
-    
+
 
 })
 
 
-app.post('/api/add-brach-semester-subject', async(req,res)=>{
+app.post('/api/add-brach-semester-subject', async (req, res) => {
     const db = await getDbConnection();
-    const {newbranch,semester,subjectid,subject} = req.body;
+    const { newbranch, semester, subjectid, subject } = req.body;
 
 
     const subjectresult = await db.query(
         `INSERT INTO subjects (subject_id,name) VALUES (?,?)`,
-        [subjectid,subject]
+        [subjectid, subject]
     );
 
 
@@ -648,12 +721,11 @@ app.post('/api/add-brach-semester-subject', async(req,res)=>{
 
     let branchresult;
     let branchid;
-    if(data[0].length > 0)
-    {
+    if (data[0].length > 0) {
         branchid = data[0][0].branch_id;
 
     }
-    else{
+    else {
         branchresult = await db.query(
             `INSERT INTO branches (name) VALUES (?)`,
             [newbranch]
@@ -661,37 +733,35 @@ app.post('/api/add-brach-semester-subject', async(req,res)=>{
 
         branchid = branchresult[0].insertId;
     }
-    
+
     const result = await db.query(
         `INSERT INTO branch_semester_subject (branch_id, semester_id, subject_id) VALUES (?, ?, ?)`,
-        [branchid,semester,subjectid]
+        [branchid, semester, subjectid]
     )
-    
-    if(result)
-        {
-          res.status(200).json(result);
-        }
+
+    if (result) {
+        res.status(200).json(result);
+    }
 
 })
 
 
-  app.get('/api/fetch-branches', async (req, res) => {
+app.get('/api/fetch-branches', async (req, res) => {
     const db = await getDbConnection();
 
-    
+
     const result = await db.query(
         `SELECT * FROM branches`);
-      if(result)
-      {
+    if (result) {
         res.status(200).json(result);
-      }
-  });
-  
-  // fetch teachers 
-  app.post('/fetch-teacher', async (req, res) => {
+    }
+});
+
+// fetch teachers 
+app.post('/fetch-teacher', async (req, res) => {
     const db = await getDbConnection();
 
-    const { branch} = req.body; 
+    const { branch } = req.body;
 
     const result = await db.query(
         'SELECT t.teacher_id, t.teacher_name FROM teachers t INNER JOIN teacher_branch tb ON t.teacher_id = tb.teacher_id INNER JOIN branches b ON tb.branch_id = b.branch_id WHERE b.name = ?',
@@ -703,10 +773,46 @@ app.post('/api/add-brach-semester-subject', async(req,res)=>{
 });
 
 
+
+app.post('/api/fetch-all-teachers', async (req, res) => {
+    const db = await getDbConnection();
+    try {
+        const result = await db.query('SELECT teacher_id, teacher_name FROM teachers');
+        
+        // Check if the result contains data (the first part of the response)
+        if (result && result[0] && result[0].length > 0) {
+            res.status(200).json(result[0]); // Send only the teacher data (the first part of the array)
+        } else {
+            res.status(404).json({ message: 'No teachers found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching teachers', error });
+    } 
+});
+
+
+
+
+
+app.delete('/api/delete-teacher/:teacherId', async (req, res) => {
+    const db = await getDbConnection();
+
+    const { teacherId } = req.params;
+    console.log(teacherId);
+    
+    try {
+        await db.query('DELETE FROM teachers WHERE teacher_id = ?', [teacherId]);
+        res.json({ success: true });
+    } catch (err) {
+        res.json({ success: false, error: err.message });
+    }
+});
+
+
 app.post('/fetch-subjects', async (req, res) => {
     const db = await getDbConnection();
-    const { branch,semester} = req.body;
-    
+    const { branch, semester } = req.body;
+
     const result = await db.query(
         'SELECT s.subject_id, s.name FROM subjects s INNER JOIN branch_semester_subject bss ON s.subject_id = bss.subject_id INNER JOIN branches b ON bss.branch_id = b.branch_id INNER JOIN semesters sem ON bss.semester_id = sem.semester_id WHERE b.name = ? AND sem.name = ?',
         [branch, semester]);

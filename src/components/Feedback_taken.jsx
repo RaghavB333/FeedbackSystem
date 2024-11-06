@@ -1,9 +1,9 @@
 import React from 'react'
-import { useState,useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from './AuthContext';
+
 
 const Feedback_taken = ({onUpdate}) => {
     
@@ -16,8 +16,14 @@ const Feedback_taken = ({onUpdate}) => {
     const location = useLocation();
     const { branch, semester,subject,teacher,teacherid,subjectid } = location.state || {};
     const navigate = useNavigate();
-    const { isAdmin } = useAuth(); // Get admin status from context
+    // const { isAdmin } = useAuth(); // Get admin status from context
 
+    // Get admin status from context
+
+
+    const [isAdmin, setIsAdmin] = useState(() => {
+        return localStorage.getItem('isAdmin') === 'true'; // Retrieve value from localStorage
+    });
 
     useEffect(() => {
         if (!isAdmin) {
@@ -25,7 +31,6 @@ const Feedback_taken = ({onUpdate}) => {
         }
     }, [isAdmin, navigate]);
 
-    
 
     useEffect(() => {
         // Fetch students data if branch and semester are available
@@ -45,17 +50,17 @@ const Feedback_taken = ({onUpdate}) => {
     }, [branch, semester,change]);
 
 
-    const createfeedback = async(e)=>{
+    const createfeedback = async (e) => {
         e.preventDefault();
-        try{
+        try {
 
-            const response = await axios.post('http://localhost:5000/api/feedback-created', {teacherid,subjectid});
-            
+            const response = await axios.post('http://localhost:5000/api/feedback-created', { teacherid, subjectid });
+
             setfeedbackid(await response.data.insertId);
-            
 
-        }catch(error){
-            console.error("Feedback not created",error);
+
+        } catch (error) {
+            console.error("Feedback not created", error);
         }
     }
 
@@ -69,14 +74,13 @@ const Feedback_taken = ({onUpdate}) => {
               );
               alert(response.data.message);
             } catch (error) {
-              console.error("Error sending messages:", error);
-              alert("Failed to send messages.");
+                console.error("Error sending messages:", error);
+                alert("Failed to send messages.");
             }
-          };
-          if(feedbackid)
-          {
+        };
+        if (feedbackid) {
             sendMessage();
-          }
+        }
     }, [feedbackid])
     
     const deletestudent = async(rollno)=>{
@@ -121,14 +125,11 @@ const Feedback_taken = ({onUpdate}) => {
             console.error(error)
         }
     }
-  
 
-
-
-  return (
-    <div>
-        <h2 style={styles.heading}>Student List</h2>
-      {students.length > 0 ? (
+    return (
+        <div>
+            <h2 style={styles.heading}>Student List</h2>
+            {students.length > 0 ? (
                 <>
                 {isEditing ?
                     <form onSubmit={handleSubmit} className="space-y-4">
@@ -183,14 +184,12 @@ const Feedback_taken = ({onUpdate}) => {
                     <button onClick={createfeedback} style={styles.send_btn}>Take Feedback</button>
                 </div>
                 </>}
-                
-                </>
-                
+            </>
             ) : (
                 <p>No students found for the selected branch and semester.</p>
             )}
-    </div>
-  )
+        </div>
+    )
 };
 
 const styles = {
