@@ -24,7 +24,7 @@ app.use(bodyParser.json());
 const dbConfig = {
     host: 'localhost',
     user: 'root',
-    password: '@Tanpreet#07',
+    password: '3235',
     database: 'registration_db'
 };
 
