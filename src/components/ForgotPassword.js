@@ -2,7 +2,7 @@ import React from 'react'
 import { useState, useEffect} from 'react'
 import axios from 'axios';
 import { Navigate, useNavigate } from 'react-router-dom';
-const ForgetPassword = () => {
+const ForgotPassword = () => {
 
   const [rollno,setrollno] = useState('');
   const [email,setemail] = useState('');
@@ -18,7 +18,7 @@ const ForgetPassword = () => {
     e.preventDefault();
     if(rollno)
     {
-      const response = await axios.post('/api/forget-fetchstu-data',{rollno});
+      const response = await axios.post('/api/forgot-fetchstu-data',{rollno});
       if(response.data[0])
       {
         setemail(response.data[0][0].email);
@@ -35,7 +35,7 @@ const ForgetPassword = () => {
   const sendOTP = async(e)=>{
     e.preventDefault();
 
-    const response = await axios.post("http://localhost:5000/api/forget-stu-pass",{email});
+    const response = await axios.post("http://localhost:5000/api/forgot-stu-pass",{email});
     if(response.data)
     {
       alert(response.data.message);
@@ -149,7 +149,7 @@ const ForgetPassword = () => {
               Send OTP
             </button>
             <div className="text-center mt-2">
-              <h3>OTP Expires in: {formatTime(timeLeft)}</h3>
+              {timeLeft != 120 && <h3>OTP Expires in: {formatTime(timeLeft)}</h3>}
               {timeLeft === 0 && (
                 <p className="text-red-600 mt-2">OTP has expired. Please request a new one.</p>
               )}
@@ -195,4 +195,4 @@ const ForgetPassword = () => {
   )
 }
 
-export default ForgetPassword
+export default ForgotPassword

@@ -13,7 +13,7 @@ import Login from './components/login';
 import Admin_home from './components/Admin_home';
 import Display_result from './components/Display_result';
 import EvaluationPage from './components/Evaluation';
-import ForgetPassword from './components/ForgetPassword';
+import ForgotPassword from './components/ForgotPassword';
 import Management from './components/Management';
 import axios from 'axios'; // Add this line to import axios
 
@@ -89,7 +89,7 @@ function App() {
                 <Route path="/feedbacktaken" element={<Feedback_taken onUpdate={handleUpdate}/>} />
                 <Route path="/teachers-result" element={<Display_result />} />
                 <Route path="/evaluation" element={<EvaluationPage />} />
-                <Route path="/forget-password" element={<ForgetPassword />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/management" element={<Management />} />
                 <Route path="/feedbackForm" element={<FeedbackForm />} />
             </Routes>

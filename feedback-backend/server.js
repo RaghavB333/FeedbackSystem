@@ -131,7 +131,7 @@ app.post('/login', async (req, res) => {
 });
 
 
-app.post('/api/forget-fetchstu-data', async(req,res)=>{
+app.post('/api/forgot-fetchstu-data', async(req,res)=>{
     const db = await getDbConnection();
 
     const {rollno} = req.body;
@@ -247,7 +247,7 @@ const sendOTPCode = async(email,otp)=>{
 
 }
 
-app.post('/api/forget-stu-pass', async(req,res)=>{
+app.post('/api/forgot-stu-pass', async(req,res)=>{
 
     const db = await getDbConnection();
 
