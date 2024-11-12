@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { BookOpen, GraduationCap, Users, School } from 'lucide-react';
  
 
 const Feedback_selection = () => {
@@ -77,110 +78,138 @@ const Feedback_selection = () => {
         }
     }, [subject, Subjects]);
 
+    if (!isAdmin) {
+        return (
+          <div className="min-h-screen flex items-center justify-center bg-red-50">
+            <div className="bg-white p-8 rounded-lg shadow-lg">
+              <div className="text-red-500 text-xl font-semibold text-center">
+                You are not authorized to access this page.
+              </div>
+            </div>
+          </div>
+        );
+      }
+
     return (
-        <div style={styles.container}>
-            {isAdmin ? (
-                <>
-            <h2>Feedback Selection for branch</h2>
-            <form onSubmit={handleSubmit} style={styles.form}>
-                {/* Branch Selection */}
-                <label style={styles.label}>Select Branch:</label>
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-2xl mx-auto">
+        <div className="bg-white rounded-xl shadow-lg p-8">
+          <div className="text-center mb-8">
+            <div className="bg-blue-500 w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-4">
+              <GraduationCap className="w-8 h-8 text-white" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-800">Feedback Selection</h2>
+            <p className="text-gray-600 mt-2">Select the details for feedback collection</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Branch Selection */}
+            <div className="space-y-2">
+              <label className="flex items-center text-sm font-medium text-gray-700">
+                <School className="w-4 h-4 mr-2 text-blue-500" />
+                Select Branch
+              </label>
+              <div className="relative">
                 <select
-                    value={branch}
-                    onChange={(e) => setBranch(e.target.value)}
-                    style={styles.select}
+                  value={branch}
+                  onChange={(e) => setBranch(e.target.value)}
+                  className="block w-full pl-3 pr-10 py-3 text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-lg transition-colors"
                 >
-                    <option value="" disabled>Select Branch</option>
-                    {branches.map((branch)=>(
-                      <option key={branch.branch_id} value={branch.name}>{branch.name}</option>
-                    ))}
+                  <option value="" disabled>Select Branch</option>
+                  {branches.map((branch) => (
+                    <option key={branch.branch_id} value={branch.name}>
+                      {branch.name}
+                    </option>
+                  ))}
                 </select>
-                <label style={styles.label}>Select Semester:</label>
-                        <select value={semester} onChange={(e) => setSemester(e.target.value)} style={styles.select}>
-                            <option value="" disabled>Select Semester</option>
-                            {branch !== "BCA" ? (
-                                <>
-                                    <option value="1">1st Semester</option>
-                                    <option value="2">2nd Semester</option>
-                                    <option value="3">3rd Semester</option>
-                                    <option value="4">4th Semester</option>
-                                    <option value="5">5th Semester</option>
-                                    <option value="6">6th Semester</option>
-                                    <option value="7">7th Semester</option>
-                                    <option value="8">8th Semester</option>
-                                </>
-                            ) : (
-                                <>
-                                    <option value="1">1st Semester</option>
-                                    <option value="2">2nd Semester</option>
-                                    <option value="3">3rd Semester</option>
-                                    <option value="4">4th Semester</option>
-                                    <option value="5">5th Semester</option>
-                                    <option value="6">6th Semester</option>
-                                </>
-                            )}
-                        </select>
-                        <label style={styles.label}>Select Subject:</label>
-                        <select value={subject} onChange={(e) => setSubject(e.target.value)} style={styles.select}>
-                            <option value="" disabled>Select Subject</option>
-                            {Subjects.map((subject) => (
-                                <option key={subject.subject_id} value={subject.name}>{subject.name}</option>
-                            ))}
-                        </select>
+              </div>
+            </div>
 
-                        <label style={styles.label}>Select Teacher:</label>
-                        <select value={teacher} onChange={(e) => setTeacher(e.target.value)} style={styles.select}>
-                            <option value="" disabled>Select Teacher</option>
-                            {Teachers.map((teacher) => (
-                                <option key={teacher.teacher_id} value={teacher.teacher_name}>{teacher.teacher_name}</option>
-                            ))}
-                        </select>
+            {/* Semester Selection */}
+            <div className="space-y-2">
+              <label className="flex items-center text-sm font-medium text-gray-700">
+                <BookOpen className="w-4 h-4 mr-2 text-blue-500" />
+                Select Semester
+              </label>
+              <div className="relative">
+                <select
+                  value={semester}
+                  onChange={(e) => setSemester(e.target.value)}
+                  className="block w-full pl-3 pr-10 py-3 text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-lg transition-colors"
+                >
+                  <option value="" disabled>Select Semester</option>
+                  {branch !== "BCA" ? (
+                    Array.from({ length: 8 }, (_, i) => (
+                      <option key={i + 1} value={i + 1}>
+                        {i + 1}{['st', 'nd', 'rd'][i] || 'th'} Semester
+                      </option>
+                    ))
+                  ) : (
+                    Array.from({ length: 6 }, (_, i) => (
+                      <option key={i + 1} value={i + 1}>
+                        {i + 1}{['st', 'nd', 'rd'][i] || 'th'} Semester
+                      </option>
+                    ))
+                  )}
+                </select>
+              </div>
+            </div>
 
-                        <button type="submit" style={styles.button}>Submit</button>
-                    </form>
-                </>
-            ) : (
-                <div>You are not authorized to access this page.</div>
-            )}
+            {/* Subject Selection */}
+            <div className="space-y-2">
+              <label className="flex items-center text-sm font-medium text-gray-700">
+                <BookOpen className="w-4 h-4 mr-2 text-blue-500" />
+                Select Subject
+              </label>
+              <div className="relative">
+                <select
+                  value={subject}
+                  onChange={(e) => setSubject(e.target.value)}
+                  className="block w-full pl-3 pr-10 py-3 text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-lg transition-colors"
+                >
+                  <option value="" disabled>Select Subject</option>
+                  {Subjects.map((subject) => (
+                    <option key={subject.subject_id} value={subject.name}>
+                      {subject.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Teacher Selection */}
+            <div className="space-y-2">
+              <label className="flex items-center text-sm font-medium text-gray-700">
+                <Users className="w-4 h-4 mr-2 text-blue-500" />
+                Select Teacher
+              </label>
+              <div className="relative">
+                <select
+                  value={teacher}
+                  onChange={(e) => setTeacher(e.target.value)}
+                  className="block w-full pl-3 pr-10 py-3 text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-lg transition-colors"
+                >
+                  <option value="" disabled>Select Teacher</option>
+                  {Teachers.map((teacher) => (
+                    <option key={teacher.teacher_id} value={teacher.teacher_name}>
+                      {teacher.teacher_name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors flex items-center justify-center space-x-2"
+            >
+              <span>Submit Feedback Selection</span>
+            </button>
+          </form>
         </div>
+      </div>
+    </div>
 )};
-
-
-const styles = {
-    container: {
-        maxWidth: '500px',
-        margin: '0 auto',
-        padding: '20px',
-        border: '1px solid #ddd',
-        borderRadius: '8px',
-        boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
-        fontFamily: 'Arial, sans-serif',
-        marginTop: '80px'
-    },
-    form: {
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '15px'
-    },
-    label: {
-        fontSize: '16px',
-        fontWeight: 'bold'
-    },
-    select: {
-        padding: '10px',
-        fontSize: '16px',
-        borderRadius: '4px',
-        border: '1px solid #ccc',
-    },
-    button: {
-        padding: '10px',
-        fontSize: '16px',
-        borderRadius: '4px',
-        border: 'none',
-        backgroundColor: '#007bff',
-        color: '#fff',
-        cursor: 'pointer',
-    }
-};
 
 export default Feedback_selection;

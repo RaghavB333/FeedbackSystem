@@ -33,8 +33,8 @@ const Login = ({ onLogin }) => {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen">
-            <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full border border-red-500">
+        <div className="flex items-center justify-center min-h-screen bg-gray-50">
+            <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
                 <img src="https://ptu.ac.in/wp-content/themes/cynic/images/classic-logo.png" alt="" width={100} height={100} className='mx-auto' />
                 <h2 className="text-2xl text-blue-800">Hello,</h2>
                 <h2 className="text-2xl font-bold text-blue-800 mb-6">Welcome Back!</h2>

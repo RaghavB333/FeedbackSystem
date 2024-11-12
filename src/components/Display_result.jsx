@@ -3,6 +3,7 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { Calendar, User, Book, ChevronRight, Star } from 'lucide-react';
  
 
 
@@ -42,44 +43,135 @@ const Display_result = () => {
   }, [feedbacks])
 
 
-  return (
-    <div>
-      <h2 style={styles.h2}>Result List</h2>
-      {feedbacks.map((feedback) => (
-        <div key={feedback.feedback_id} style={styles.teacherCard} onClick={() => navigate('/evaluation', { state: { feedback_id: feedback.feedback_id, teacherid: feedback.teacher_id, teacher_name: feedback.teacher_name, subject: feedback.name } })}>
-          <h2 style={styles.header}>Teacher ID: {feedback.teacher_id}</h2>
-          <h2 style={styles.header}>Teacher Name: {feedback.teacher_name}</h2>
-          <h3 style={styles.subheader}>Subject Name: {feedback.name}</h3>
-          <h3 style={styles.subheader}>Date: {feedback.last_updated}</h3>
-          <table style={styles.table}>
-            <tr>
-              <th style={styles.th}>Avg_subject_knowledge</th>
-              <th style={styles.th}>Avg_communication_effectiveness</th>
-              <th style={styles.th}>Avg_communication_clarity</th>
-              <th style={styles.th}>Avg_engagement</th>
-              <th style={styles.th}>Avg_participation</th>
-              <th style={styles.th}>Avg_responsiveness_approachability</th>
-              <th style={styles.th}>Avg_responsiveness_effectiveness</th>
-              <th style={styles.th}>Avg_punctuality</th>
-              <th style={styles.th}>Avg_preparedness</th>
-              <th style={styles.th}>Avg_critical_thinking</th>
-            </tr>
-            <tr>
-              <td style={styles.td}>{feedback.avg_subject_knowledge}</td>
-              <td style={styles.td}>{feedback.avg_communication_effectiveness}</td>
-              <td style={styles.td}>{feedback.avg_communication_clarity}</td>
-              <td style={styles.td}>{feedback.avg_engagement}</td>
-              <td style={styles.td}>{feedback.avg_participation}</td>
-              <td style={styles.td}>{feedback.avg_responsiveness_approachability}</td>
-              <td style={styles.td}>{feedback.avg_responsiveness_effectiveness}</td>
-              <td style={styles.td}>{feedback.avg_punctuality}</td>
-              <td style={styles.td}>{feedback.avg_preparedness}</td>
-              <td style={styles.td}>{feedback.avg_critical_thinking}</td>
-            </tr>
-          </table>
-        </div>
+  const formatDate = (dateString) => {
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return dateString;
 
-      ))}
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const month = months[date.getMonth()];
+      const day = date.getDate().toString().padStart(2, '0');
+      const year = date.getFullYear();
+      const hours = date.getHours();
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      const formattedHours = ((hours % 12) || 12).toString().padStart(2, '0');
+
+      return `${month} ${day}, ${year} • ${formattedHours}:${minutes} ${ampm}`;
+    } catch {
+      return dateString;
+    }
+  };
+
+  const getScoreColor = (score) => {
+    if (score >= 4) return 'text-green-600 bg-green-50';
+    if (score >= 3) return 'text-yellow-600 bg-yellow-50';
+    return 'text-red-600 bg-red-50';
+  };
+
+
+  // const getStarRating = (feedback_id) => {
+
+  //   let totalreating = 0;
+  //   for(let i=3;i<feedbacks.length;i++)
+  //   {
+  //     totalreating +=
+  //   }
+  //   const fullStars = Math.floor(score);
+  //   const hasHalfStar = score - fullStars >= 0.5;
+  //   const stars = [];
+
+  //   for (let i = 0; i < fullStars; i++) {
+  //     stars.push(<Star key={i} className="w-5 h-5 text-yellow-500" />);
+  //   }
+
+  //   if (hasHalfStar) {
+  //     stars.push(<Star key={fullStars} className="w-5 h-5 text-yellow-500 fill-half" />);
+  //   }
+
+  //   return stars;
+  // };
+
+  const metrics = [
+    { key: 'avg_subject_knowledge', label: 'Subject Knowledge' },
+    { key: 'avg_communication_effectiveness', label: 'Communication Effectiveness' },
+    { key: 'avg_communication_clarity', label: 'Communication Clarity' },
+    { key: 'avg_engagement', label: 'Engagement' },
+    { key: 'avg_participation', label: 'Participation' },
+    { key: 'avg_responsiveness_approachability', label: 'Approachability' },
+    { key: 'avg_responsiveness_effectiveness', label: 'Responsiveness' },
+    { key: 'avg_punctuality', label: 'Punctuality' },
+    { key: 'avg_preparedness', label: 'Preparedness' },
+    { key: 'avg_critical_thinking', label: 'Critical Thinking' }
+  ];
+
+
+  return (
+    <div className="p-6 bg-gray-50 min-h-screen">
+      <div className="max-w-7xl mx-auto">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Feedback Results</h2>
+        <div className="space-y-6">
+          {feedbacks.map((feedback) => (
+            <div
+              key={feedback.feedback_id}
+              className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer overflow-hidden"
+              onClick={() => navigate('/evaluation', {
+                state: {
+                  feedback_id: feedback.feedback_id,
+                  teacherid: feedback.teacher_id,
+                  teacher_name: feedback.teacher_name,
+                  subject: feedback.name
+                }
+              })}
+            >
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center space-x-4">
+                    <div className="bg-blue-100 p-2 rounded-lg">
+                      <User className="w-6 h-6 text-blue-600" />
+                    </div>
+                    <div>
+                      <div className="flex items-center space-x-2">
+                        <h3 className="text-lg font-semibold text-gray-900">
+                          {feedback.teacher_name}
+                        </h3>
+                        {/* {getStarRating(feedback.feedback_id)} */}
+                      </div>
+                      <p className="text-sm text-gray-500">ID: {feedback.teacher_id}</p>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-gray-400" />
+                </div>
+
+                <div className="flex items-center space-x-4 mb-6">
+                  <div className="flex items-center text-gray-500 font-bold">
+                    <Book className="w-4 h-4 mr-2" />
+                    {feedback.name}
+                  </div>
+                  <div className="flex items-center text-gray-500">
+                    <Calendar className="w-4 h-4 mr-2" />
+                    {formatDate(feedback.last_updated)}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                  {metrics.map(({ key, label }) => (
+                    <div
+                      key={key}
+                      className="p-3 rounded-lg"
+                    >
+                      <div className="text-sm text-gray-500 mb-1">{label}</div>
+                      <div className={`text-lg font-semibold rounded-md px-2 py-1 inline-block ${getScoreColor(feedback[key])}`}>
+                        {Number(feedback[key]).toFixed(1)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
