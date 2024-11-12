@@ -108,90 +108,189 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-  <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-    {!showforgetfield ? (
-      <form>
-        <p className="text-center mt-4 text-lg font-semibold">Enter Your Roll Number:</p>
-        <input
-          type="text"
-          placeholder="Enter Your Roll No."
-          value={rollno}
-          onChange={(e) => setrollno(e.target.value)}
-          className="block w-full border border-gray-300 rounded-md px-4 py-2 mt-4 text-center focus:outline-none focus:border-blue-500"
-        />
-        <button
-          onClick={fetchstudata}
-          className="w-full bg-blue-600 text-white font-semibold p-2 rounded-md mt-4 hover:bg-blue-700 transition duration-200"
-        >
-          Submit
-        </button>
-      </form>
-    ) : (
-      <div>
-        {!verified ? (
+//     <div className="flex justify-center items-center min-h-screen bg-gray-100">
+//   <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+//     {!showforgetfield ? (
+//       <form>
+//         <p className="text-center mt-4 text-lg font-semibold">Enter Your Roll Number:</p>
+//         <input
+//           type="text"
+//           placeholder="Enter Your Roll No."
+//           value={rollno}
+//           onChange={(e) => setrollno(e.target.value)}
+//           className="block w-full border border-gray-300 rounded-md px-4 py-2 mt-4 text-center focus:outline-none focus:border-blue-500"
+//         />
+//         <button
+//           onClick={fetchstudata}
+//           className="w-full bg-blue-600 text-white font-semibold p-2 rounded-md mt-4 hover:bg-blue-700 transition duration-200"
+//         >
+//           Submit
+//         </button>
+//       </form>
+//     ) : (
+//       <div>
+//         {!verified ? (
+//           <form>
+//             <p className="text-center mt-4 text-lg font-semibold">{`OTP is sent to this email: ${email}`}</p>
+//             <input
+//               type="text"
+//               placeholder="Enter OTP Code"
+//               value={otp}
+//               onChange={(e) => setotp(e.target.value)}
+//               className="block w-full border border-gray-300 rounded-md px-4 py-2 mt-4 text-center focus:outline-none focus:border-blue-500"
+//             />
+//             <button
+//               disabled={timeLeft !== 120}
+//               onClick={sendOTP}
+//               className={`w-full bg-blue-600 text-white font-semibold p-2 rounded-md mt-4 hover:bg-blue-700 transition duration-200 ${
+//                 timeLeft !== 120 ? "opacity-50 cursor-not-allowed" : ""
+//               }`}
+//             >
+//               Send OTP
+//             </button>
+//             <div className="text-center mt-2">
+//               {timeLeft != 120 && <h3>OTP Expires in: {formatTime(timeLeft)}</h3>}
+//               {timeLeft === 0 && (
+//                 <p className="text-red-600 mt-2">OTP has expired. Please request a new one.</p>
+//               )}
+//             </div>
+//             <button
+//               onClick={veritystudent}
+//               className="w-full bg-blue-600 text-white font-semibold p-2 rounded-md mt-4 hover:bg-blue-700 transition duration-200"
+//             >
+//               Verify
+//             </button>
+//           </form>
+//         ) : (
+//           <div>
+//             <h2 className="text-center text-lg font-semibold mt-4">Set New Password</h2>
+//             <form>
+//               <input
+//                 type="password"
+//                 placeholder="New Password"
+//                 value={newPassword}
+//                 onChange={(e) => setNewPassword(e.target.value)}
+//                 className="block w-full border border-gray-300 rounded-md px-4 py-2 mt-4 text-center focus:outline-none focus:border-blue-500"
+//               />
+//               <input
+//                 type="password"
+//                 placeholder="Confirm Password"
+//                 value={confirmPassword}
+//                 onChange={(e) => setConfirmPassword(e.target.value)}
+//                 className="block w-full border border-gray-300 rounded-md px-4 py-2 mt-4 text-center focus:outline-none focus:border-blue-500"
+//               />
+//               <button
+//                 onClick={handleChangePassword}
+//                 className="w-full mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+//               >
+//                 Submit
+//               </button>
+//             </form>
+//           </div>
+//         )}
+//       </div>
+//     )}
+//   </div>
+// </div>
+
+
+<div className="flex justify-center items-center min-h-screen">
+<div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md border border-red-500">
+  <p className="text-center text-lg font-semibold text-gray-700">
+    Forgot your password? Don&apos;t worry, we&apos;ve got you covered!
+  </p>
+  <p className="text-center text-sm text-gray-500 mt-2">
+    Please follow the instructions carefully to reset your password. <br />
+    <span className="text-red-600 font-medium">Note:</span> Do not refresh the page during this process.
+  </p>
+
+  {!showforgetfield ? (
+    <form>
+      <p className="text-center mt-6 text-xl font-semibold text-gray-800">Enter Your Roll Number:</p>
+      <input
+        type="text"
+        placeholder="Enter Your Roll No."
+        value={rollno}
+        onChange={(e) => setrollno(e.target.value)}
+        className="block w-full border border-gray-300 rounded-md px-4 py-2 mt-4 text-center focus:outline-none focus:border-blue-500 transition duration-200 hover:border-blue-400"
+      />
+      <button
+        onClick={fetchstudata}
+        className="w-full bg-blue-600 text-white font-semibold p-2 rounded-md mt-6 hover:bg-blue-700 transition duration-200"
+      >
+        Reset Password
+      </button>
+    </form>
+  ) : (
+    <div>
+      {!verified ? (
+        <form>
+          <p className="text-center mt-4 text-lg font-semibold text-gray-800">{`OTP is sent to this email: ${email}`}</p>
+          <input
+            type="text"
+            placeholder="Enter OTP Code"
+            value={otp}
+            onChange={(e) => setotp(e.target.value)}
+            className="block w-full border border-gray-300 rounded-md px-4 py-2 mt-4 text-center focus:outline-none focus:border-blue-500 transition duration-200 hover:border-blue-400"
+          />
+          <button
+            disabled={timeLeft !== 120}
+            onClick={sendOTP}
+            className={`w-full bg-blue-600 text-white font-semibold p-2 rounded-md mt-4 hover:bg-blue-700 transition duration-200 ${
+              timeLeft !== 120 ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          >
+            Send OTP
+          </button>
+          <div className="text-center mt-2">
+            {timeLeft !== 120 && <h3>OTP Expires in: {formatTime(timeLeft)}</h3>}
+            {timeLeft === 0 && (
+              <p className="text-red-600 mt-2">OTP has expired. Please request a new one.</p>
+            )}
+          </div>
+          <button
+            disabled={!otp}
+            onClick={veritystudent}
+            className="w-full bg-blue-600 text-white font-semibold p-2 rounded-md mt-6 hover:bg-blue-700 transition duration-200"
+          >
+            Verify
+          </button>
+        </form>
+      ) : (
+        <div>
+          <h2 className="text-center text-xl font-semibold mt-4 text-gray-800">Set New Password</h2>
           <form>
-            <p className="text-center mt-4 text-lg font-semibold">{`OTP is sent to this email: ${email}`}</p>
             <input
-              type="text"
-              placeholder="Enter OTP Code"
-              value={otp}
-              onChange={(e) => setotp(e.target.value)}
-              className="block w-full border border-gray-300 rounded-md px-4 py-2 mt-4 text-center focus:outline-none focus:border-blue-500"
+              type="password"
+              placeholder="New Password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              className="block w-full border border-gray-300 rounded-md px-4 py-2 mt-4 text-center focus:outline-none focus:border-blue-500 transition duration-200 hover:border-blue-400"
+            />
+            <input
+              type="password"
+              placeholder="Confirm Password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="block w-full border border-gray-300 rounded-md px-4 py-2 mt-4 text-center focus:outline-none focus:border-blue-500 transition duration-200 hover:border-blue-400"
             />
             <button
-              disabled={timeLeft !== 120}
-              onClick={sendOTP}
-              className={`w-full bg-blue-600 text-white font-semibold p-2 rounded-md mt-4 hover:bg-blue-700 transition duration-200 ${
-                timeLeft !== 120 ? "opacity-50 cursor-not-allowed" : ""
-              }`}
+              onClick={handleChangePassword}
+              className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200"
             >
-              Send OTP
-            </button>
-            <div className="text-center mt-2">
-              {timeLeft != 120 && <h3>OTP Expires in: {formatTime(timeLeft)}</h3>}
-              {timeLeft === 0 && (
-                <p className="text-red-600 mt-2">OTP has expired. Please request a new one.</p>
-              )}
-            </div>
-            <button
-              onClick={veritystudent}
-              className="w-full bg-blue-600 text-white font-semibold p-2 rounded-md mt-4 hover:bg-blue-700 transition duration-200"
-            >
-              Verify
+              Reset Password
             </button>
           </form>
-        ) : (
-          <div>
-            <h2 className="text-center text-lg font-semibold mt-4">Set New Password</h2>
-            <form>
-              <input
-                type="password"
-                placeholder="New Password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="block w-full border border-gray-300 rounded-md px-4 py-2 mt-4 text-center focus:outline-none focus:border-blue-500"
-              />
-              <input
-                type="password"
-                placeholder="Confirm Password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="block w-full border border-gray-300 rounded-md px-4 py-2 mt-4 text-center focus:outline-none focus:border-blue-500"
-              />
-              <button
-                onClick={handleChangePassword}
-                className="w-full mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-              >
-                Submit
-              </button>
-            </form>
-          </div>
-        )}
-      </div>
-    )}
-  </div>
+        </div>
+      )}
+    </div>
+  )}
+  <p className="text-center text-sm text-gray-500 mt-6">
+    Please do not refresh the page while the process is ongoing to ensure a smooth experience.
+  </p>
 </div>
+</div>
+
   )
 }
 

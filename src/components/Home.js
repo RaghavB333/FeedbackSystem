@@ -28,19 +28,18 @@ const Home = () => {
       className="absolute inset-0 w-full h-full object-cover"
     />
 
-    <div className="relative z-10 max-w-4xl mx-auto px-4 text-center mt-16">
-      {/* Background overlay for better text visibility */}
-      <div className="bg-black bg-opacity-50 p-8 rounded-lg">
-        <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-          IKGPTU Feedback System
-        </h1>
-        <p className="text-xl md:text-2xl text-gray-200 mb-8">
-          Your voice shapes the future of education
-        </p>
-      </div>
-    </div>
-  </div>
-</header>
+        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center mt-16">
+          {/* Background overlay for better text visibility */}
+          <div className="bg-black bg-opacity-50 p-8 rounded-lg">
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
+              IKGPTU Feedback System
+            </h1>
+            <p className="text-xl md:text-2xl text-gray-200 mb-8">
+              Your voice shapes the future of education
+            </p>
+          </div>
+        </div>
+      </header>
 
       <div className="bg-black text-white py-16">
         <main className="container mx-auto px-4">
