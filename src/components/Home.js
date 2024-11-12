@@ -2,30 +2,45 @@ import React from 'react';
 
 const Home = () => {
   return (
+
     <div className="min-h-screen bg-gray-50">
-      <header className="relative h-[70vh] flex items-center justify-center">
-        {/* Dark overlay for better text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 to-black/50" />
 
-        {/* Placeholder image for university campus */}
-        <img
-          src="https://www.pturesults.in/resources/images/slider/ptu-campus-main-1.jpg"
-          alt="University Campus"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
+<header className="relative">
+  {/* White Section at the Top */}
+  <div className="w-full h-[15vh] bg-white flex items-center justify-center">
+    <h2 className="text-lg md:text-xl font-medium text-gray-800">
+      <img src="https://ptu.ac.in/wp-content/themes/cynic/images/classic-logo.png" alt="" width={75} height={75} className='absolute left-[80px] top-4' />
+    </h2>
+    <div className='absolute left-[35.5vw] top-4'>ਆਈ. ਕੇ. ਗੁਜਰਾਲ ਪੰਜਾਬ ਟੈਕਨੀਕਲ ਯੂਨੀਵਰਸਿਟੀ, ਜਲੰਧਰ</div>
+    <div className='absolute left-[35.5vw] top-10 text-red-600 text-lg'>I.K. GUJRAL PUNJAB TECHNICAL UNIVERSITY, JALANDHAR</div>
+    <div className='absolute left-[35.5vw] top-[70px] text-blue-900 font-bold text-sm'>(A State University Established by Govt. of Punjab vide Punjab Act No. 1 of 1997)</div>
+  </div>
 
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center mt-16">
-          {/* Background overlay for better text visibility */}
-          <div className="bg-black bg-opacity-50 p-8 rounded-lg">
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-              IKGPTU Feedback System
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-200 mb-8">
-              Your voice shapes the future of education
-            </p>
-          </div>
-        </div>
-      </header>
+  {/* Main Header Section */}
+  <div className="relative h-[70vh] flex items-center justify-center">
+    {/* Dark overlay for better text readability */}
+    <div className="absolute inset-0 bg-gradient-to-b from-black/70 to-black/50" />
+
+    {/* Placeholder image for university campus */}
+    <img
+      src="https://www.pturesults.in/resources/images/slider/ptu-campus-main-1.jpg"
+      alt="University Campus"
+      className="absolute inset-0 w-full h-full object-cover"
+    />
+
+    <div className="relative z-10 max-w-4xl mx-auto px-4 text-center mt-16">
+      {/* Background overlay for better text visibility */}
+      <div className="bg-black bg-opacity-50 p-8 rounded-lg">
+        <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
+          IKGPTU Feedback System
+        </h1>
+        <p className="text-xl md:text-2xl text-gray-200 mb-8">
+          Your voice shapes the future of education
+        </p>
+      </div>
+    </div>
+  </div>
+</header>
 
       <div className="bg-black text-white py-16">
         <main className="container mx-auto px-4">
@@ -47,7 +62,7 @@ const Home = () => {
               Join thousands of students who are already making a difference through their valuable feedback.
             </p>
           </div>
-            
+
 
           <div className="grid md:grid-cols-3 gap-8 relative top-10">
             <div className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
@@ -60,7 +75,7 @@ const Home = () => {
               <p className="text-gray-600 mb-6">
                 Create your account in minutes and join our community of engaged students.
               </p>
-              <a 
+              <a
                 href="/registration"
                 className="block w-full border-2 border-gray-200 hover:border-blue-600 text-gray-700 hover:text-blue-600 font-semibold py-2 px-4 rounded-lg transition-colors duration-300 text-center"
               >
@@ -78,7 +93,7 @@ const Home = () => {
               <p className="text-gray-600 mb-6">
                 Access your personalized dashboard to manage and submit your data.
               </p>
-              <a 
+              <a
                 href="/dashboard"
                 className="block w-full border-2 border-gray-200 hover:border-green-600 text-gray-700 hover:text-green-600 font-semibold py-2 px-4 rounded-lg transition-colors duration-300 text-center"
               >
@@ -96,7 +111,7 @@ const Home = () => {
               <p className="text-gray-600 mb-6">
                 Secure administrative area for managing feedback and generating insights.
               </p>
-              <a 
+              <a
                 href="/admin-login"
                 className="block w-full border-2 border-gray-200 hover:border-purple-600 text-gray-700 hover:text-purple-600 font-semibold py-2 px-4 rounded-lg transition-colors duration-300 text-center"
               >
