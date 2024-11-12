@@ -14,14 +14,12 @@ const Login = ({ onLogin }) => {
         try {
             const response = await axios.post('http://localhost:5000/login', { rollNumber, password });
             const studentData = response.data;
-            onLogin(studentData);
 
-            // Determine the target page based on referrer and navigate with replace
-            // const targetPath = referrer === 'feedbackForm' ? '/feedbackForm' : '/dashboard';
+            // Pass the student data and roll number to the parent through onLogin
+            onLogin({ ...studentData, rollNumber });
+
+            // Navigate to the dashboard
             navigate('/dashboard', { replace: true });
-
-            // Clear the referrer to prevent accidental redirection loops
-            // clearReferrer();
         } catch (error) {
             console.error('Login error:', error);
             setMessage(error.response?.data?.error || 'Login failed. Please try again.');
@@ -29,8 +27,9 @@ const Login = ({ onLogin }) => {
     };
 
     const togglePasswordVisibility = () => {
-        setShowPassword((prevShowPassword) => !prevShowPassword);
+        setShowPassword((prev) => !prev);
     };
+
 
     return (
         <div className="flex items-center justify-center min-h-screen">

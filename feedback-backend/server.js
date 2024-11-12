@@ -64,7 +64,7 @@ app.post('/register', async (req, res) => {
 
         // Insert new student record without password
         const sql = `
-            INSERT INTO students (name, fname, rollNumber, contact, email, address, department, semester)
+            INSERT INTO students (name, fname, rollNumber, contact, email, address, branch, semester)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `;
         await db.query(sql, [name, fname, rollNumber, contact, email, address, department, semester]);
@@ -148,7 +148,7 @@ app.post('/api/forgot-fetchstu-data', async(req,res)=>{
 })
 
 app.post('/updateStudent', async (req, res) => {
-    const { rollNumber, name, fname, contact, email, address, department, semester } = req.body;
+    const { rollNumber, name, fname, contact, email, address, branch, semester } = req.body;
 
 
     if (!rollNumber) {
@@ -160,10 +160,10 @@ app.post('/updateStudent', async (req, res) => {
         const sql = `
             UPDATE students SET 
                 name = ?, fname = ?, contact = ?, email = ?, 
-                address = ?, department = ?, semester = ? 
+                address = ?, branch = ?, semester = ? 
             WHERE rollNumber = ?
         `;
-        const [result] = await db.query(sql, [name, fname, contact, email, address, department, semester, rollNumber]);
+        const [result] = await db.query(sql, [name, fname, contact, email, address, branch, semester, rollNumber]);
 
         if (result.affectedRows === 0) {
             return res.status(404).send('Student not found.');
@@ -529,7 +529,7 @@ app.get('/api/students', async (req, res) => {
     try {
         // Execute the query and log the result
         const result = await db.query(
-            'SELECT * FROM students WHERE department = ? AND semester = ?',
+            'SELECT * FROM students WHERE branch = ? AND semester = ?',
             [branch, semester[0]]
         );
 
@@ -755,6 +755,30 @@ app.get('/api/fetch-branches', async (req, res) => {
         `SELECT * FROM branches`);
     if (result) {
         res.status(200).json(result);
+    }
+});
+
+
+app.get('/api/fetch-student-branches', async (req, res) => {
+    const { rollNumber } = req.query; // Fetch roll number from query parameters
+    if (!rollNumber) {
+        return res.status(400).json({ error: 'Roll number is required' });
+    }
+
+    try {
+        const db = await getDbConnection();
+        const [result] = await db.query(
+            `SELECT branch FROM students WHERE rollNumber = ?`, [rollNumber]
+        );
+
+        if (result.length > 0) {
+            res.status(200).json(result);
+        } else {
+            res.status(404).json({ error: 'No branches found for this roll number' });
+        }
+    } catch (error) {
+        console.error('Error fetching branches:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 

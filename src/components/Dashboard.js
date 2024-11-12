@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Modal from 'react-modal';
 import axios from 'axios';
@@ -12,7 +12,38 @@ const Dashboard = ({ studentData, onLogout, onUpdate }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [branches, setBranches] = useState([]);
+  const [stuBranch, setStuBranch] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchStuBranch = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/fetch-student-branches");
+        setStuBranch(response.data[0]);
+      } catch (error) {
+        console.error("Error fetching branches:", error);
+      }
+    };
+
+    fetchStuBranch();
+  }, []);
+
+  // Fetch branches on component mount
+  useEffect(() => {
+    const fetchBranches = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/fetch-branches");
+        // console.log(response.data); // Check the response data
+        setBranches(response.data[0]);
+      } catch (error) {
+        console.error("Error fetching branches:", error);
+      }
+    };
+
+    fetchBranches();
+  }, []);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -37,10 +68,13 @@ const Dashboard = ({ studentData, onLogout, onUpdate }) => {
 
   const handleChangePassword = async () => {
     if (newPassword === confirmPassword) {
-      let rollno = studentData.rollNumber;
-      const response = await axios.post('http://localhost:5000/stu-pass-change', { rollno, newPassword });
-      console.log(response.data);
-      setIsModalOpen(false);
+      const rollno = studentData.rollNumber;
+      try {
+        const response = await axios.post('http://localhost:5000/stu-pass-change', { rollno, newPassword });
+        setIsModalOpen(false);
+      } catch (error) {
+        console.error('Error updating password:', error);
+      }
     } else {
       alert('New password and confirm password do not match!');
     }
@@ -50,6 +84,13 @@ const Dashboard = ({ studentData, onLogout, onUpdate }) => {
     setIsModalOpen(false);
     setNewPassword('');
     setConfirmPassword('');
+  }
+  // Branch and Semester Options
+  const branchOptions = {
+    BCA: Array.from({ length: 6 }, (_, i) => `${i + 1}`),
+    CSE: Array.from({ length: 8 }, (_, i) => `${i + 1}`),
+    ME: Array.from({ length: 8 }, (_, i) => `${i + 1}`),
+    Civil: Array.from({ length: 8 }, (_, i) => `${i + 1}`),
   };
 
   return (
@@ -60,25 +101,24 @@ const Dashboard = ({ studentData, onLogout, onUpdate }) => {
         contentLabel="Change Password"
         style={{
           overlay: {
-            backgroundColor: 'rgba(0, 0, 0, 0.75)'
+            backgroundColor: 'rgba(0, 0, 0, 0.75)',
           },
           content: {
             width: '400px',
-            height: 'auto',
             margin: 'auto',
             padding: '2rem',
             borderRadius: '12px',
             boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
             border: 'none',
-            backgroundColor: '#ffffff'
-          }
+            backgroundColor: '#ffffff',
+          },
         }}
-        className="relative"
       >
+        {/* Change Password Modal */}
         <div className="space-y-6">
           <div className="text-center pb-4 border-b border-gray-200">
-            <h2 className="text-3xl font-bold text-black">Change Password</h2>
-            <p className="text-black text-lg mt-2">Enter your new password below</p>
+            <h2 className="text-3xl font-bold">Change Password</h2>
+            <p className="text-lg mt-2">Enter your new password below</p>
           </div>
           <div className="space-y-4">
             <div>
@@ -88,7 +128,7 @@ const Dashboard = ({ studentData, onLogout, onUpdate }) => {
                 placeholder="Enter new password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
@@ -98,20 +138,20 @@ const Dashboard = ({ studentData, onLogout, onUpdate }) => {
                 placeholder="Confirm new password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
           <div className="flex space-x-4 mt-6">
             <button
               onClick={handleChangePassword}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200"
+              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg"
             >
               Update Password
             </button>
             <button
               onClick={handleCloseModal}
-              className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-4 rounded-lg transition duration-200"
+              className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 rounded-lg"
             >
               Cancel
             </button>
@@ -119,14 +159,10 @@ const Dashboard = ({ studentData, onLogout, onUpdate }) => {
         </div>
       </Modal>
 
-
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-center mb-8">
-            <h1 className="text-4xl font-bold text-gray-800 relative">
-              Student Dashboard
-              {/* <div className="absolute bottom-[-13px] left-0 w-full h-1 bg-blue-600 transform -translate-y-2"></div> */}
-            </h1>
+            <h1 className="text-4xl font-bold text-gray-800">Student Dashboard</h1>
           </div>
 
           <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
@@ -135,9 +171,9 @@ const Dashboard = ({ studentData, onLogout, onUpdate }) => {
               {!isEditing && (
                 <button
                   onClick={handleEditToggle}
-                  className="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 transition duration-200 flex items-center space-x-2"
+                  className="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 transition duration-200"
                 >
-                  <span>Edit Profile</span>
+                  Edit Profile
                 </button>
               )}
             </div>
@@ -145,7 +181,7 @@ const Dashboard = ({ studentData, onLogout, onUpdate }) => {
             {isEditing ? (
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {['name', 'fname', 'contact', 'email', 'address', 'department', 'semester'].map((field) => (
+                  {['name', 'fname', 'contact', 'email', 'address'].map((field) => (
                     <div key={field}>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         {field.charAt(0).toUpperCase() + field.slice(1)}
@@ -155,10 +191,56 @@ const Dashboard = ({ studentData, onLogout, onUpdate }) => {
                         name={field}
                         value={formData[field]}
                         onChange={handleChange}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
                   ))}
+
+                  {/* Branch Select */}
+                  <div className="relative">
+                    <label className="flex items-center text-gray-700 text-sm font-semibold mb-2">
+                      Branch
+                    </label>
+                    <select
+                      name="branch"
+                      value={formData.branch}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all appearance-none"
+                      required
+                    >
+                      <option value="" disabled hidden>
+                        Select your branch
+                      </option>
+                      {branches.map((branch) => (
+                        <option key={branch.branch_id} value={branch.name}>
+                          {branch.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Semester Select */}
+                  <div className="relative">
+                    <label className="flex items-center text-gray-700 text-sm font-semibold mb-2">
+                      Semester
+                    </label>
+                    <select
+                      name="semester"
+                      value={formData.semester}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all appearance-none"
+                      required
+                    >
+                      <option value="" disabled hidden>
+                        Select your semester
+                      </option>
+                      {branchOptions[formData.branch]?.map((semester) => (
+                        <option key={semester} value={semester}>
+                          Semester {semester}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
                 <div className="flex justify-end space-x-4 mt-8">
                   <button
@@ -185,8 +267,8 @@ const Dashboard = ({ studentData, onLogout, onUpdate }) => {
                   'Contact': studentData.contact,
                   'Email': studentData.email,
                   'Address': studentData.address,
-                  'Department': studentData.department,
-                  'Semester': studentData.semester
+                  'Branch': studentData.branch,
+                  'Semester': studentData.semester,
                 }).map(([key, value]) => (
                   <div key={key} className="bg-gray-50 p-4 rounded-lg">
                     <p className="text-sm text-gray-500 mb-1">{key}</p>
@@ -205,13 +287,13 @@ const Dashboard = ({ studentData, onLogout, onUpdate }) => {
             <div className="flex flex-wrap gap-4 mt-8 pt-6 border-t border-gray-200">
               <button
                 onClick={() => setIsModalOpen(true)}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200"
+                className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg"
               >
                 Change Password
               </button>
               <button
                 onClick={onLogout}
-                className="bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200"
+                className="bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-lg"
               >
                 Logout
               </button>

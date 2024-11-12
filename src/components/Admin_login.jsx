@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 const AdminLogin = () => {
     const navigate = useNavigate();
     const [adminCredentials, setAdminCredentials] = useState({ username: '', password: '' });
+    const [isFocused, setIsFocused] = useState({ username: false, password: false });
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -27,6 +28,14 @@ const AdminLogin = () => {
         }
     };
 
+    const handleFocus = (inputName) => {
+        setIsFocused((prev) => ({ ...prev, [inputName]: true }));
+    };
+
+    const handleBlur = (inputName) => {
+        setIsFocused((prev) => ({ ...prev, [inputName]: false }));
+    };
+
     return (
         <div style={styles.page}>
             <div style={styles.container}>
@@ -38,18 +47,28 @@ const AdminLogin = () => {
                         name="username"
                         value={adminCredentials.username}
                         onChange={handleInputChange}
+                        onFocus={() => handleFocus('username')}
+                        onBlur={() => handleBlur('username')}
                         placeholder="Username"
                         required
-                        style={styles.input}
+                        style={{
+                            ...styles.input,
+                            border: isFocused.username ? '1px solid #1976D2' : '1px solid #ddd',
+                        }}
                     />
                     <input
                         type="password"
                         name="password"
                         value={adminCredentials.password}
                         onChange={handleInputChange}
+                        onFocus={() => handleFocus('password')}
+                        onBlur={() => handleBlur('password')}
                         placeholder="Password"
                         required
-                        style={styles.input}
+                        style={{
+                            ...styles.input,
+                            border: isFocused.password ? '1px solid #1976D2' : '1px solid #ddd',
+                        }}
                     />
                     <button type="submit" style={styles.button}>Login</button>
                 </form>
@@ -95,13 +114,9 @@ const styles = {
         padding: '14px',
         fontSize: '16px',
         borderRadius: '8px',
-        border: '1px solid #ddd',
         backgroundColor: '#f9f9f9',
         outline: 'none',
         transition: 'border 0.3s ease',
-    },
-    inputFocus: {
-        border: '1px solid #1976D2', // Match refined blue for focus
     },
     button: {
         padding: '14px',
@@ -114,33 +129,6 @@ const styles = {
         cursor: 'pointer',
         transition: 'opacity 0.3s ease',
     },
-    buttonHover: {
-        opacity: '0.9',
-    },
 };
 
-document.addEventListener('DOMContentLoaded', () => {
-    const inputs = document.querySelectorAll('input');
-    const button = document.querySelector('button');
-
-    inputs.forEach((input) => {
-        input.addEventListener('focus', () => {
-            input.style.border = styles.inputFocus.border;
-        });
-        input.addEventListener('blur', () => {
-            input.style.border = styles.input.border;
-        });
-    });
-
-    button.addEventListener('mouseover', () => {
-        button.style.opacity = styles.buttonHover.opacity;
-    });
-
-    button.addEventListener('mouseout', () => {
-        button.style.opacity = '1';
-    });
-});
-
 export default AdminLogin;
-
-

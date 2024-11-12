@@ -1,5 +1,4 @@
-// src/Registration.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   GraduationCap,
   User,
@@ -21,14 +20,44 @@ const Registration = () => {
     address: "",
     department: "",
     semester: "",
+    branch: "", // Add branch to the form data
   });
   const [message, setMessage] = useState("");
+  const [branches, setBranches] = useState([]); // State to hold fetched branches
   const navigate = useNavigate();
+
+  // Fetch branches on component mount
+  useEffect(() => {
+    const fetchBranches = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/fetch-branches");
+        // console.log(response.data); // Check the response data
+        setBranches(response.data[0]);
+      } catch (error) {
+        console.error("Error fetching branches:", error);
+      }
+    };
+
+    fetchBranches();
+  }, []);
+
+  useEffect(() => {
+    console.log(branches); // Check the updated state
+  }, [branches]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    if (name === "branch") { // Change from department to branch
+      setFormData((prevData) => ({
+        ...prevData,
+        branch: value,
+        semester: "", // Reset semester when branch changes
+      }));
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -46,20 +75,20 @@ const Registration = () => {
 
       navigate("/setPassword"); // Redirect to set password page
     } catch (error) {
-      const errorMessage = `Failed to register. ${
-        error.response ? error.response.data : error.message
-      } Please try again.`;
+      const errorMessage = `Failed to register. ${error.response ? error.response.data : error.message
+        } Please try again.`;
       setMessage(errorMessage);
     }
   };
 
-  // Department and Semester Options
-  const departmentOptions = {
-    BTECHCSE: Array.from({ length: 8 }, (_, i) => `${i + 1}`),
-    BTECHME: Array.from({ length: 8 }, (_, i) => `${i + 1}`),
-    BTECHCE: Array.from({ length: 8 }, (_, i) => `${i + 1}`),
+  // Branch and Semester Options
+  const branchOptions = {
     BCA: Array.from({ length: 6 }, (_, i) => `${i + 1}`),
+    CSE: Array.from({ length: 8 }, (_, i) => `${i + 1}`),
+    ME: Array.from({ length: 8 }, (_, i) => `${i + 1}`),
+    Civil: Array.from({ length: 8 }, (_, i) => `${i + 1}`),
   };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -165,90 +194,86 @@ const Registration = () => {
                   />
                 </div>
 
-                {/* Department Select */}
+                {/* Branch Select */}
                 <div className="relative">
                   <label className="flex items-center text-gray-700 text-sm font-semibold mb-2">
                     <GraduationCap className="w-4 h-4 mr-2" />
-                    Department
+                    Branch
                   </label>
                   <select
-                    name="department"
-                    value={formData.department}
+                    name="branch"
+                    value={formData.branch}
                     onChange={handleChange}
                     className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all appearance-none"
                     required
                   >
                     <option value="" disabled hidden>
-                      Select your department
+                      Select your branch
                     </option>
-                    <option value="BTECHCSE">BTECH CSE</option>
-                    <option value="BTECHME">BTECH ME</option>
-                    <option value="BTECHCE">BTECH CE</option>
-                    <option value="BCA">BCA</option>
-                  </select>
-                </div>
-
-                {/* Semester Select */}
-                <div className="relative">
-                  <label className="flex items-center text-gray-700 text-sm font-semibold mb-2">
-                    <BookOpen className="w-4 h-4 mr-2" />
-                    Semester
-                  </label>
-                  <select
-                    name="semester"
-                    value={formData.semester}
-                    onChange={handleChange}
-                    disabled={!formData.department}
-                    className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all appearance-none"
-                    required
-                  >
-                    <option value="" disabled hidden>
-                      Select your semester
-                    </option>
-                    {formData.department &&
-                      departmentOptions[formData.department]?.map(
-                        (sem, index) => (
-                          <option key={index} value={sem}>
-                            {sem}
-                          </option>
-                        )
-                      )}
+                    {branches.map((branch) => (
+                      <option key={branch.branch_id} value={branch.name}>
+                        {branch.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
 
-              {/* Address Input - Full Width */}
+              {/* Semester Select */}
+              <div className="relative">
+                <label className="flex items-center text-gray-700 text-sm font-semibold mb-2">
+                  Semester
+                </label>
+                <select
+                  name="semester"
+                  value={formData.semester}
+                  onChange={handleChange}
+                  disabled={!formData.branch} // Disable if no branch is selected
+                  className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all appearance-none"
+                  required
+                >
+                  <option value="" disabled hidden>
+                    Select your semester
+                  </option>
+                  {formData.branch &&
+                    branchOptions[formData.branch]?.map((sem, index) => (
+                      <option key={index} value={sem}>
+                        {sem}
+                      </option>
+                    ))}
+                </select>
+
+              </div>
+
+
               <div className="relative">
                 <label className="flex items-center text-gray-700 text-sm font-semibold mb-2">
                   <MapPin className="w-4 h-4 mr-2" />
                   Address
                 </label>
-                <input
-                  type="text"
+                <textarea
                   name="address"
                   value={formData.address}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all"
-                  placeholder="Enter your full address"
+                  placeholder="Enter your home address"
                   required
-                />
+                ></textarea>
               </div>
+
 
               {/* Submit Button */}
-              <div className="flex justify-center pt-4">
-                <button
-                  type="submit"
-                  className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 transform transition-all hover:-translate-y-0.5"
-                >
-                  Register Now
-                </button>
-              </div>
+              <button
+                type="submit"
+                className="w-full py-3 px-4 bg-blue-600 text-white text-lg font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                Register
+              </button>
             </form>
 
-            {/* Success Message */}
             {message && (
-              <div className="mt-6 bg-green-50 border border-green-200 rounded-lg p-4">
-                <p className="text-green-800 text-center">{message}</p>
+              <div className="mt-4 text-center text-sm text-red-600">
+                {message}
               </div>
             )}
           </div>
