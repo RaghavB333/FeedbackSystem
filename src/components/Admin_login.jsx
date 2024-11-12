@@ -2,10 +2,13 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Lock, LogIn } from 'lucide-react';
 
-const Admin_login = () => {
+const AdminLogin = () => {
     const navigate = useNavigate();
     const [adminCredentials, setAdminCredentials] = useState({ username: '', password: '' });
-    const [message,setmassge] = useState();
+    
+    const [message,setmassge] = useState('');
+    const [isFocused, setIsFocused] = useState({ username: false, password: false });
+
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -22,12 +25,20 @@ const Admin_login = () => {
         });
 
         if (response.ok) {
-            localStorage.setItem('isAdmin', 'true'); // Save login status in localStorage
-            navigate('/admin-home'); // Redirect after successful login
+            localStorage.setItem('isAdmin', 'true');
+            navigate('/admin-home');
         } else {
             setmassge("Invalid Credentials");
             console.error('Admin login failed');
         }
+    };
+
+    const handleFocus = (inputName) => {
+        setIsFocused((prev) => ({ ...prev, [inputName]: true }));
+    };
+
+    const handleBlur = (inputName) => {
+        setIsFocused((prev) => ({ ...prev, [inputName]: false }));
     };
 
     return (
@@ -82,10 +93,9 @@ const Admin_login = () => {
               <p className='text-red-500 text-center'>{message && message}</p>
             </form>
           </div>
-        </div>
+      </div>
       </div>
     );
 };
 
-
-export default Admin_login;
+export default AdminLogin;

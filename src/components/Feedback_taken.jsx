@@ -6,17 +6,20 @@ import { useNavigate } from 'react-router-dom';
 import { Pencil, Trash2, Send, Users, X, Save, Search } from 'lucide-react';
 
 
-const Feedback_taken = ({onUpdate}) => {
-    
+const Feedback_taken = ({ onUpdate }) => {
+
     const [students, setStudents] = useState([]);
     const [formData, setformData] = useState([]);
-    const [feedbackid,setfeedbackid] = useState('');
+    const [feedbackid, setfeedbackid] = useState('');
     const [isEditing, setisEditing] = useState(false);
-    const [change,setchange] = useState('');
-    const [rollNumber,setrollNumber] = useState(''); 
+    const [change, setchange] = useState('');
+    const [rollNumber, setrollNumber] = useState('');
     const location = useLocation();
-    const { branch, semester,subject,teacher,teacherid,subjectid } = location.state || {};
+    const { branch, semester, subject, teacher, teacherid, subjectid } = location.state || {};
     const navigate = useNavigate();
+
+    const [branches, setBranches] = useState([]);
+
 
     const [searchTerm, setSearchTerm] = React.useState('');
 
@@ -37,6 +40,30 @@ const Feedback_taken = ({onUpdate}) => {
     const [isAdmin, setIsAdmin] = useState(() => {
         return localStorage.getItem('isAdmin') === 'true'; // Retrieve value from localStorage
     });
+
+    // Fetch branches on component mount
+    useEffect(() => {
+        const fetchBranches = async () => {
+            try {
+                const response = await axios.get("http://localhost:5000/api/fetch-branches");
+                // console.log(response.data); // Check the response data
+                setBranches(response.data[0]);
+            } catch (error) {
+                console.error("Error fetching branches:", error);
+            }
+        };
+
+        fetchBranches();
+    }, []);
+    // Branch and Semester Options
+    const branchOptions = {
+        BCA: Array.from({ length: 6 }, (_, i) => `${i + 1}`),
+        CSE: Array.from({ length: 8 }, (_, i) => `${i + 1}`),
+        ME: Array.from({ length: 8 }, (_, i) => `${i + 1}`),
+        Civil: Array.from({ length: 8 }, (_, i) => `${i + 1}`),
+    };
+
+
 
     useEffect(() => {
         if (!isAdmin) {
@@ -60,7 +87,7 @@ const Feedback_taken = ({onUpdate}) => {
             };
             fetchStudents();
         }
-    }, [branch, semester,change]);
+    }, [branch, semester, change]);
 
 
     const createfeedback = async (e) => {
@@ -80,12 +107,12 @@ const Feedback_taken = ({onUpdate}) => {
     useEffect(() => {
         const sendMessage = async () => {
             try {
-              const response = await axios.post(
-                "http://localhost:5000/send-feedback-link",
-                { feedbackid,students,subject,teacher }
-                
-              );
-              alert(response.data.message);
+                const response = await axios.post(
+                    "http://localhost:5000/send-feedback-link",
+                    { feedbackid, students, subject, teacher }
+
+                );
+                alert(response.data.message);
             } catch (error) {
                 console.error("Error sending messages:", error);
                 alert("Failed to send messages.");
@@ -95,26 +122,24 @@ const Feedback_taken = ({onUpdate}) => {
             sendMessage();
         }
     }, [feedbackid])
-    
-    const deletestudent = async(rollno)=>{
+
+    const deletestudent = async (rollno) => {
         try {
             const response = await axios.post(
-              "http://localhost:5000/api/delete-student",
-              { rollno}
+                "http://localhost:5000/api/delete-student",
+                { rollno }
             );
             setchange(response.data);
-          } catch (error) {
+        } catch (error) {
             console.error(error);
-          }
+        }
     }
 
-    const editstudent = (rollno)=>{
+    const editstudent = (rollno) => {
         setrollNumber(rollno);
 
-        for(let student=0;student<students.length;student++)
-        {
-            if(students[student].rollNumber == rollno)
-            {
+        for (let student = 0; student < students.length; student++) {
+            if (students[student].rollNumber == rollno) {
                 setformData(students[student]);
             }
         }
@@ -124,11 +149,11 @@ const Feedback_taken = ({onUpdate}) => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        console.log(name,value);
+        console.log(name, value);
         setformData({ ...formData, [name]: value });
     };
 
-    const handleSubmit = async(e)=>{
+    const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             await onUpdate(formData);
@@ -203,6 +228,74 @@ const Feedback_taken = ({onUpdate}) => {
         //     )}
         // </div>
 
+
+        // <div>
+        //     <h2 style={styles.heading}>Student List</h2>
+        //     {students.length > 0 ? (
+        //         <>
+        //             {isEditing ?
+        //                 <form onSubmit={handleSubmit} className="space-y-4">
+        //                     {['name', 'fname', 'contact', 'email', 'address'].map((field) => (
+        //                         <div key={field}>
+        //                             <label className="block font-semibold">{field.charAt(0).toUpperCase() + field.slice(1)}:</label>
+        //                             <input
+        //                                 type="text"
+        //                                 name={field}
+        //                                 value={formData[field]}
+        //                                 onChange={handleChange}
+        //                                 className="w-full p-2 border border-gray-300 rounded-md"
+        //                             />
+        //                         </div>
+        //                     ))}
+        //                     {/* Branch Select */}
+        //                     <div className="relative">
+        //                         <label className="flex items-center text-gray-700 text-sm font-semibold mb-2">
+        //                             Branch
+        //                         </label>
+        //                         <select
+        //                             name="branch"
+        //                             value={formData.branch}
+        //                             onChange={handleChange}
+        //                             className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all appearance-none"
+        //                             required
+        //                         >
+        //                             <option value="" disabled hidden>
+        //                                 Select your branch
+        //                             </option>
+        //                             {branches.map((branch) => (
+        //                                 <option key={branch.branch_id} value={branch.name}>
+        //                                     {branch.name}
+        //                                 </option>
+        //                             ))}
+        //                         </select>
+        //                     </div>
+
+        //                     {/* Semester Select */}
+        //                     <div className="relative">
+        //                         <label className="flex items-center text-gray-700 text-sm font-semibold mb-2">
+        //                             Semester
+        //                         </label>
+        //                         <select
+        //                             name="semester"
+        //                             value={formData.semester}
+        //                             onChange={handleChange}
+        //                             className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all appearance-none"
+        //                             required
+        //                         >
+        //                             <option value="" disabled hidden>
+        //                                 Select your semester
+        //                             </option>
+        //                             {branchOptions[formData.branch]?.map((semester) => (
+        //                                 <option key={semester} value={semester}>
+        //                                     Semester {semester}
+        //                                 </option>
+        //                             ))}
+        //                         </select>
+        //                     </div>
+
+        //                     <button type="submit" className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">Save Changes</button>
+        //                 </form>
+
         <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
@@ -233,7 +326,7 @@ const Feedback_taken = ({onUpdate}) => {
                     <h3 className="text-lg font-semibold text-gray-900">Edit Student Information</h3>
                   </div>
                   <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {['name', 'fname', 'contact', 'email', 'address', 'department', 'semester'].map((field) => (
+                    {['name', 'fname', 'contact', 'email', 'address'].map((field) => (
                       <div key={field} className="space-y-1">
                         <label className="block text-sm font-medium text-gray-700">
                           {field.charAt(0).toUpperCase() + field.slice(1)}
@@ -247,23 +340,64 @@ const Feedback_taken = ({onUpdate}) => {
                         />
                       </div>
                     ))}
+                    
+                    <label className="block text-sm font-medium text-gray-700">
+                                   Branch
+                                 </label>
+                                 <select
+                                    name="branch"
+                                    value={formData.branch}
+                                    onChange={handleChange}
+                                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                    required
+                                >
+                                    <option value="" disabled hidden>
+                                        Select your branch
+                                    </option>
+                                    {branches.map((branch) => (
+                                        <option key={branch.branch_id} value={branch.name}>
+                                            {branch.name}
+                                        </option>
+                                    ))}
+                                </select>
+
+                                <label className="block text-sm font-medium text-gray-700">
+                                     Semester
+                                 </label>
+                                 <select
+                                    name="semester"
+                                    value={formData.semester}
+                                    onChange={handleChange}
+                                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                    required
+                                >
+                                    <option value="" disabled hidden>
+                                        Select your semester
+                                    </option>
+                                    {branchOptions[formData.branch]?.map((semester) => (
+                                        <option key={semester} value={semester}>
+                                            Semester {semester}
+                                        </option>
+                                    ))}
+                                </select>
+
                     <div className="md:col-span-2 flex justify-end space-x-4">
-                    <button
-                      type="button"
-                      onClick={cancelEdit}
-                      className="flex items-center px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
-                    >
-                      <X className="w-4 h-4 mr-2" />
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                      <Save className="w-4 h-4 mr-2" />
-                      Save Changes
-                    </button>
-                  </div>
+                      <button
+                        type="button"
+                        onClick={cancelEdit}
+                        className="flex items-center px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
+                      >
+                        <X className="w-4 h-4 mr-2" />
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      >
+                        <Save className="w-4 h-4 mr-2" />
+                        Save Changes
+                      </button>
+                    </div>
                   </form>
                 </div>
               ) : (
@@ -300,7 +434,7 @@ const Feedback_taken = ({onUpdate}) => {
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{student.fname}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.email}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.contact}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.department}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.branch}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.semester}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm space-x-2">
                               <button
@@ -334,57 +468,8 @@ const Feedback_taken = ({onUpdate}) => {
             </div>
           )}
         </div>
-      </div>
+        </div>
     )
-};
-
-const styles = {
-    heading: {
-        marginLeft: "43%",
-    },
-    table: {
-        marginLeft: "10%",
-        width: '80%',
-        borderCollapse: 'collapse',
-        marginTop: '20px'
-    },
-    th: {
-        padding: '10px',
-        border: '1px solid black',
-        backgroundColor: '#f5f5f5'
-    },
-    td: {
-        padding: '10px',
-        border: '1px solid #ddd',
-        textAlign: 'center'
-    },
-    dlt_btn: {
-        padding: '5px',
-        borderRadius: '4px',
-        border: 'none',
-        backgroundColor: 'red',
-        color: '#fff',
-        cursor: 'pointer',
-    },
-    edit_btn: {
-        padding: '5px',
-        marginLeft: '4px',
-        borderRadius: '4px',
-        border: 'none',
-        backgroundColor: '#007bff',
-        color: '#fff',
-        cursor: 'pointer',
-    },
-    send_btn: {
-        padding: '10px',
-        marginLeft: '80%',
-        marginTop: '10px',
-        borderRadius: '4px',
-        border: 'none',
-        backgroundColor: '#007bff',
-        color: '#fff',
-        cursor: 'pointer',
-    }
 };
 
 export default Feedback_taken

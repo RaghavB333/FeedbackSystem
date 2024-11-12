@@ -1,5 +1,5 @@
 // src/Registration.js
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import {
   GraduationCap,
   User,
@@ -23,11 +23,40 @@ const Registration = () => {
     semester: "",
   });
   const [message, setMessage] = useState("");
+  const [branches, setBranches] = useState([]);
   const navigate = useNavigate();
+
+  // const handleChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setFormData({ ...formData, [name]: value });
+  // };
+
+  useEffect(() => {
+    const fetchBranches = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/fetch-branches");
+        // console.log(response.data); // Check the response data
+        setBranches(response.data[0]);
+      } catch (error) {
+        console.error("Error fetching branches:", error);
+      }
+    };
+
+    fetchBranches();
+  }, []);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    if (name === "branch") { // Change from department to branch
+      setFormData((prevData) => ({
+        ...prevData,
+        branch: value,
+        semester: "", // Reset semester when branch changes
+      }));
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -53,12 +82,11 @@ const Registration = () => {
     }
   };
 
-  // Department and Semester Options
-  const departmentOptions = {
-    BTECHCSE: Array.from({ length: 8 }, (_, i) => `${i + 1}`),
-    BTECHME: Array.from({ length: 8 }, (_, i) => `${i + 1}`),
-    BTECHCE: Array.from({ length: 8 }, (_, i) => `${i + 1}`),
+  const branchOptions = {
     BCA: Array.from({ length: 6 }, (_, i) => `${i + 1}`),
+    CSE: Array.from({ length: 8 }, (_, i) => `${i + 1}`),
+    ME: Array.from({ length: 8 }, (_, i) => `${i + 1}`),
+    Civil: Array.from({ length: 8 }, (_, i) => `${i + 1}`),
   };
 
   return (
@@ -172,19 +200,28 @@ const Registration = () => {
                     Department
                   </label>
                   <select
-                    name="department"
-                    value={formData.department}
+                    name="branch"
+                    value={formData.branch}
                     onChange={handleChange}
                     className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all appearance-none"
                     required
                   >
-                    <option value="" disabled hidden>
+                    {/* <option value="" disabled hidden>
                       Select your department
                     </option>
                     <option value="BTECHCSE">BTECH CSE</option>
                     <option value="BTECHME">BTECH ME</option>
                     <option value="BTECHCE">BTECH CE</option>
-                    <option value="BCA">BCA</option>
+                    <option value="BCA">BCA</option> */}
+                    
+                    <option value="" disabled hidden>
+                      Select your branch
+                    </option>
+                    {branches.map((branch) => (
+                      <option key={branch.branch_id} value={branch.name}>
+                        {branch.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
@@ -198,21 +235,19 @@ const Registration = () => {
                     name="semester"
                     value={formData.semester}
                     onChange={handleChange}
-                    disabled={!formData.department}
+                    disabled={!formData.branch}
                     className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all appearance-none"
                     required
                   >
-                    <option value="" disabled hidden>
-                      Select your semester
-                    </option>
-                    {formData.department &&
-                      departmentOptions[formData.department]?.map(
-                        (sem, index) => (
-                          <option key={index} value={sem}>
-                            {sem}
-                          </option>
-                        )
-                      )}
+                     <option value="" disabled hidden>
+                    Select your semester
+                  </option>
+                  {formData.branch &&
+                    branchOptions[formData.branch]?.map((sem, index) => (
+                      <option key={index} value={sem}>
+                        {sem}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>

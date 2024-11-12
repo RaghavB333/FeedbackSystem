@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import EvaluationChart from './EvaluationChart';
 import { useNavigate } from 'react-router-dom';
- 
+
 
 const EvaluationPage = () => {
     const [evaluationData, setEvaluationData] = useState(null);
@@ -13,12 +13,12 @@ const EvaluationPage = () => {
     const { feedback_id, teacherid, subject, teacher_name } = location.state || {};
 
     const navigate = useNavigate();
-       // Get admin status from context
+    // Get admin status from context
 
-       const [isAdmin, setIsAdmin] = useState(() => {
+    const [isAdmin, setIsAdmin] = useState(() => {
         return localStorage.getItem('isAdmin') === 'true'; // Retrieve value from localStorage
     });
-    
+
     useEffect(() => {
         if (!isAdmin) {
             navigate('/admin-login'); // Redirect to login page if not authorized
@@ -87,48 +87,56 @@ const EvaluationPage = () => {
                         },
                     });
 
-
-                    // Dynamic Summary Generation
+                    //dynamically generated summary
                     const generateSummary = (score) => {
-                        if (score >= 4.5) {
+                        if (score === 5) {
+                            return {
+                                overallPerformance: "Perfect",
+                                summary: "The teacher delivers impeccable performance, setting a benchmark for excellence."
+                            };
+                        } else if (score >= 4.5 && score < 5) {
                             return {
                                 overallPerformance: "Excellent",
-                                summary: "The teacher demonstrates exceptional performance, excelling in all evaluated areas.",
-                                suggestions: "Continue to leverage strengths, engage in professional development, and mentor peers."
+                                summary: "The teacher consistently excels, demonstrating mastery in teaching."
                             };
-                        } else if (score >= 4.0) {
+                        } else if (score >= 4 && score < 4.5) {
                             return {
                                 overallPerformance: "Very Good",
-                                summary: "The teacher shows very good performance with minor areas for improvement.",
-                                suggestions: "Consider exploring new teaching strategies and seeking feedback from colleagues."
+                                summary: "The teacher shows strong performance with minimal areas for improvement."
                             };
-                        } else if (score >= 3.5) {
+                        } else if (score >= 3.5 && score < 4) {
                             return {
                                 overallPerformance: "Good",
-                                summary: "The teacher performs well but should focus on enhancing engagement and clarity.",
-                                suggestions: "Attend workshops on communication techniques and student engagement."
+                                summary: "The teacher performs well, fostering a positive learning environment."
                             };
-                        } else if (score >= 3.0) {
+                        } else if (score >= 3 && score < 3.5) {
                             return {
                                 overallPerformance: "Satisfactory",
-                                summary: "The teacher's performance is satisfactory, with notable room for improvement.",
-                                suggestions: "Work on specific areas such as classroom management and responsiveness to student inquiries."
+                                summary: "The teacher meets expectations, though some areas could be improved."
                             };
-                        } else if (score >= 2.5) {
+                        } else if (score >= 2.5 && score < 3) {
                             return {
-                                overallPerformance: "Needs Improvement",
-                                summary: "The teacher needs improvement in several key areas impacting student learning.",
-                                suggestions: "Engage in professional development, focus on lesson preparation, and seek mentorship."
+                                overallPerformance: "Average",
+                                summary: "The teacher's performance is adequate but lacks notable strengths."
+                            };
+                        } else if (score >= 2 && score < 2.5) {
+                            return {
+                                overallPerformance: "Below Average",
+                                summary: "The teacher struggles to meet performance expectations in key areas."
+                            };
+                        } else if (score >= 1 && score < 2) {
+                            return {
+                                overallPerformance: "Poor",
+                                summary: "The teacher's performance is significantly below acceptable standards."
                             };
                         } else {
                             return {
-                                overallPerformance: "Unsatisfactory",
-                                summary: "The teacher's performance is unsatisfactory, significantly affecting student experience.",
-                                suggestions: "Consider a comprehensive review of teaching strategies and possibly seeking support from educational mentors."
+                                overallPerformance: "Dreadful",
+                                summary: "The teacher's performance is unacceptably low, severely affecting student outcomes."
                             };
                         }
                     };
-
+                    
                     const summaryData = generateSummary(totalScore);
                     setEvaluationSummary(summaryData);
                 }
@@ -226,47 +234,78 @@ const EvaluationPage = () => {
                 return { statement: "No performance statement available.", suggestion: "Consult the evaluation framework for guidance." };
         }
     };
+    const getScoreColor = (score) => {
+        if (score >= 4) return "text-green-600";
+        if (score >= 3) return "text-yellow-500";
+        return "text-red-500";
+    };
+
+    const getScoreBadgeColor = (score) => {
+        if (score >= 4) return "bg-green-50";
+        if (score >= 3) return "bg-yellow-50";
+        return "bg-red-50";
+    };
 
     return (
-        <div className="container w-[calc(100vw-12rem)] mx-24 p-8 bg-white rounded-lg shadow-lg">
+        <div className="container w-[calc(100vw-12rem)] mx-24 p-8 bg-gradient-to-b from-white to-gray-50 rounded-xl shadow-xl">
             {evaluationData ? (
                 <>
-                    <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Teacher Evaluation Report</h1>
-                    <div className="text-center mb-6">
-                        {/* <p className="text-lg font-semibold text-gray-700">Evaluator: <span className="font-normal">{evaluationData.evaluatorName}</span></p> */}
-                        <p className="text-lg font-semibold text-gray-700">Teacher ID: <span className="font-normal">{evaluationData.teacherID}</span></p>
-                        <p className="text-lg font-semibold text-gray-700">TeacherName: <span className="font-normal">{evaluationData.teacherName}</span></p>
-                        <p className="text-lg font-semibold text-gray-700">Subject: <span className="font-normal">{evaluationData.subjectName}</span></p>
-                        <p className="text-lg font-semibold text-gray-700">Date: <span className="font-normal">{evaluationData.evaluationDate}</span></p>
+                    <h1 className="text-4xl font-bold text-center text-gray-900 mb-8 tracking-tight">Teacher Evaluation Report</h1>
+                    <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+                        <div className="grid grid-cols-2 gap-4 text-center">
+                            <p className="text-lg text-gray-700">Teacher ID: <span className="font-semibold text-gray-900">{evaluationData.teacherID}</span></p>
+                            <p className="text-lg text-gray-700">TeacherName: <span className="font-semibold text-gray-900">{evaluationData.teacherName}</span></p>
+                            <p className="text-lg text-gray-700">Subject: <span className="font-semibold text-gray-900">{evaluationData.subjectName}</span></p>
+                            <p className="text-lg text-gray-700">Date: <span className="font-semibold text-gray-900">{evaluationData.evaluationDate}</span></p>
+                        </div>
                     </div>
 
-                    <h2 className="text-xl font-semibold text-gray-800 mb-4">Overall Score: <span className="text-green-600">{evaluationData.totalScore}</span></h2>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4">Overall Score:
+                        <span className={`ml-2 ${getScoreColor(evaluationData.totalScore)}`}>
+                            {evaluationData.totalScore}
+                        </span>
+                    </h2>
+
                     {evaluationSummary && (
-                        <div className="bg-gray-100 border-l-4 border-green-500 p-4 rounded-lg mb-6 shadow-inner">
-                            <p className="font-semibold text-gray-800">Overall Performance: <span className="font-normal">{evaluationSummary.overallPerformance}</span></p>
-                            <p className="text-gray-700">{evaluationSummary.summary}</p>
-                            <p className="mt-2"><span className="font-semibold">Suggestions: </span>{evaluationSummary.suggestions}</p>
+                        <div className="bg-gradient-to-r from-green-50 to-blue-50 border-l-4 border-green-500 p-6 rounded-lg mb-8 shadow-md">
+                            <p className="font-bold text-gray-900 mb-2">Overall Performance: <span className="font-semibold text-gray-800">{evaluationSummary.overallPerformance}</span></p>
+                            <p className="text-gray-700 mb-4">{evaluationSummary.summary}</p>
+                            
                         </div>
                     )}
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Detailed Performance Statements:</h3>
-                    <ul className="list-disc list-inside mb-6">
+
+                    <h3 className="text-xl font-bold text-gray-900 mb-4">Detailed Performance Statements:</h3>
+                    <ul className="space-y-6 mb-8">
                         {Object.keys(evaluationData.ratings).map((parameter) => {
                             const score = evaluationData.ratings[parameter];
                             const { statement, suggestion } = getPerformanceStatement(parameter, score);
                             return (
-                                <li key={parameter} className="mb-4 text-gray-700">
-                                    <strong className="text-gray-800">{capitalizeWords(parameter)}:</strong> {statement} <br />
-                                    <span className="italic text-gray-600">Suggestion: {suggestion}</span>
+                                <li key={parameter} className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <strong className="text-lg text-gray-900">{capitalizeWords(parameter)}</strong>
+                                        <div className={`flex items-center justify-center px-3 py-1 rounded-full ${getScoreBadgeColor(score)}`}>
+                                            <span className={`text-xl font-bold ${getScoreColor(score)}`}>{score}</span>
+                                            <span className="text-sm text-gray-500 ml-1">/5</span>
+                                        </div>
+                                    </div>
+                                    <p className="text-gray-700 mt-2 mb-3">{statement}</p>
+                                    <p className="text-gray-600 italic bg-gray-50 p-3 rounded">Suggestion: {suggestion}</p>
                                 </li>
                             );
                         })}
                     </ul>
-                    <div className="chart-container mt-5">
-                        <EvaluationChart ratings={evaluationData.ratings} />
+
+                    <div className="bg-white p-6 rounded-lg shadow-md mt-8">
+                        <h3 className="text-xl font-bold text-gray-900 mb-6">Performance Visualization</h3>
+                        <div className="chart-container">
+                            <EvaluationChart ratings={evaluationData.ratings} />
+                        </div>
                     </div>
                 </>
             ) : (
-                <p className="text-center text-gray-500">Loading evaluation data...</p>
+                <div className="flex justify-center items-center min-h-screen">
+                    <p className="text-xl text-gray-500">Loading evaluation data...</p>
+                </div>
             )}
         </div>
     );
