@@ -246,6 +246,26 @@ const EvaluationPage = () => {
         return "bg-red-50";
     };
 
+    const formatDate = (dateString) => {
+        try {
+          const date = new Date(dateString);
+          if (isNaN(date.getTime())) return dateString;
+    
+          const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+          const month = months[date.getMonth()];
+          const day = date.getDate().toString().padStart(2, '0');
+          const year = date.getFullYear();
+          const hours = date.getHours();
+          const minutes = date.getMinutes().toString().padStart(2, '0');
+          const ampm = hours >= 12 ? 'PM' : 'AM';
+          const formattedHours = ((hours % 12) || 12).toString().padStart(2, '0');
+    
+          return `${month} ${day}, ${year} • ${formattedHours}:${minutes} ${ampm}`;
+        } catch {
+          return dateString;
+        }
+      };
+
     return (
         <div className="container w-[calc(100vw-12rem)] mx-24 p-8 bg-gradient-to-b from-white to-gray-50 rounded-xl shadow-xl">
             {evaluationData ? (
@@ -256,7 +276,7 @@ const EvaluationPage = () => {
                             <p className="text-lg text-gray-700">Teacher ID: <span className="font-semibold text-gray-900">{evaluationData.teacherID}</span></p>
                             <p className="text-lg text-gray-700">TeacherName: <span className="font-semibold text-gray-900">{evaluationData.teacherName}</span></p>
                             <p className="text-lg text-gray-700">Subject: <span className="font-semibold text-gray-900">{evaluationData.subjectName}</span></p>
-                            <p className="text-lg text-gray-700">Date: <span className="font-semibold text-gray-900">{evaluationData.evaluationDate}</span></p>
+                            <p className="text-lg text-gray-700">Date: <span className="text-gray-900">{formatDate(evaluationData.evaluationDate)}</span></p>
                         </div>
                     </div>
 
