@@ -1,5 +1,4 @@
-// src/Registration.js
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   GraduationCap,
   User,
@@ -19,23 +18,20 @@ const Registration = () => {
     contact: "",
     email: "",
     address: "",
-    department: "",
+    branch: "", // Renamed 'department' to 'branch'
     semester: "",
   });
+
   const [message, setMessage] = useState("");
   const [branches, setBranches] = useState([]);
+  const [semesters, setSemesters] = useState([]); // Dynamic semester options
   const navigate = useNavigate();
 
-  // const handleChange = (e) => {
-  //   const { name, value } = e.target;
-  //   setFormData({ ...formData, [name]: value });
-  // };
 
   useEffect(() => {
     const fetchBranches = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/fetch-branches");
-        // console.log(response.data); // Check the response data
         setBranches(response.data[0]);
       } catch (error) {
         console.error("Error fetching branches:", error);
@@ -45,18 +41,22 @@ const Registration = () => {
     fetchBranches();
   }, []);
 
+  // Dynamically update semester options based on selected branch
+  useEffect(() => {
+    if (formData.branch) {
+      setSemesters(branchOptions[formData.branch] || []);
+    } else {
+      setSemesters([]); // Reset semesters if no branch selected
+    }
+  }, [formData.branch]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === "branch") { // Change from department to branch
-      setFormData((prevData) => ({
-        ...prevData,
-        branch: value,
-        semester: "", // Reset semester when branch changes
-      }));
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+      ...(name === "branch" ? { semester: "" } : {}), // Reset semester if branch changes
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -64,16 +64,11 @@ const Registration = () => {
     setMessage(""); // Reset message before submit
 
     try {
-      const response = await axios.post(
-        "http://localhost:5000/register",
-        formData
-      );
-      setMessage(response.data); // Set success message from response
+      const response = await axios.post("http://localhost:5000/register", formData);
+      setMessage(response.data);
 
-      // Save roll number in session storage
       sessionStorage.setItem("rollNumber", formData.rollNumber);
-
-      navigate("/setPassword"); // Redirect to set password page
+      navigate("/setPassword");
     } catch (error) {
       const errorMessage = `Failed to register. ${
         error.response ? error.response.data : error.message
@@ -193,63 +188,54 @@ const Registration = () => {
                   />
                 </div>
 
-                {/* Department Select */}
-                <div className="relative">
-                  <label className="flex items-center text-gray-700 text-sm font-semibold mb-2">
-                    <GraduationCap className="w-4 h-4 mr-2" />
-                    Department
-                  </label>
-                  <select
-                    name="branch"
-                    value={formData.branch}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all appearance-none"
-                    required
-                  >
-                    {/* <option value="" disabled hidden>
-                      Select your department
+                 {/* Branch Select */}
+              <div className="relative">
+                <label className="flex items-center text-gray-700 text-sm font-semibold mb-2">
+                  <GraduationCap className="w-4 h-4 mr-2" />
+                  Branch
+                </label>
+                <select
+                  name="branch"
+                  value={formData.branch}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border-2 rounded-lg"
+                  required
+                >
+                  <option value="" disabled hidden>
+                    Select your branch
+                  </option>
+                  {branches.map((branch) => (
+                    <option key={branch.branch_id} value={branch.name}>
+                      {branch.name}
                     </option>
-                    <option value="BTECHCSE">BTECH CSE</option>
-                    <option value="BTECHME">BTECH ME</option>
-                    <option value="BTECHCE">BTECH CE</option>
-                    <option value="BCA">BCA</option> */}
-                    
-                    <option value="" disabled hidden>
-                      Select your branch
-                    </option>
-                    {branches.map((branch) => (
-                      <option key={branch.branch_id} value={branch.name}>
-                        {branch.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                  ))}
+                </select>
+              </div>
 
-                {/* Semester Select */}
-                <div className="relative">
-                  <label className="flex items-center text-gray-700 text-sm font-semibold mb-2">
-                    <BookOpen className="w-4 h-4 mr-2" />
-                    Semester
-                  </label>
-                  <select
-                    name="semester"
-                    value={formData.semester}
-                    onChange={handleChange}
-                    disabled={!formData.branch}
-                    className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all appearance-none"
-                    required
-                  >
-                     <option value="" disabled hidden>
+              {/* Semester Select */}
+              <div className="relative">
+                <label className="flex items-center text-gray-700 text-sm font-semibold mb-2">
+                  <BookOpen className="w-4 h-4 mr-2" />
+                  Semester
+                </label>
+                <select
+                  name="semester"
+                  value={formData.semester}
+                  onChange={handleChange}
+                  disabled={!formData.branch}
+                  className="w-full px-4 py-2 border-2 rounded-lg"
+                  required
+                >
+                  <option value="" disabled hidden>
                     Select your semester
                   </option>
-                  {formData.branch &&
-                    branchOptions[formData.branch]?.map((sem, index) => (
-                      <option key={index} value={sem}>
-                        {sem}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                  {semesters.map((sem, index) => (
+                    <option key={index} value={sem}>
+                      {sem}
+                    </option>
+                  ))}
+                </select>
+              </div>
               </div>
 
               {/* Address Input - Full Width */}
