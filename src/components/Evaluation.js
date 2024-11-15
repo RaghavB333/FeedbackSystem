@@ -4,17 +4,16 @@ import { useLocation } from 'react-router-dom';
 import EvaluationChart from './EvaluationChart';
 import { useNavigate } from 'react-router-dom';
 
-
 const EvaluationPage = () => {
     const [evaluationData, setEvaluationData] = useState(null);
     const [evaluationSummary, setEvaluationSummary] = useState(null);
+    const [overallScore, setOverallScore] = useState(null);
+    const [error, setError] = useState('');
 
     const location = useLocation();
     const { feedback_id, teacherid, subject, teacher_name } = location.state || {};
 
     const navigate = useNavigate();
-    // Get admin status from context
-
     const [isAdmin, setIsAdmin] = useState(() => {
         return localStorage.getItem('isAdmin') === 'true'; // Retrieve value from localStorage
     });
@@ -25,11 +24,89 @@ const EvaluationPage = () => {
         }
     }, [isAdmin, navigate]);
 
-    //capitalie first letters of parameters
+    useEffect(() => {
+        const fetchOverallScore = async () => {
+            if (!feedback_id) {
+                setError('Feedback ID is required.');
+                return;
+            }
+
+            setError('');
+            setOverallScore(null);
+
+            try {
+                const response = await axios.get('/api/getOverallScore', {
+                    params: { feedback_id: feedback_id },
+                });
+
+                if (response.data.success) {
+                    const roundedScore = parseFloat(response.data.overall_score.toFixed(1));
+                    setOverallScore(roundedScore);
+                } else {
+                    setError(response.data.message || 'Failed to fetch overall score.');
+                }
+            } catch (err) {
+                console.error('Error fetching overall score:', err);
+                setError('An error occurred while fetching the overall score.');
+            }
+        };
+
+        fetchOverallScore();
+    }, [feedback_id]);
+
+    // Capitalize first letters of parameters
     const capitalizeWords = (str) => {
         return str.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
     };
 
+    const generateSummary = (score) => {
+        if (score === 5) {
+            return {
+                overallPerformance: "Perfect",
+                summary: "The teacher delivers impeccable performance, setting a benchmark for excellence."
+            };
+        } else if (score >= 4.5 && score < 5) {
+            return {
+                overallPerformance: "Excellent",
+                summary: "The teacher consistently excels, demonstrating mastery in teaching."
+            };
+        } else if (score >= 4 && score < 4.5) {
+            return {
+                overallPerformance: "Very Good",
+                summary: "The teacher shows strong performance with minimal areas for improvement."
+            };
+        } else if (score >= 3.5 && score < 4) {
+            return {
+                overallPerformance: "Good",
+                summary: "The teacher performs well, fostering a positive learning environment."
+            };
+        } else if (score >= 3 && score < 3.5) {
+            return {
+                overallPerformance: "Satisfactory",
+                summary: "The teacher meets expectations, though some areas could be improved."
+            };
+        } else if (score >= 2.5 && score < 3) {
+            return {
+                overallPerformance: "Average",
+                summary: "The teacher's performance is adequate but lacks notable strengths."
+            };
+        } else if (score >= 2 && score < 2.5) {
+            return {
+                overallPerformance: "Below Average",
+                summary: "The teacher struggles to meet performance expectations in key areas."
+            };
+        } else if (score >= 1 && score < 2) {
+            return {
+                overallPerformance: "Poor",
+                summary: "The teacher's performance is significantly below acceptable standards."
+            };
+        } else {
+            return {
+                overallPerformance: "Dreadful",
+                summary: "The teacher's performance is unacceptably low, severely affecting student outcomes."
+            };
+        }
+    };
 
     useEffect(() => {
         const fetchEvaluationData = async () => {
@@ -52,27 +129,12 @@ const EvaluationPage = () => {
                         avg_critical_thinking: 0.05
                     };
 
-                    const totalScore = (
-                        (Number(data.avg_subject_knowledge) * weights.avg_subject_knowledge || 0) +
-                        (Number(data.avg_communication_effectiveness) * weights.avg_communication_effectiveness || 0) +
-                        (Number(data.avg_communication_clarity) * weights.avg_communication_clarity || 0) +
-                        (Number(data.avg_engagement) * weights.avg_engagement || 0) +
-                        (Number(data.avg_participation) * weights.avg_participation || 0) +
-                        (Number(data.avg_responsiveness_approachability) * weights.avg_responsiveness_approachability || 0) +
-                        (Number(data.avg_responsiveness_effectiveness) * weights.avg_responsiveness_effectiveness || 0) +
-                        (Number(data.avg_punctuality) * weights.avg_punctuality || 0) +
-                        (Number(data.avg_preparedness) * weights.avg_preparedness || 0) +
-                        (Number(data.avg_critical_thinking) * weights.avg_critical_thinking || 0)
-                    ).toFixed(1);
-
-
-
                     setEvaluationData({
                         teacherID: teacherid,
                         teacherName: teacher_name,
                         subjectName: subject,
                         evaluationDate: data.last_updated,
-                        totalScore: totalScore,
+
                         ratings: {
                             subject_knowledge: data.avg_subject_knowledge,
                             communication_effectiveness: data.avg_communication_effectiveness,
@@ -87,58 +149,11 @@ const EvaluationPage = () => {
                         },
                     });
 
-                    //dynamically generated summary
-                    const generateSummary = (score) => {
-                        if (score === 5) {
-                            return {
-                                overallPerformance: "Perfect",
-                                summary: "The teacher delivers impeccable performance, setting a benchmark for excellence."
-                            };
-                        } else if (score >= 4.5 && score < 5) {
-                            return {
-                                overallPerformance: "Excellent",
-                                summary: "The teacher consistently excels, demonstrating mastery in teaching."
-                            };
-                        } else if (score >= 4 && score < 4.5) {
-                            return {
-                                overallPerformance: "Very Good",
-                                summary: "The teacher shows strong performance with minimal areas for improvement."
-                            };
-                        } else if (score >= 3.5 && score < 4) {
-                            return {
-                                overallPerformance: "Good",
-                                summary: "The teacher performs well, fostering a positive learning environment."
-                            };
-                        } else if (score >= 3 && score < 3.5) {
-                            return {
-                                overallPerformance: "Satisfactory",
-                                summary: "The teacher meets expectations, though some areas could be improved."
-                            };
-                        } else if (score >= 2.5 && score < 3) {
-                            return {
-                                overallPerformance: "Average",
-                                summary: "The teacher's performance is adequate but lacks notable strengths."
-                            };
-                        } else if (score >= 2 && score < 2.5) {
-                            return {
-                                overallPerformance: "Below Average",
-                                summary: "The teacher struggles to meet performance expectations in key areas."
-                            };
-                        } else if (score >= 1 && score < 2) {
-                            return {
-                                overallPerformance: "Poor",
-                                summary: "The teacher's performance is significantly below acceptable standards."
-                            };
-                        } else {
-                            return {
-                                overallPerformance: "Dreadful",
-                                summary: "The teacher's performance is unacceptably low, severely affecting student outcomes."
-                            };
-                        }
-                    };
-                    
-                    const summaryData = generateSummary(totalScore);
-                    setEvaluationSummary(summaryData);
+                    // Only generate the summary after the overall score is fetched and set
+                    if (overallScore !== null) {
+                        const summaryData = generateSummary(overallScore);
+                        setEvaluationSummary(summaryData);
+                    }
                 }
             } catch (error) {
                 console.error("Failed to fetch evaluation data:", error);
@@ -146,7 +161,7 @@ const EvaluationPage = () => {
         };
 
         fetchEvaluationData();
-    }, []);
+    }, [feedback_id, overallScore]);
 
     const getPerformanceStatement = (parameter, score) => {
         switch (parameter) {
@@ -248,23 +263,23 @@ const EvaluationPage = () => {
 
     const formatDate = (dateString) => {
         try {
-          const date = new Date(dateString);
-          if (isNaN(date.getTime())) return dateString;
-    
-          const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-          const month = months[date.getMonth()];
-          const day = date.getDate().toString().padStart(2, '0');
-          const year = date.getFullYear();
-          const hours = date.getHours();
-          const minutes = date.getMinutes().toString().padStart(2, '0');
-          const ampm = hours >= 12 ? 'PM' : 'AM';
-          const formattedHours = ((hours % 12) || 12).toString().padStart(2, '0');
-    
-          return `${month} ${day}, ${year} • ${formattedHours}:${minutes} ${ampm}`;
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return dateString;
+
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const month = months[date.getMonth()];
+            const day = date.getDate().toString().padStart(2, '0');
+            const year = date.getFullYear();
+            const hours = date.getHours();
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            const formattedHours = ((hours % 12) || 12).toString().padStart(2, '0');
+
+            return `${month} ${day}, ${year} • ${formattedHours}:${minutes} ${ampm}`;
         } catch {
-          return dateString;
+            return dateString;
         }
-      };
+    };
 
     return (
         <div className="container w-[calc(100vw-12rem)] mx-24 p-8 bg-gradient-to-b from-white to-gray-50 rounded-xl shadow-xl">
@@ -281,8 +296,8 @@ const EvaluationPage = () => {
                     </div>
 
                     <h2 className="text-2xl font-bold text-gray-900 mb-4">Overall Score:
-                        <span className={`ml-2 ${getScoreColor(evaluationData.totalScore)}`}>
-                            {evaluationData.totalScore}
+                        <span className={`ml-2 ${getScoreColor(overallScore)}`}>
+                            {overallScore}
                         </span>
                     </h2>
 
@@ -290,7 +305,7 @@ const EvaluationPage = () => {
                         <div className="bg-gradient-to-r from-green-50 to-blue-50 border-l-4 border-green-500 p-6 rounded-lg mb-8 shadow-md">
                             <p className="font-bold text-gray-900 mb-2">Overall Performance: <span className="font-semibold text-gray-800">{evaluationSummary.overallPerformance}</span></p>
                             <p className="text-gray-700 mb-4">{evaluationSummary.summary}</p>
-                            
+
                         </div>
                     )}
 

@@ -96,7 +96,7 @@ const Admin_home = () => {
       </div>
       <div
         className="bg-white shadow-md rounded-lg p-6 cursor-pointer hover:bg-gray-100 transition-colors"
-        onClick={() => navigate('/teachers-result')}
+        onClick={() => navigate('/result-selection')}
       >
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-medium text-blue-600">View Result</h2>

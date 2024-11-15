@@ -15,6 +15,8 @@ import EvaluationPage from './components/Evaluation';
 import ForgotPassword from './components/ForgotPassword';
 import Management from './components/Management';
 import axios from 'axios'; // Add this line to import axios
+import ResultSelection from './components/Result_Selection';
+import OverallPerformancePage from './components/Overall_Performance_Page';
 
 const App = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -98,6 +100,12 @@ const App = () => {
 
                 {/* Feedback Form */}
                 <Route path="/feedbackForm" element={<FeedbackForm />} />
+
+                {/* Result Selection */}
+                <Route path="/result-selection" element={<AdminProtectedRoute element={<ResultSelection />} />} />
+
+                {/* Overall Performance Page */}
+                <Route path="/overall-performance" element={<AdminProtectedRoute element={<OverallPerformancePage />} />} />
             </Routes>
         </Router>
     );

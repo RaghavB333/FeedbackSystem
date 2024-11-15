@@ -24,7 +24,7 @@ app.use(bodyParser.json());
 const dbConfig = {
     host: 'localhost',
     user: 'root',
-    password: '@Tanpreet#07',
+    password: '3235',
     database: 'registration_db'
 };
 
@@ -380,12 +380,25 @@ app.post('/api/updateFeedback', async (req, res) => {
             total_feedback_count: newFeedbackCount
         };
 
+        // Calculate overall score based on weights
+        const overallScore = 
+            (0.20 * updatedData.avg_subject_knowledge +
+             0.15 * updatedData.avg_communication_effectiveness +
+             0.10 * updatedData.avg_communication_clarity +
+             0.10 * updatedData.avg_engagement +
+             0.05 * updatedData.avg_participation +
+             0.10 * updatedData.avg_responsiveness_approachability +
+             0.05 * updatedData.avg_responsiveness_effectiveness +
+             0.05 * updatedData.avg_punctuality +
+             0.10 * updatedData.avg_preparedness +
+             0.10 * updatedData.avg_critical_thinking);
+
         const updateQuery = `
             UPDATE TeacherEvaluationSummary 
             SET avg_subject_knowledge = ?, avg_communication_effectiveness = ?, avg_communication_clarity = ?, 
                 avg_engagement = ?, avg_participation = ?, avg_responsiveness_approachability = ?, 
                 avg_responsiveness_effectiveness = ?, avg_punctuality = ?, avg_preparedness = ?, 
-                avg_critical_thinking = ?, total_feedback_count = ?
+                avg_critical_thinking = ?, total_feedback_count = ?, overall_score = ?
             WHERE feedback_id = ?
         `;
 
@@ -393,7 +406,7 @@ app.post('/api/updateFeedback', async (req, res) => {
             updatedData.avg_subject_knowledge, updatedData.avg_communication_effectiveness, updatedData.avg_communication_clarity,
             updatedData.avg_engagement, updatedData.avg_participation, updatedData.avg_responsiveness_approachability,
             updatedData.avg_responsiveness_effectiveness, updatedData.avg_punctuality, updatedData.avg_preparedness,
-            updatedData.avg_critical_thinking, updatedData.total_feedback_count, feedback_id
+            updatedData.avg_critical_thinking, updatedData.total_feedback_count, overallScore, feedback_id
         ]);
 
         await db.query('DELETE FROM feedbacktokens WHERE token = ?', [token]);
@@ -404,6 +417,7 @@ app.post('/api/updateFeedback', async (req, res) => {
         res.status(500).json({ success: false, message: 'Error updating feedback.' });
     }
 });
+
 
 
 
@@ -512,6 +526,62 @@ app.post('/api/fetchFeedback', async (req, res) => {
 });
 
 
+// Endpoint to fetch the overall score
+app.get('/api/getOverallScore', async (req, res) => {
+    const { feedback_id } = req.query;
+
+    if (!feedback_id) {
+        return res.status(400).json({ success: false, message: 'Feedback ID is required.' });
+    }
+
+    const query = `SELECT overall_score FROM TeacherEvaluationSummary WHERE feedback_id = ?`;
+
+    try {
+        const db = await getDbConnection();
+        const [rows] = await db.query(query, [feedback_id]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ success: false, message: 'Feedback not found.' });
+        }
+
+        res.json({ success: true, overall_score: rows[0].overall_score });
+    } catch (error) {
+        console.error('Error fetching overall score:', error);
+        res.status(500).json({ success: false, message: 'Error fetching overall score.' });
+    }
+});
+
+// Fetch distinct years
+app.get('/api/years', async (req, res) => {
+    try {
+        const db = await getDbConnection();
+        const query = `SELECT DISTINCT YEAR(last_updated) as year FROM teacherevaluationsummary`;
+        const [rows] = await db.query(query);
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching years:', error);
+        res.status(500).send('Error fetching years');
+    }
+});
+
+// Fetch performance data for a specific year
+app.get('/api/overall-performance', async (req, res) => {
+    const { year } = req.query;
+    try {
+        const db = await getDbConnection();
+        const query = `
+            SELECT tes.teacher_id, t.teacher_name, tes.overall_score 
+            FROM teacherevaluationsummary tes 
+            JOIN teachers t ON tes.teacher_id = t.teacher_id 
+            WHERE YEAR(tes.last_updated) = ?
+        `;
+        const [rows] = await db.query(query, [year]);
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching performance data:', error);
+        res.status(500).send('Error fetching performance data');
+    }
+});
 
 
 
