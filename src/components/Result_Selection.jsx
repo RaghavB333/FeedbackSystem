@@ -10,7 +10,7 @@ const ResultSelection = () => {
                 {/* Overall Performance Box */}
                 <div
                     className="bg-white shadow-lg rounded-lg p-6 hover:shadow-xl transform hover:scale-105 transition duration-300 cursor-pointer"
-                  
+                    onClick={() => navigate('/overall-performance')}
                 >
                     <h2 className="text-2xl font-bold text-center text-blue-600 mb-4">
                         Overall Teacher Performance Analysis
