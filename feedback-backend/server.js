@@ -393,6 +393,8 @@ app.post('/api/updateFeedback', async (req, res) => {
              0.10 * updatedData.avg_preparedness +
              0.10 * updatedData.avg_critical_thinking);
 
+             
+
         const updateQuery = `
             UPDATE TeacherEvaluationSummary 
             SET avg_subject_knowledge = ?, avg_communication_effectiveness = ?, avg_communication_clarity = ?, 

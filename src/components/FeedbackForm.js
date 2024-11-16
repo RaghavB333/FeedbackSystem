@@ -16,6 +16,7 @@ function FeedbackForm() {
         teacher_id: 1,
         ratings: {
             avg_subject_knowledge: '',
+            avg_syllabus_coverage: '',
             avg_communication_effectiveness: '',
             avg_communication_clarity: '',
             avg_engagement: '',
@@ -33,11 +34,31 @@ function FeedbackForm() {
     const [isVerificationOpen, setIsVerificationOpen] = useState(true);
 
     const ratingDescriptions = {
-        1: { label: 'Poor', description: 'Significant improvement needed' },
-        2: { label: 'Below Average', description: 'Some improvement required' },
-        3: { label: 'Satisfactory', description: 'Meets basic expectations' },
-        4: { label: 'Good', description: 'Exceeds expectations' },
-        5: { label: 'Excellent', description: 'Outstanding performance' }
+        1: { 
+            label: 'Poor', 
+            description: 'Significant improvement needed', 
+            punjabi: 'ਮਹੱਤਵਪੂਰਨ ਸੁਧਾਰ ਦੀ ਲੋੜ ਹੈ।' 
+        },
+        2: { 
+            label: 'Below Average', 
+            description: 'Some improvement required', 
+            punjabi: 'ਕੁਝ ਸੁਧਾਰ ਦੀ ਲੋੜ ਹੈ।' 
+        },
+        3: { 
+            label: 'Satisfactory', 
+            description: 'Meets basic expectations', 
+            punjabi: 'ਮੁੱਢਲੀ ਉਮੀਦਾਂ ਨੂੰ ਪੂਰਾ ਕਰਦਾ ਹੈ।' 
+        },
+        4: { 
+            label: 'Good', 
+            description: 'Exceeds expectations', 
+            punjabi: 'ਉਮੀਦਾਂ ਤੋਂ ਵਧੀਆ ਪ੍ਰਦਰਸ਼ਨ।' 
+        },
+        5: { 
+            label: 'Excellent', 
+            description: 'Outstanding performance', 
+            punjabi: 'ਸ਼ਾਨਦਾਰ ਪ੍ਰਦਰਸ਼ਨ।' 
+        }
     };
 
     useEffect(() => {
@@ -92,16 +113,17 @@ function FeedbackForm() {
     };
 
     const ratingParameters = [
-        { label: 'Subject Knowledge', name: 'avg_subject_knowledge', description: 'Understanding and expertise in the subject matter' },
-        { label: 'Communication Skills - Effectiveness', name: 'avg_communication_effectiveness', description: 'Ability to convey ideas effectively' },
-        { label: 'Communication Skills - Clarity', name: 'avg_communication_clarity', description: 'Clarity and coherence in explanation' },
-        { label: 'Engagement in Learning', name: 'avg_engagement', description: 'Creating an engaging learning environment' },
-        { label: 'Encouragement of Class Participation', name: 'avg_participation', description: 'Promoting student involvement' },
-        { label: 'Responsiveness to Questions - Approachability', name: 'avg_responsiveness_approachability', description: 'Openness to student queries' },
-        { label: 'Responsiveness to Questions - Effectiveness', name: 'avg_responsiveness_effectiveness', description: 'Quality of responses to questions' },
-        { label: 'Punctuality', name: 'avg_punctuality', description: 'Timeliness and attendance' },
-        { label: 'Preparedness', name: 'avg_preparedness', description: 'Organization and readiness for class' },
-        { label: 'Encouragement of Critical Thinking', name: 'avg_critical_thinking', description: 'Promoting analytical and deeper understanding' }
+        { label: 'Subject Knowledge', name: 'avg_subject_knowledge', description: 'Understanding and expertise in the subject matter', punjabi: 'ਵਿਸ਼ੇ ਦੀ ਜਾਣਕਾਰੀ ਅਤੇ ਕੁਸ਼ਲਤਾ' },
+        { label: 'Syllabus Coverage', name: 'avg_syllabus_coverage', description: 'Coverage of course syllabus', punjabi: 'ਕੋਰਸ ਦੇ ਸਿਲੇਬਸ ਦੀ ਕਵਰੇਜ' },
+        { label: 'Communication Skills - Effectiveness', name: 'avg_communication_effectiveness', description: 'Ability to convey ideas effectively', punjabi: 'ਵਿਚਾਰਾਂ ਨੂੰ ਪ੍ਰਭਾਵਸ਼ਾਲੀ ਢੰਗ ਨਾਲ ਪੇਸ਼ ਕਰਨ ਦੀ ਯੋਗਤਾ' },
+        { label: 'Communication Skills - Clarity', name: 'avg_communication_clarity', description: 'Clarity and coherence in explanation', punjabi: 'ਵਿਆਖਿਆ ਵਿੱਚ ਸਪਸ਼ਟਤਾ' },
+        { label: 'Engagement in Learning', name: 'avg_engagement', description: 'Creating an engaging learning environment', punjabi: 'ਰੁਚਿਕਰ ਪਾਠ ਸਥਿਤੀ ਦਾ ਨਿਰਮਾਣ' },
+        { label: 'Encouragement of Class Participation', name: 'avg_participation', description: 'Promoting student involvement', punjabi: 'ਵਿਦਿਆਰਥੀ ਹਿੱਸੇਦਾਰੀ ਨੂੰ ਉਤਸ਼ਾਹਿਤ ਕਰਨਾ' },
+        { label: 'Responsiveness - Approachability', name: 'avg_responsiveness_approachability', description: 'Openness to student queries', punjabi: 'ਵਿਦਿਆਰਥੀਆਂ ਦੇ ਪ੍ਰਸ਼ਨਾਂ ਲਈ ਖੁਲ੍ਹੇ ਦਿਲ ਦੇ ਹੋਣਾ' },
+        { label: 'Responsiveness - Effectiveness', name: 'avg_responsiveness_effectiveness', description: 'Quality of responses to questions', punjabi: 'ਪ੍ਰਸ਼ਨਾਂ ਦੇ ਉੱਤਰਾਂ ਦੀ ਗੁਣਵੱਤਾ' },
+        { label: 'Punctuality', name: 'avg_punctuality', description: 'Timeliness and attendance', punjabi: 'ਸਮੇਂ ਦੀ ਪਾਬੰਦੀ ਅਤੇ ਹਾਜ਼ਰੀ' },
+        { label: 'Preparedness', name: 'avg_preparedness', description: 'Organization and readiness for class', punjabi: 'ਕਲਾਸ ਲਈ ਤਿਆਰੀ' },
+        { label: 'Critical Thinking Encouragement', name: 'avg_critical_thinking', description: 'Promoting analytical thinking', punjabi: 'ਅਲੋਚਨਾਤਮਕ ਸੋਚ ਨੂੰ ਉਤਸ਼ਾਹਿਤ ਕਰਨਾ' }
     ];
 
     if (Date.now() > expirytime) {
@@ -121,26 +143,24 @@ function FeedbackForm() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8 px-4">
+        <div className="min-h-screen bg-gradient-to-b from-blue-50 to-gray-100 py-10 px-4">
             {isVerificationOpen && <VerificationModal />}
-            
-            <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
-                <div className="p-8">
-                    <div className="text-center mb-8">
-                        <h1 className="text-3xl font-bold text-gray-900 mb-2">Teacher Evaluation Form</h1>
-                        <p className="text-lg text-gray-600">Welcome, {name}</p>
-                        <p className="text-gray-600">Providing feedback for {subject} taught by {teacher}</p>
-                        <p className="text-sm text-gray-500 mt-1">Feedback ID: {feedbackid}</p>
-                    </div>
+            <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg">
+                <header className="p-8 bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-center rounded-t-lg">
+                    <h1 className="text-4xl font-bold mb-2">Teacher Evaluation Form</h1>
+                    <p>Welcome, <span className="font-semibold">{name}</span></p>
+                    <p>Feedback for <span className="font-semibold">{subject}</span> taught by {teacher}</p>
+                </header>
 
-                    {/* Rating Guide */}
-                    <div className="bg-gray-50 p-4 rounded-lg mb-6">
+                <div className="p-8">
+                    <div className="bg-gray-100 p-4 rounded-lg mb-6">
                         <h4 className="text-lg font-semibold mb-3">Rating Guide</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-5 gap-2">
-                            {Object.entries(ratingDescriptions).map(([rating, { label, description }]) => (
-                                <div key={rating} className="p-2 rounded border bg-white">
+                        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                            {Object.entries(ratingDescriptions).map(([rating, { label, description, punjabi }]) => (
+                                <div key={rating} className="p-2 rounded border shadow-sm bg-white">
                                     <div className="font-medium text-sm">{rating} - {label}</div>
                                     <div className="text-xs text-gray-600">{description}</div>
+                                    <div className="text-xs text-gray-500">{punjabi}</div>
                                 </div>
                             ))}
                         </div>
@@ -148,49 +168,34 @@ function FeedbackForm() {
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {ratingParameters.map((param, index) => (
-                            <div key={index} className="bg-gray-50 p-4 rounded-lg border">
-                                <div className="flex flex-col space-y-2">
-                                    <label className="text-gray-800 font-medium">
-                                        {param.label}
-                                        <span className="text-sm text-gray-500 font-normal ml-2">
-                                            ({param.description})
-                                        </span>
-                                    </label>
-                                    <select
-                                        name={param.name}
-                                        value={formData.ratings[param.name]}
-                                        onChange={handleChange}
-                                        className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                                        required
-                                    >
-                                        <option value="">Select a rating</option>
-                                        {Object.entries(ratingDescriptions).map(([value, { label }]) => (
-                                            <option key={value} value={value}>
-                                                {value} - {label}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
+                            <div key={index} className="p-4 bg-blue-50 rounded-lg border">
+                                <label className="block text-gray-800 font-medium mb-1">
+                                    {param.label} <span className="text-sm text-gray-500">({param.description})</span>
+                                </label>
+                                <span className="text-sm text-gray-600">{param.punjabi}</span>
+                                <select
+                                    name={param.name}
+                                    value={formData.ratings[param.name]}
+                                    onChange={handleChange}
+                                    className="mt-2 w-full border bg-white p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                >
+                                    <option value="">Select Rating</option>
+                                    {Object.keys(ratingDescriptions).map((rating) => (
+                                        <option key={rating} value={rating}>{rating}</option>
+                                    ))}
+                                </select>
                             </div>
                         ))}
 
-                        <button
-                            type="submit"
-                            className="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                            disabled={loading}
-                        >
-                            {loading ? (
-                                <span className="flex items-center justify-center">
-                                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                    </svg>
-                                    Submitting...
-                                </span>
-                            ) : (
-                                'Submit Feedback'
-                            )}
-                        </button>
+                        <div className="text-center mt-6">
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full md:w-auto bg-indigo-600 text-white px-6 py-2 rounded-lg shadow hover:bg-indigo-700 disabled:bg-indigo-300"
+                            >
+                                {loading ? 'Submitting...' : 'Submit Feedback'}
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -199,3 +204,4 @@ function FeedbackForm() {
 }
 
 export default FeedbackForm;
+    
