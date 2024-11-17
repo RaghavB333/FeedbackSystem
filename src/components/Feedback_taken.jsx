@@ -112,7 +112,7 @@ const Feedback_taken = ({ onUpdate }) => {
           { feedbackid, students, subject, teacher }
 
         );
-        alert(response.data.message);
+        alert(await response.data.message);
       } catch (error) {
         console.error("Error sending messages:", error);
         alert("Failed to send messages.");
@@ -165,137 +165,6 @@ const Feedback_taken = ({ onUpdate }) => {
   }
 
   return (
-    // <div>
-    //     <h2 style={styles.heading}>Student List</h2>
-    //     {students.length > 0 ? (
-    //         <>
-    //         {isEditing ?
-    //             <form onSubmit={handleSubmit} className="space-y-4">
-    //                 {['name', 'fname', 'contact', 'email', 'address', 'department', 'semester'].map((field) => (
-    //                     <div key={field}>
-    //                         <label className="block font-semibold">{field.charAt(0).toUpperCase() + field.slice(1)}:</label>
-    //                         <input
-    //                             type="text"
-    //                             name={field}
-    //                             value={formData[field]}
-    //                             onChange={handleChange}
-    //                             className="w-full p-2 border border-gray-300 rounded-md"
-    //                         />
-    //                     </div>
-    //                 ))}
-    //                 <button type="submit" className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">Save Changes</button>
-    //             </form>
-    //         :<>
-    //             <table style={styles.table}>
-    //             <thead>
-    //                 <tr>
-    //                     <th style={styles.th}>Roll Number</th>
-    //                     <th style={styles.th}>Name</th>
-    //                     <th style={styles.th}>Father Name</th>
-    //                     <th style={styles.th}>Email</th>
-    //                     <th style={styles.th}>Contact</th>
-    //                     <th style={styles.th}>Branch</th>
-    //                     <th style={styles.th}>Semester</th>
-    //                     <th style={styles.th}>Operations</th>
-    //                 </tr>
-    //             </thead>
-    //             <tbody>
-    //                 {students.map((student) => (
-    //                     <tr key={student.rollNumber}>
-    //                         <td style={styles.td}>{student.rollNumber}</td>
-    //                         <td style={styles.td}>{student.name}</td>
-    //                         <td style={styles.td}>{student.fname}</td>
-    //                         <td style={styles.td}>{student.email}</td>
-    //                         <td style={styles.td}>{student.contact}</td>
-    //                         <td style={styles.td}>{student.department}</td>
-    //                         <td style={styles.td}>{student.semester}</td>
-    //                         <td style={styles.td}>
-    //                             <button onClick={()=>deletestudent(student.rollNumber)} style={styles.dlt_btn}>Delete</button>
-    //                             <button onClick={()=>editstudent(student.rollNumber)} style={styles.edit_btn}>Edit</button>
-    //                         </td>
-    //                     </tr>
-    //                 ))}
-    //             </tbody>
-    //         </table>
-
-    //         <div>
-    //             <button onClick={createfeedback} style={styles.send_btn}>Take Feedback</button>
-    //         </div>
-    //         </>}
-    //     </>
-    //     ) : (
-    //         <p>No students found for the selected branch and semester.</p>
-    //     )}
-    // </div>
-
-
-    // <div>
-    //     <h2 style={styles.heading}>Student List</h2>
-    //     {students.length > 0 ? (
-    //         <>
-    //             {isEditing ?
-    //                 <form onSubmit={handleSubmit} className="space-y-4">
-    //                     {['name', 'fname', 'contact', 'email', 'address'].map((field) => (
-    //                         <div key={field}>
-    //                             <label className="block font-semibold">{field.charAt(0).toUpperCase() + field.slice(1)}:</label>
-    //                             <input
-    //                                 type="text"
-    //                                 name={field}
-    //                                 value={formData[field]}
-    //                                 onChange={handleChange}
-    //                                 className="w-full p-2 border border-gray-300 rounded-md"
-    //                             />
-    //                         </div>
-    //                     ))}
-    //                     {/* Branch Select */}
-    //                     <div className="relative">
-    //                         <label className="flex items-center text-gray-700 text-sm font-semibold mb-2">
-    //                             Branch
-    //                         </label>
-    //                         <select
-    //                             name="branch"
-    //                             value={formData.branch}
-    //                             onChange={handleChange}
-    //                             className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all appearance-none"
-    //                             required
-    //                         >
-    //                             <option value="" disabled hidden>
-    //                                 Select your branch
-    //                             </option>
-    //                             {branches.map((branch) => (
-    //                                 <option key={branch.branch_id} value={branch.name}>
-    //                                     {branch.name}
-    //                                 </option>
-    //                             ))}
-    //                         </select>
-    //                     </div>
-
-    //                     {/* Semester Select */}
-    //                     <div className="relative">
-    //                         <label className="flex items-center text-gray-700 text-sm font-semibold mb-2">
-    //                             Semester
-    //                         </label>
-    //                         <select
-    //                             name="semester"
-    //                             value={formData.semester}
-    //                             onChange={handleChange}
-    //                             className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all appearance-none"
-    //                             required
-    //                         >
-    //                             <option value="" disabled hidden>
-    //                                 Select your semester
-    //                             </option>
-    //                             {branchOptions[formData.branch]?.map((semester) => (
-    //                                 <option key={semester} value={semester}>
-    //                                     Semester {semester}
-    //                                 </option>
-    //                             ))}
-    //                         </select>
-    //                     </div>
-
-    //                     <button type="submit" className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">Save Changes</button>
-    //                 </form>
-
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
@@ -326,7 +195,7 @@ const Feedback_taken = ({ onUpdate }) => {
                   <h3 className="text-lg font-semibold text-gray-900">Edit Student Information</h3>
                 </div>
                 <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {['name', 'fname', 'contact', 'email', 'address'].map((field) => (
+                  {['name', 'fname', 'contact', 'email', 'address', 'CGPA'].map((field) => (
                     <div key={field} className="space-y-1">
                       <label className="block text-sm font-medium text-gray-700">
                         {field.charAt(0).toUpperCase() + field.slice(1)}

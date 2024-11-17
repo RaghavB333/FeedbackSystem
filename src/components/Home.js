@@ -1,5 +1,5 @@
 import React from 'react';
-
+import { ChevronDown, Users, BookOpen, Award, ArrowRight, Target, Eye, Lightbulb, CheckCircle, TrendingUp, Users2 } from 'lucide-react';
 const Home = () => {
   return (
     <>
@@ -42,7 +42,7 @@ const Home = () => {
           </div>
         </header>
 
-        <div className="bg-black text-white py-16">
+        <div className="bg-white text-black py-16">
           <main className="container mx-auto px-4">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -120,6 +120,119 @@ const Home = () => {
             </div>
           </main>
         </div>
+
+        <div className="bg-white py-20">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">About Our Feedback System</h2>
+            <div className="w-24 h-1 bg-blue-600 mx-auto mb-8"></div>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Our comprehensive feedback system is designed to bridge the gap between students and administration, 
+              ensuring continuous improvement in educational quality and student experience.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
+            <div className="space-y-8">
+              {[
+                {
+                  icon: CheckCircle,
+                  title: "Real-Time Feedback",
+                  description: "Provide instant feedback on courses, teaching methods, and facilities."
+                },
+                {
+                  icon: TrendingUp,
+                  title: "Data-Driven Improvements",
+                  description: "Analytics-based decision making for continuous educational enhancement."
+                },
+                {
+                  icon: Users,
+                  title: "Anonymous Submissions",
+                  description: "Safe and confidential platform for honest student opinions."
+                }
+              ].map((feature, index) => (
+                <div key={index} className="flex items-start space-x-4">
+                  <div className="bg-blue-100 rounded-lg p-3">
+                    <feature.icon className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">{feature.title}</h3>
+                    <p className="text-gray-600">{feature.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* <div className="relative">
+              <div className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl p-1">
+                <div className="bg-white rounded-2xl p-8">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-6">Key Statistics</h3>
+                  <div className="space-y-6">
+                    {[
+                      { label: "Student Satisfaction", value: "92%" },
+                      { label: "Response Rate", value: "85%" },
+                      { label: "Implementation Rate", value: "78%" }
+                    ].map((stat, index) => (
+                      <div key={index} className="relative">
+                        <div className="flex justify-between mb-2">
+                          <span className="text-gray-600">{stat.label}</span>
+                          <span className="font-bold text-blue-600">{stat.value}</span>
+                        </div>
+                        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"
+                            style={{ width: stat.value }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div> */}
+          </div>
+        </div>
+      </div>
+
+
+      <div className="bg-gradient-to-r from-blue-900 to-purple-900 text-white py-20">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <Eye className="w-16 h-16 mx-auto text-blue-400 mb-6" />
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">Our Vision</h2>
+            <div className="w-24 h-1 bg-blue-400 mx-auto mb-8"></div>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {[
+              {
+                icon: Target,
+                title: "Excellence in Education",
+                description: "Striving to maintain the highest standards of educational quality through continuous feedback and improvement."
+              },
+              {
+                icon: Lightbulb,
+                title: "Innovation",
+                description: "Fostering innovative teaching methods and learning environments based on student insights and suggestions."
+              },
+              {
+                icon: Users2,
+                title: "Student-Centric",
+                description: "Placing students at the heart of our decision-making process through transparent feedback mechanisms."
+              }
+            ].map((item, index) => (
+              <div 
+                key={index}
+                className="bg-white/10 backdrop-blur-sm rounded-xl p-8 hover:bg-white/20 transition-all duration-300 transform hover:-translate-y-2"
+              >
+                <item.icon className="w-12 h-12 text-blue-400 mb-4" />
+                <h3 className="text-xl font-bold mb-3">{item.title}</h3>
+                <p className="text-gray-300">{item.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
         <footer className="bg-gray-900 text-gray-400 py-12">
           <div className="container mx-auto px-4">

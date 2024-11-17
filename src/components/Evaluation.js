@@ -11,7 +11,7 @@ const EvaluationPage = () => {
     const [error, setError] = useState('');
 
     const location = useLocation();
-    const { feedback_id, teacherid, subject, teacher_name } = location.state || {};
+    const { feedback_id, teacherid, subject, teacher_name} = location.state || {};
 
     const navigate = useNavigate();
     const [isAdmin, setIsAdmin] = useState(() => {

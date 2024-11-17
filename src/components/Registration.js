@@ -20,6 +20,7 @@ const Registration = () => {
     address: "",
     branch: "", // Renamed 'department' to 'branch'
     semester: "",
+    CGPA: ""
   });
 
   const [message, setMessage] = useState("");
@@ -236,6 +237,35 @@ const Registration = () => {
                   ))}
                 </select>
               </div>
+                  {formData.semester == 1 ?
+              <div className="relative">
+                <label className="flex items-center text-gray-700 text-sm font-semibold mb-2">
+                  <BookOpen className="w-4 h-4 mr-2" />
+                  Enter 12th Marks
+                </label>
+                <input
+                  name="CGPA"
+                  value={formData.CGPA}
+                  onChange={handleChange}
+                  disabled={!formData.semester}
+                  className="w-full px-4 py-2 border-2 rounded-lg"
+                  required
+                />
+              </div>:
+              <div className="relative">
+              <label className="flex items-center text-gray-700 text-sm font-semibold mb-2">
+                <BookOpen className="w-4 h-4 mr-2" />
+                CGPA
+              </label>
+              <input
+                name="CGPA"
+                value={formData.CGPA}
+                onChange={handleChange}
+                disabled={!formData.semester}
+                className="w-full px-4 py-2 border-2 rounded-lg"
+                required
+              />
+            </div>}
               </div>
 
               {/* Address Input - Full Width */}

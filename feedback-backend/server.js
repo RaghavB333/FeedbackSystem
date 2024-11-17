@@ -40,7 +40,7 @@ async function getDbConnection() {
 // Register route (without password)
 app.post('/register', async (req, res) => {
 
-    const { name, fname, rollNumber, contact, email, address, branch, semester } = req.body;
+    const { name, fname, rollNumber, contact, email, address, branch, semester, CGPA } = req.body;
 
     if (!name || !rollNumber || !email) {
         return res.status(400).send('Name, Roll Number, and Email are required.');
@@ -64,10 +64,10 @@ app.post('/register', async (req, res) => {
 
         // Insert new student record without password
         const sql = `
-            INSERT INTO students (name, fname, rollNumber, contact, email, address, branch, semester)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO students (name, fname, rollNumber, contact, email, address, branch, semester, CGPA)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
-        await db.query(sql, [name, fname, rollNumber, contact, email, address, branch, semester]);
+        await db.query(sql, [name, fname, rollNumber, contact, email, address, branch, semester, CGPA]);
         res.send('Registration successful!');
     } catch (error) {
         console.error('Error registering student:', error);
@@ -148,7 +148,7 @@ app.post('/api/forgot-fetchstu-data', async(req,res)=>{
 })
 
 app.post('/updateStudent', async (req, res) => {
-    const { rollNumber, name, fname, contact, email, address, branch, semester } = req.body;
+    const { rollNumber, name, fname, contact, email, address, branch, semester, CGPA } = req.body;
 
 
     if (!rollNumber) {
@@ -160,10 +160,10 @@ app.post('/updateStudent', async (req, res) => {
         const sql = `
             UPDATE students SET 
                 name = ?, fname = ?, contact = ?, email = ?, 
-                address = ?, branch = ?, semester = ? 
+                address = ?, branch = ?, semester = ?, CGPA = ? 
             WHERE rollNumber = ?
         `;
-        const [result] = await db.query(sql, [name, fname, contact, email, address, branch, semester, rollNumber]);
+        const [result] = await db.query(sql, [name, fname, contact, email, address, branch, semester, CGPA, rollNumber]);
 
         if (result.affectedRows === 0) {
             return res.status(404).send('Student not found.');
@@ -304,7 +304,7 @@ app.post('/api/feedback-created', async (req, res) => {
     const query = `
     INSERT INTO TeacherEvaluationSummary (teacher_id, subject_id, avg_subject_knowledge, avg_communication_effectiveness, avg_communication_clarity,
                avg_engagement, avg_participation, avg_responsiveness_approachability, avg_responsiveness_effectiveness,
-               avg_punctuality, avg_preparedness, avg_critical_thinking, total_feedback_count) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
+               avg_punctuality, avg_preparedness, avg_critical_thinking, total_weightage) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
     `;
 
     const [result] = await db.query(query, [teacherid, subjectid, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
@@ -340,8 +340,9 @@ app.post('/api/verify-student', async (req, res) => {
 
 
 app.post('/api/updateFeedback', async (req, res) => {
-    const { feedback_id, ratings } = req.body;
+    const { feedback_id, ratings,weightage } = req.body;
     const { token } = req.query;
+    // console.log(weightage);
 
     if (!feedback_id || !ratings || !token) {
         return res.status(400).json({ success: false, message: 'Missing required fields' });
@@ -350,7 +351,7 @@ app.post('/api/updateFeedback', async (req, res) => {
     const selectQuery = `
         SELECT avg_subject_knowledge, avg_communication_effectiveness, avg_communication_clarity,
                avg_engagement, avg_participation, avg_responsiveness_approachability, avg_responsiveness_effectiveness,
-               avg_punctuality, avg_preparedness, avg_critical_thinking, total_feedback_count 
+               avg_punctuality, avg_preparedness, avg_critical_thinking, total_weightage 
         FROM TeacherEvaluationSummary
         WHERE feedback_id = ?
     `;
@@ -359,33 +360,52 @@ app.post('/api/updateFeedback', async (req, res) => {
         const db = await getDbConnection();
 
         const [rows] = await db.query(selectQuery, [feedback_id]);
+        // console.log(rows);
         if (rows.length === 0) {
             return res.status(404).json({ success: false, message: 'Feedback not found.' });
         }
 
         const currentData = rows[0];
-        const newFeedbackCount = Number(currentData.total_feedback_count) + 1;
+        console.log(currentData);
+        const new_weightage = Number(currentData.total_weightage) + Number(weightage);
+        console.log("new weightage :", new_weightage);
 
         const updatedData = {
-            avg_subject_knowledge: ((Number(currentData.avg_subject_knowledge) * currentData.total_feedback_count) + Number(ratings.avg_subject_knowledge || 0)) / newFeedbackCount,
-            avg_communication_effectiveness: ((Number(currentData.avg_communication_effectiveness) * currentData.total_feedback_count) + Number(ratings.avg_communication_effectiveness || 0)) / newFeedbackCount,
-            avg_communication_clarity: ((Number(currentData.avg_communication_clarity) * currentData.total_feedback_count) + Number(ratings.avg_communication_clarity || 0)) / newFeedbackCount,
-            avg_engagement: ((Number(currentData.avg_engagement) * currentData.total_feedback_count) + Number(ratings.avg_engagement || 0)) / newFeedbackCount,
-            avg_participation: ((Number(currentData.avg_participation) * currentData.total_feedback_count) + Number(ratings.avg_participation || 0)) / newFeedbackCount,
-            avg_responsiveness_approachability: ((Number(currentData.avg_responsiveness_approachability) * currentData.total_feedback_count) + Number(ratings.avg_responsiveness_approachability || 0)) / newFeedbackCount,
-            avg_responsiveness_effectiveness: ((Number(currentData.avg_responsiveness_effectiveness) * currentData.total_feedback_count) + Number(ratings.avg_responsiveness_effectiveness || 0)) / newFeedbackCount,
-            avg_punctuality: ((Number(currentData.avg_punctuality) * currentData.total_feedback_count) + Number(ratings.avg_punctuality || 0)) / newFeedbackCount,
-            avg_preparedness: ((Number(currentData.avg_preparedness) * currentData.total_feedback_count) + Number(ratings.avg_preparedness || 0)) / newFeedbackCount,
-            avg_critical_thinking: ((Number(currentData.avg_critical_thinking) * currentData.total_feedback_count) + Number(ratings.avg_critical_thinking || 0)) / newFeedbackCount,
-            total_feedback_count: newFeedbackCount
+            avg_subject_knowledge: ((Number(currentData.avg_subject_knowledge) * Number(currentData.total_weightage)) + (Number(ratings.avg_subject_knowledge || 0) * weightage)) / new_weightage,
+            avg_communication_effectiveness: ((Number(currentData.avg_communication_effectiveness) * Number(currentData.total_weightage)) + (Number(ratings.avg_communication_effectiveness || 0) * weightage)) / new_weightage,
+            avg_communication_clarity: ((Number(currentData.avg_communication_clarity) * Number(currentData.total_weightage)) + (Number(ratings.avg_communication_clarity || 0) * weightage)) / new_weightage,
+            avg_engagement: ((Number(currentData.avg_engagement) * Number(currentData.total_weightage)) + (Number(ratings.avg_engagement || 0) * weightage)) / new_weightage,
+            avg_participation: ((Number(currentData.avg_participation) * Number(currentData.total_weightage)) + (Number(ratings.avg_participation || 0) * weightage)) / new_weightage,
+            avg_responsiveness_approachability: ((Number(currentData.avg_responsiveness_approachability) * Number(currentData.total_weightage)) + (Number(ratings.avg_responsiveness_approachability || 0) * weightage)) / new_weightage,
+            avg_responsiveness_effectiveness: ((Number(currentData.avg_responsiveness_effectiveness) * Number(currentData.total_weightage)) + (Number(ratings.avg_responsiveness_effectiveness || 0) * weightage)) / new_weightage,
+            avg_punctuality: ((Number(currentData.avg_punctuality) * Number(currentData.total_weightage)) + (Number(ratings.avg_punctuality || 0) * weightage)) / new_weightage,
+            avg_preparedness: ((Number(currentData.avg_preparedness) * Number(currentData.total_weightage)) + (Number(ratings.avg_preparedness || 0) * weightage)) / new_weightage,
+            avg_critical_thinking: ((Number(currentData.avg_critical_thinking) * Number(currentData.total_weightage)) + (Number(ratings.avg_critical_thinking || 0) * weightage)) / new_weightage,
+            total_weightage: new_weightage
         };
+        console.log("updated data :" ,updatedData);
+
+        let overallScore = 
+            (0.20 * updatedData.avg_subject_knowledge +
+             0.15 * updatedData.avg_communication_effectiveness +
+             0.10 * updatedData.avg_communication_clarity +
+             0.10 * updatedData.avg_engagement +
+             0.05 * updatedData.avg_participation +
+             0.10 * updatedData.avg_responsiveness_approachability +
+             0.05 * updatedData.avg_responsiveness_effectiveness +
+             0.05 * updatedData.avg_punctuality +
+             0.10 * updatedData.avg_preparedness +
+             0.10 * updatedData.avg_critical_thinking);
+
+            //  console.log(overallScore);
+
 
         const updateQuery = `
             UPDATE TeacherEvaluationSummary 
             SET avg_subject_knowledge = ?, avg_communication_effectiveness = ?, avg_communication_clarity = ?, 
                 avg_engagement = ?, avg_participation = ?, avg_responsiveness_approachability = ?, 
                 avg_responsiveness_effectiveness = ?, avg_punctuality = ?, avg_preparedness = ?, 
-                avg_critical_thinking = ?, total_feedback_count = ?
+                avg_critical_thinking = ?, total_weightage = ?, overall_score = ?
             WHERE feedback_id = ?
         `;
 
@@ -393,7 +413,7 @@ app.post('/api/updateFeedback', async (req, res) => {
             updatedData.avg_subject_knowledge, updatedData.avg_communication_effectiveness, updatedData.avg_communication_clarity,
             updatedData.avg_engagement, updatedData.avg_participation, updatedData.avg_responsiveness_approachability,
             updatedData.avg_responsiveness_effectiveness, updatedData.avg_punctuality, updatedData.avg_preparedness,
-            updatedData.avg_critical_thinking, updatedData.total_feedback_count, feedback_id
+            updatedData.avg_critical_thinking, updatedData.total_weightage, overallScore, feedback_id
         ]);
 
         await db.query('DELETE FROM feedbacktokens WHERE token = ?', [token]);
@@ -441,7 +461,7 @@ app.post('/api/fetchFeedback', async (req, res) => {
         const sql = `
             SELECT avg_subject_knowledge, avg_communication_effectiveness, avg_communication_clarity,
                    avg_engagement, avg_participation, avg_responsiveness_approachability, avg_responsiveness_effectiveness,
-                   avg_punctuality, avg_preparedness, avg_critical_thinking, total_feedback_count, last_updated
+                   avg_punctuality, avg_preparedness, avg_critical_thinking, total_weightage, last_updated
             FROM TeacherEvaluationSummary
             WHERE feedback_id = ?
         `;
@@ -514,6 +534,64 @@ app.post('/api/fetchFeedback', async (req, res) => {
 
 
 
+// Endpoint to fetch the overall score
+app.get('/api/getOverallScore', async (req, res) => {
+    const { feedback_id } = req.query;
+
+    if (!feedback_id) {
+        return res.status(400).json({ success: false, message: 'Feedback ID is required.' });
+    }
+
+    const query = `SELECT overall_score FROM TeacherEvaluationSummary WHERE feedback_id = ?`;
+
+    try {
+        const db = await getDbConnection();
+        const [rows] = await db.query(query, [feedback_id]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ success: false, message: 'Feedback not found.' });
+        }
+
+        res.json({ success: true, overall_score: rows[0].overall_score });
+    } catch (error) {
+        console.error('Error fetching overall score:', error);
+        res.status(500).json({ success: false, message: 'Error fetching overall score.' });
+    }
+});
+
+// Fetch distinct years
+app.get('/api/years', async (req, res) => {
+    try {
+        const db = await getDbConnection();
+        const query = `SELECT DISTINCT YEAR(last_updated) as year FROM teacherevaluationsummary`;
+        const [rows] = await db.query(query);
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching years:', error);
+        res.status(500).send('Error fetching years');
+    }
+});
+
+// Fetch performance data for a specific year
+app.get('/api/overall-performance', async (req, res) => {
+    const { year } = req.query;
+    try {
+        const db = await getDbConnection();
+        const query = `
+            SELECT tes.teacher_id, t.teacher_name, tes.overall_score 
+            FROM teacherevaluationsummary tes 
+            JOIN teachers t ON tes.teacher_id = t.teacher_id 
+            WHERE YEAR(tes.last_updated) = ?
+        `;
+        const [rows] = await db.query(query, [year]);
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching performance data:', error);
+        res.status(500).send('Error fetching performance data');
+    }
+});
+
+
 
 
 
@@ -577,30 +655,62 @@ const sendFeedbackLinks = async (feedbackid, students, subject, teacher) => {
     const promises = []; // Array to hold promises for database insertions
 
     students.forEach((student) => {
-        // Generate a token for each student
-        let token = crypto.randomBytes(32).toString('hex'); // Generates a 64-character hex string
-        const query = 'INSERT INTO feedbacktokens (token) VALUES (?)';
-
-        // Push the database query promise to the array
-        promises.push(
-            new Promise((resolve, reject) => {
-                db.query(query, [token], (error, results) => {
-                    if (error) {
-                        return reject(error); // Reject the promise on error
-                    }
-                    resolve(results); // Resolve the promise on success
-                });
-            })
-        );
-
-        // Create the feedback link
-        const feedbackLink = `http://localhost:3000/feedbackForm?feedbackid=${encodeURIComponent(feedbackid)}&name=${encodeURIComponent(student.name)}&subject=${encodeURIComponent(subject)}&teacher=${encodeURIComponent(teacher)}&expiryTime=${expiryTime}&token=${token}`;
-
-        if (student.email) {
-            // Send feedback link via email
-            console.log(`Sending feedback link to: ${student.email}`);
-            sendEmail(student.email, feedbackLink);
+        
+        
+        const CGPA = student.CGPA;
+        console.log(CGPA);
+        let weightage = 0;
+        if(CGPA >=5 && CGPA < 6)
+        {
+            weightage = 0.8;
         }
+        else if(CGPA >= 6 && CGPA < 7)
+        {
+            weightage = 1.0;
+        }
+        else if(CGPA >= 7 && CGPA < 8)
+        {
+            weightage = 1.2;
+        }
+        else if(CGPA >= 8 && CGPA < 9)
+        {
+            weightage = 1.4;
+        }
+        else if(CGPA >= 9 && CGPA <= 10)
+        {
+            weightage = 1.5;
+        }
+        console.log(weightage);
+
+
+        if(weightage != 0)
+        {
+
+            // Generate a token for each student
+            let token = crypto.randomBytes(32).toString('hex'); // Generates a 64-character hex string
+            const query = 'INSERT INTO feedbacktokens (token) VALUES (?)';
+    
+            // Push the database query promise to the array
+            promises.push(
+                new Promise((resolve, reject) => {
+                    db.query(query, [token], (error, results) => {
+                        if (error) {
+                            return reject(error); // Reject the promise on error
+                        }
+                        resolve(results); // Resolve the promise on success
+                    });
+                })
+            );
+            // Create the feedback link
+            const feedbackLink = `http://localhost:3000/feedbackForm?feedbackid=${encodeURIComponent(feedbackid)}&name=${encodeURIComponent(student.name)}&subject=${encodeURIComponent(subject)}&teacher=${encodeURIComponent(teacher)}&expiryTime=${expiryTime}&token=${token}&weightage=${weightage}`;
+    
+            if (student.email) {
+                // Send feedback link via email
+                console.log(`Sending feedback link to: ${student.email}`);
+                sendEmail(student.email, feedbackLink);
+            }
+        }
+
     });
 
     // Wait for all tokens to be inserted into the database

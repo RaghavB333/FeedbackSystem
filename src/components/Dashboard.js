@@ -181,7 +181,7 @@ const Dashboard = ({ studentData, onLogout, onUpdate }) => {
             {isEditing ? (
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {['name', 'fname', 'contact', 'email', 'address'].map((field) => (
+                  {['name', 'fname', 'contact', 'email', 'address', 'CGPA'].map((field) => (
                     <div key={field}>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         {field.charAt(0).toUpperCase() + field.slice(1)}

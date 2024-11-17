@@ -11,6 +11,9 @@ function FeedbackForm() {
     const teacher = queryParams.get('teacher');
     const expirytime = queryParams.get('expiryTime');
     const token = queryParams.get('token');
+    const weightage = queryParams.get('weightage');
+
+    console.log(weightage);
 
     const [formData, setFormData] = useState({
         teacher_id: 1,
@@ -68,7 +71,8 @@ function FeedbackForm() {
 
         const feedbackData = {
             feedback_id: feedbackid,
-            ratings: formData.ratings
+            ratings: formData.ratings,
+            weightage:weightage
         };
 
         try {
