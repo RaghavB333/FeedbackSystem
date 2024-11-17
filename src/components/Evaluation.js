@@ -11,7 +11,7 @@ const EvaluationPage = () => {
     const [error, setError] = useState('');
 
     const location = useLocation();
-    const { feedback_id, teacherid, subject, teacher_name} = location.state || {};
+    const { feedback_id, teacherid, subject, teacher_name } = location.state || {};
 
     const navigate = useNavigate();
     const [isAdmin, setIsAdmin] = useState(() => {
@@ -173,6 +173,14 @@ const EvaluationPage = () => {
                 if (score >= 2.5) return { statement: "Limited understanding; more study is required.", suggestion: "Invest time in studying the curriculum and related resources." };
                 if (score >= 2.0) return { statement: "Lacks adequate subject knowledge.", suggestion: "Consider mentorship from more experienced colleagues." };
                 return { statement: "Very poor understanding of the subject matter.", suggestion: "Immediate action is needed to improve subject knowledge." };
+            case 'syllabus_coverage':
+                if (score >= 4.5) return { statement: "Outstanding syllabus coverage, going beyond the required scope.", suggestion: "Keep maintaining high standards, and integrate advanced topics for further enrichment." };
+                if (score >= 4.0) return { statement: "Comprehensive coverage of syllabus topics.", suggestion: "Ensure to balance in-depth explanations with broader topic discussions." };
+                if (score >= 3.5) return { statement: "Good syllabus coverage with slight omissions.", suggestion: "Review omitted areas to cover the syllabus fully in future sessions." };
+                if (score >= 3.0) return { statement: "Adequate coverage but some important topics are missing.", suggestion: "Focus on identifying and covering gaps in future lectures." };
+                if (score >= 2.5) return { statement: "Partial coverage; significant portions of the syllabus were not addressed.", suggestion: "Prioritize missing topics to improve syllabus completion." };
+                if (score >= 2.0) return { statement: "Minimal syllabus coverage, leaving students underprepared.", suggestion: "Reassess lecture plans to align with the syllabus requirements." };
+                return { statement: "Very poor syllabus coverage; most topics were not addressed.", suggestion: "Develop a structured syllabus plan and adhere to it strictly." };
             case 'communication_effectiveness':
                 if (score >= 4.5) return { statement: "Communicates ideas clearly and effectively.", suggestion: "Continue to employ effective communication techniques." };
                 if (score >= 4.0) return { statement: "Generally communicates well, with some minor issues.", suggestion: "Work on refining presentation skills." };
