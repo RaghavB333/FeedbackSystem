@@ -206,7 +206,7 @@ const Home = () => {
       className="overflow-hidden relative"
     >
       <motion.h3
-        className="text-2xl md:text-3xl min-w-[400px]:text-[5px] font-bold text-gray-900 mb-4 inline-block"
+        className="text-[1.3rem] sm:text-2xl md:text-3xl lg:text-3xl font-bold text-gray-900 mb-4 inline-block"
         variants={titleContainer}
         initial="initial"
         animate="animate"

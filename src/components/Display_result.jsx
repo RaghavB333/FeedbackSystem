@@ -1,47 +1,36 @@
-// App.js
-import React from 'react';
-import { useState, useEffect } from 'react';
+// Display_result.js
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, User, Book, ChevronRight, Star } from 'lucide-react';
- 
-
 
 const Display_result = () => {
-
-  const [feedbacks, setfeedbacks] = useState([]);
+  const [feedbacks, setFeedbacks] = useState([]);
   const navigate = useNavigate();
 
-     // Get admin status from context
-
-
-     const [isAdmin, setIsAdmin] = useState(() => {
-      return localStorage.getItem('isAdmin') === 'true'; // Retrieve value from localStorage
+  // Get admin status from context
+  const [isAdmin, setIsAdmin] = useState(() => {
+    return localStorage.getItem('isAdmin') === 'true'; // Retrieve value from localStorage
   });
-  
-  useEffect(() => {
-      if (!isAdmin) {
-          navigate('/admin-login'); // Redirect to login page if not authorized
-      }
-  }, [isAdmin, navigate]);
-  useEffect(() => {
 
-    const fetchfeedbacks = async () => {
-
-      const response = axios.get('http://localhost:5000/api/fetch-feedbacks');
-      const data = await response;
-      setfeedbacks(data.data[0]);
+  useEffect(() => {
+    if (!isAdmin) {
+      navigate('/admin-login'); // Redirect to login page if not authorized
     }
-
-    fetchfeedbacks();
-
-  }, [])
+  }, [isAdmin, navigate]);
 
   useEffect(() => {
-    if (feedbacks)
-      console.log(feedbacks);
-  }, [feedbacks])
+    const fetchFeedbacks = async () => {
+      const response = await axios.get('http://localhost:5000/api/fetch-feedbacks');
+      setFeedbacks(response.data[0]);
+    };
 
+    fetchFeedbacks();
+  }, []);
+
+  useEffect(() => {
+    if (feedbacks) console.log(feedbacks);
+  }, [feedbacks]);
 
   const formatDate = (dateString) => {
     try {
@@ -69,29 +58,6 @@ const Display_result = () => {
     return 'text-red-600 bg-red-50';
   };
 
-
-  // const getStarRating = (feedback_id) => {
-
-  //   let totalreating = 0;
-  //   for(let i=3;i<feedbacks.length;i++)
-  //   {
-  //     totalreating +=
-  //   }
-  //   const fullStars = Math.floor(score);
-  //   const hasHalfStar = score - fullStars >= 0.5;
-  //   const stars = [];
-
-  //   for (let i = 0; i < fullStars; i++) {
-  //     stars.push(<Star key={i} className="w-5 h-5 text-yellow-500" />);
-  //   }
-
-  //   if (hasHalfStar) {
-  //     stars.push(<Star key={fullStars} className="w-5 h-5 text-yellow-500 fill-half" />);
-  //   }
-
-  //   return stars;
-  // };
-
   const metrics = [
     { key: 'avg_subject_knowledge', label: 'Subject Knowledge' },
     { key: 'avg_communication_effectiveness', label: 'Communication Effectiveness' },
@@ -105,7 +71,6 @@ const Display_result = () => {
     { key: 'avg_critical_thinking', label: 'Critical Thinking' },
     { key: 'avg_syllabus_coverage', label: 'Syllabus Coverage' }
   ];
-
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -125,7 +90,14 @@ const Display_result = () => {
                 }
               })}
             >
-              <div className="p-6">
+              <div className="p-6 relative">
+                {/* Overall score at the top-right */}
+                <div
+                  className={`absolute top-4 right-4 py-1 px-3 rounded-md text-xl font-semibold ${getScoreColor(feedback.overall_score)}`}
+                > Overall Score -   
+                   {Number(feedback.overall_score).toFixed(1)}
+                </div>
+
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-4">
                     <div className="bg-blue-100 p-2 rounded-lg">
@@ -136,7 +108,6 @@ const Display_result = () => {
                         <h3 className="text-lg font-semibold text-gray-900">
                           {feedback.teacher_name}
                         </h3>
-                        {/* {getStarRating(feedback.feedback_id)} */}
                       </div>
                       <p className="text-sm text-gray-500">ID: {feedback.teacher_id}</p>
                     </div>
@@ -157,12 +128,11 @@ const Display_result = () => {
 
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                   {metrics.map(({ key, label }) => (
-                    <div
-                      key={key}
-                      className="p-3 rounded-lg"
-                    >
+                    <div key={key} className="p-3 rounded-lg">
                       <div className="text-sm text-gray-500 mb-1">{label}</div>
-                      <div className={`text-lg font-semibold rounded-md px-2 py-1 inline-block ${getScoreColor(feedback[key])}`}>
+                      <div
+                        className={`text-lg font-semibold rounded-md px-2 py-1 inline-block ${getScoreColor(feedback[key])}`}
+                      >
                         {Number(feedback[key]).toFixed(1)}
                       </div>
                     </div>
@@ -176,6 +146,8 @@ const Display_result = () => {
     </div>
   );
 };
+
+
 
 const styles = {
   h2: {

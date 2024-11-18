@@ -459,7 +459,7 @@ app.post('/api/fetchFeedback', async (req, res) => {
         const sql = `
             SELECT avg_subject_knowledge, avg_communication_effectiveness, avg_communication_clarity,
                    avg_engagement, avg_participation, avg_responsiveness_approachability, avg_responsiveness_effectiveness,
-                   avg_punctuality, avg_preparedness, avg_critical_thinking, avg_syllabus_coverage, total_weightage, last_updated
+                   avg_punctuality, avg_preparedness, avg_critical_thinking, avg_syllabus_coverage, overall_score, total_weightage, last_updated
             FROM TeacherEvaluationSummary
             WHERE feedback_id = ?
         `;
@@ -467,7 +467,6 @@ app.post('/api/fetchFeedback', async (req, res) => {
         const [results] = await db.query(sql, [feedback_id]);
 
         // Create an array to store parameter ratings
-        // console.log(results[0]);
         const ratings = [];
 
         if (results[0]) {
@@ -523,7 +522,8 @@ app.post('/api/fetchFeedback', async (req, res) => {
                 ratings: ratings, // Include the ratings array in the response
             };
 
-            res.json(responseData); // Return the updated response as JSON
+            // Return the updated response as JSON
+            res.json(responseData);
         } else {
             res.json({ error: "No feedback data available for this teacher." });
         }
@@ -532,6 +532,7 @@ app.post('/api/fetchFeedback', async (req, res) => {
         res.status(500).json({ error: "Failed to fetch feedback" });
     }
 });
+
 
 
 
