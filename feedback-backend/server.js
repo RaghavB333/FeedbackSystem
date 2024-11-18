@@ -277,7 +277,7 @@ app.post('/api/forgot-stu-pass', async(req,res)=>{
 
 // Admin Password Change Route
 app.post('/api/admin-pass-change', async (req, res) => {
-    const { newPassword } = req.body;
+    const { admin_name,newPassword } = req.body;
 
     if (!newPassword) {
         return res.status(400).json({ error: 'New password is required.' });
@@ -287,7 +287,7 @@ app.post('/api/admin-pass-change', async (req, res) => {
         const db = await getDbConnection();
         const newHashedPassword = await bcrypt.hash(newPassword, saltRounds);
 
-        const [result] = await db.query('UPDATE admin SET password = ? WHERE username = ?', [newHashedPassword, "admin"]);
+        const [result] = await db.query('UPDATE admin SET password = ? WHERE username = ?', [newHashedPassword, admin_name]);
 
         res.status(200).send('Admin password updated successfully.');
     } catch (error) {
@@ -565,7 +565,11 @@ app.get('/api/getOverallScore', async (req, res) => {
 app.get('/api/years', async (req, res) => {
     try {
         const db = await getDbConnection();
-        const query = `SELECT DISTINCT YEAR(last_updated) as year FROM teacherevaluationsummary`;
+        const query = `
+            SELECT DISTINCT YEAR(last_updated) AS year 
+            FROM teacherevaluationsummary 
+            ORDER BY year DESC
+        `;
         const [rows] = await db.query(query);
         res.json(rows);
     } catch (error) {
@@ -577,14 +581,29 @@ app.get('/api/years', async (req, res) => {
 // Fetch performance data for a specific year
 app.get('/api/overall-performance', async (req, res) => {
     const { year } = req.query;
+
+    if (!year) {
+        return res.status(400).json({ error: 'Year is required' });
+    }
+
     try {
         const db = await getDbConnection();
+
         const query = `
-            SELECT tes.teacher_id, t.teacher_name, tes.overall_score 
-            FROM teacherevaluationsummary tes 
-            JOIN teachers t ON tes.teacher_id = t.teacher_id 
-            WHERE YEAR(tes.last_updated) = ?
+            SELECT 
+                tes.teacher_id, 
+                t.teacher_name, 
+                AVG(tes.overall_score) AS overall_score
+            FROM 
+                teacherevaluationsummary tes
+            JOIN 
+                teachers t ON tes.teacher_id = t.teacher_id
+            WHERE 
+                YEAR(tes.last_updated) = ?
+            GROUP BY 
+                tes.teacher_id, t.teacher_name
         `;
+
         const [rows] = await db.query(query, [year]);
         res.json(rows);
     } catch (error) {
@@ -592,7 +611,6 @@ app.get('/api/overall-performance', async (req, res) => {
         res.status(500).send('Error fetching performance data');
     }
 });
-
 
 
 

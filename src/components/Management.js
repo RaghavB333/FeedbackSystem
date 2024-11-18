@@ -72,8 +72,9 @@ const Management = () => {
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
+    const admin_name = localStorage.getItem('admin_name');
     if (newPassword === confirmPassword) {
-      const response = await axios.post('http://localhost:5000/api/admin-pass-change', { newPassword });
+      const response = await axios.post('http://localhost:5000/api/admin-pass-change', { admin_name,newPassword });
       alert("Password Changed");
     } else {
       alert("Passwords do not match");
