@@ -139,13 +139,13 @@ const Home = () => {
         
         {/* Center Text */}
         <div className='text-center flex-1 mx-4'>
-          <div className='text-blue-800 font-bold text-[8px] sm:text-sm md:text-base lg:text-lg'>
+          <div className='text-blue-800 font-bold text-[9px] sm:text-sm md:text-base lg:text-lg'>
             ਆਈ. ਕੇ. ਗੁਜਰਾਲ ਪੰਜਾਬ ਟੈਕਨੀਕਲ ਯੂਨੀਵਰਸਿਟੀ, ਜਲੰਧਰ
           </div>
-          <div className='text-red-600 font-bold text-[8px] sm:text-sm md:text-base lg:text-lg'>
+          <div className='text-red-600 font-bold text-[9px] sm:text-sm md:text-base lg:text-lg'>
             I.K. GUJRAL PUNJAB TECHNICAL UNIVERSITY, JALANDHAR
           </div>
-          <div className='text-blue-900 font-bold text-[6px] sm:text-xs md:text-sm lg:text-base'>
+          <div className='text-blue-900 font-bold text-[7px] sm:text-xs md:text-sm lg:text-base'>
             (A State University Established by Govt. of Punjab vide Punjab Act No. 1 of 1997)
           </div>
         </div>
@@ -206,7 +206,7 @@ const Home = () => {
       className="overflow-hidden relative"
     >
       <motion.h3
-        className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 inline-block"
+        className="text-2xl md:text-3xl min-w-[400px]:text-[5px] font-bold text-gray-900 mb-4 inline-block"
         variants={titleContainer}
         initial="initial"
         animate="animate"
