@@ -102,7 +102,8 @@ const Display_result = () => {
     { key: 'avg_responsiveness_effectiveness', label: 'Responsiveness' },
     { key: 'avg_punctuality', label: 'Punctuality' },
     { key: 'avg_preparedness', label: 'Preparedness' },
-    { key: 'avg_critical_thinking', label: 'Critical Thinking' }
+    { key: 'avg_critical_thinking', label: 'Critical Thinking' },
+    { key: 'avg_syllabus_coverage', label: 'Syllabus Coverage' }
   ];
 
 

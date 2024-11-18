@@ -137,6 +137,7 @@ const EvaluationPage = () => {
 
                         ratings: {
                             subject_knowledge: data.avg_subject_knowledge,
+                            syllabus_coverage: data.avg_syllabus_coverage,
                             communication_effectiveness: data.avg_communication_effectiveness,
                             communication_clarity: data.avg_communication_clarity,
                             engagement_in_learning: data.avg_engagement,
@@ -327,7 +328,7 @@ const EvaluationPage = () => {
                                     <div className="flex items-center justify-between mb-2">
                                         <strong className="text-lg text-gray-900">{capitalizeWords(parameter)}</strong>
                                         <div className={`flex items-center justify-center px-3 py-1 rounded-full ${getScoreBadgeColor(score)}`}>
-                                            <span className={`text-xl font-bold ${getScoreColor(score)}`}>{score}</span>
+                                            <span className={`text-xl font-bold ${getScoreColor(score)}`}>{score.toFixed(1)}</span>
                                             <span className="text-sm text-gray-500 ml-1">/5</span>
                                         </div>
                                     </div>

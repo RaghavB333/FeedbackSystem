@@ -24,7 +24,7 @@ app.use(bodyParser.json());
 const dbConfig = {
     host: 'localhost',
     user: 'root',
-    password: '3235',
+    password: '@Tanpreet#07',
     database: 'registration_db'
 };
 
@@ -459,7 +459,7 @@ app.post('/api/fetchFeedback', async (req, res) => {
         const sql = `
             SELECT avg_subject_knowledge, avg_communication_effectiveness, avg_communication_clarity,
                    avg_engagement, avg_participation, avg_responsiveness_approachability, avg_responsiveness_effectiveness,
-                   avg_punctuality, avg_preparedness, avg_critical_thinking,avg_syllabus_coverage, total_weightage, last_updated
+                   avg_punctuality, avg_preparedness, avg_critical_thinking, avg_syllabus_coverage, total_weightage, last_updated
             FROM TeacherEvaluationSummary
             WHERE feedback_id = ?
         `;
