@@ -27,12 +27,9 @@ const OverallPerformancePage = () => {
                 try {
                     const response = await axios.get(`/api/overall-performance?year=${selectedYear}`);
                     const scores = response.data;
-    
-                    console.log("Selected Year:", selectedYear);  // Check selected year
-                    console.log("Fetched scores:", scores);        // Check API response
-    
-                    setTeacherScores(scores); // Set the scores in state
-    
+
+                    setTeacherScores(scores);
+
                     // Calculate university average
                     const totalScore = scores.reduce((sum, teacher) => sum + teacher.overall_score, 0);
                     setUniversityAverage((totalScore / scores.length).toFixed(2));
@@ -43,7 +40,7 @@ const OverallPerformancePage = () => {
             fetchScores();
         }
     }, [selectedYear]);
-    
+
     const handleYearChange = (event) => {
         setSelectedYear(event.target.value);
     };
@@ -52,16 +49,27 @@ const OverallPerformancePage = () => {
         labels: teacherScores.map(score => score.teacher_name),
         datasets: [
             {
-                label: 'Overall Score',
+                label: 'Overall Score per Teacher',
                 data: teacherScores.map(score => score.overall_score),
                 backgroundColor: 'rgba(75, 192, 192, 0.6)',
             },
             {
                 label: 'University Average',
-                data: teacherScores.map(() => universityAverage),
-                backgroundColor: 'rgba(153, 102, 255, 0.6)',
+                data: new Array(teacherScores.length).fill(universityAverage),
+                type: 'line', // Use a line chart for university average
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 2,
+                fill: false,
             },
         ],
+    };
+
+    const chartOptions = {
+        scales: {
+            y: {
+                beginAtZero: true,
+            },
+        },
     };
 
     return (
@@ -84,9 +92,9 @@ const OverallPerformancePage = () => {
                 </select>
             </div>
 
-            {teacherScores.length > 0 && (
+            {teacherScores.length > 0 ? (
                 <>
-                    <Bar data={chartData} />
+                    <Bar data={chartData} options={chartOptions} />
 
                     <table className="mt-4 w-full border">
                         <thead>
@@ -103,12 +111,17 @@ const OverallPerformancePage = () => {
                                     <tr key={score.teacher_id}>
                                         <td className="border px-4 py-2">{score.teacher_id}</td>
                                         <td className="border px-4 py-2">{score.teacher_name}</td>
-                                        <td className="border px-4 py-2">{score.overall_score}</td>
+                                        <td className="border px-4 py-2">
+                                            {parseFloat(score.overall_score).toFixed(1)}
+                                        </td>
                                     </tr>
                                 ))}
                         </tbody>
                     </table>
+
                 </>
+            ) : (
+                selectedYear && <p>No data available for the selected year.</p>
             )}
         </div>
     );
