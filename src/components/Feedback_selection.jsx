@@ -31,7 +31,7 @@ const Feedback_selection = () => {
 
     useEffect(() => {
       const fetchbranches = async()=>{
-        const response = await axios.get('http://localhost:5000/api/fetch-branches');
+        const response = await axios.get('https://feedbacksystem-backend-8kxj.onrender.com/api/fetch-branches');
         setbranches(await response.data[0]);
       }
       fetchbranches();
@@ -44,7 +44,7 @@ const Feedback_selection = () => {
 
     useEffect(() => {
         const fetchteachers = async () => {
-            const response = await axios.post("http://localhost:5000/fetch-teacher", { branch });
+            const response = await axios.post("https://feedbacksystem-backend-8kxj.onrender.com/fetch-teacher", { branch });
             setTeachers(response.data[0]);
         };
 
@@ -55,7 +55,7 @@ const Feedback_selection = () => {
 
     useEffect(() => {
         const fetchsubject = async () => {
-            const response = await axios.post("http://localhost:5000/fetch-subjects", { branch, semester });
+            const response = await axios.post("https://feedbacksystem-backend-8kxj.onrender.com/fetch-subjects", { branch, semester });
             setSubjects(response.data[0]);
         };
 

@@ -32,7 +32,7 @@ const Registration = () => {
   useEffect(() => {
     const fetchBranches = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/fetch-branches");
+        const response = await axios.get("https://feedbacksystem-backend-8kxj.onrender.com/api/fetch-branches");
         setBranches(response.data[0]);
       } catch (error) {
         console.error("Error fetching branches:", error);
@@ -65,7 +65,7 @@ const Registration = () => {
     setMessage(""); // Reset message before submit
 
     try {
-      const response = await axios.post("http://localhost:5000/register", formData);
+      const response = await axios.post("https://feedbacksystem-backend-8kxj.onrender.com/register", formData);
       setMessage(response.data);
 
       sessionStorage.setItem("rollNumber", formData.rollNumber);

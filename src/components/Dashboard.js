@@ -19,7 +19,7 @@ const Dashboard = ({ studentData, onLogout, onUpdate }) => {
   useEffect(() => {
     const fetchStuBranch = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/fetch-student-branches");
+        const response = await axios.get("https://feedbacksystem-backend-8kxj.onrender.com/api/fetch-student-branches");
         setStuBranch(response.data[0]);
       } catch (error) {
         console.error("Error fetching branches:", error);
@@ -33,7 +33,7 @@ const Dashboard = ({ studentData, onLogout, onUpdate }) => {
   useEffect(() => {
     const fetchBranches = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/fetch-branches");
+        const response = await axios.get("https://feedbacksystem-backend-8kxj.onrender.com/api/fetch-branches");
         // console.log(response.data); // Check the response data
         setBranches(response.data[0]);
       } catch (error) {
@@ -70,7 +70,7 @@ const Dashboard = ({ studentData, onLogout, onUpdate }) => {
     if (newPassword === confirmPassword) {
       const rollno = studentData.rollNumber;
       try {
-        const response = await axios.post('http://localhost:5000/stu-pass-change', { rollno, newPassword });
+        const response = await axios.post('https://feedbacksystem-backend-8kxj.onrender.com/stu-pass-change', { rollno, newPassword });
         setIsModalOpen(false);
       } catch (error) {
         console.error('Error updating password:', error);

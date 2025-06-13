@@ -27,7 +27,7 @@ const SetPassword = () => {
         }
 
         try {
-            const response = await axios.post('http://localhost:5000/set-password', { rollNumber, password });
+            const response = await axios.post('https://feedbacksystem-backend-8kxj.onrender.com/set-password', { rollNumber, password });
             setMessage(response.data);
             navigate('/dashboard'); // Redirect to dashboard after setting password
         } catch (error) {

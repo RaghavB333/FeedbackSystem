@@ -35,7 +35,7 @@ const ForgotPassword = () => {
   const sendOTP = async(e)=>{
     e.preventDefault();
 
-    const response = await axios.post("http://localhost:5000/api/forgot-stu-pass",{email});
+    const response = await axios.post("https://feedbacksystem-backend-8kxj.onrender.com/api/forgot-stu-pass",{email});
     if(response.data)
     {
       alert(response.data.message);
@@ -95,7 +95,7 @@ const ForgotPassword = () => {
   const handleChangePassword = async(e) => {
     e.preventDefault();
     if (newPassword === confirmPassword) {
-        const response = await axios.post('http://localhost:5000/stu-pass-change', {rollno, newPassword});
+        const response = await axios.post('https://feedbacksystem-backend-8kxj.onrender.com/stu-pass-change', {rollno, newPassword});
 
         if(response.data.affectedRows)
         {

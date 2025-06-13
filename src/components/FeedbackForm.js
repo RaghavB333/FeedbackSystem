@@ -67,7 +67,7 @@ function FeedbackForm() {
     useEffect(() => {
         const checkSubmission = async () => {
             try {
-                const response = await fetch(`http://localhost:5000/api/checkFeedbackSubmission?token=${token}`);
+                const response = await fetch(`https://feedbacksystem-backend-8kxj.onrender.com/api/checkFeedbackSubmission?token=${token}`);
                 const data = await response.json();
                 setHasSubmitted(!data.submitted);
             } catch (error) {
@@ -97,7 +97,7 @@ function FeedbackForm() {
         };
 
         try {
-            const response = await fetch(`http://localhost:5000/api/updateFeedback?token=${token}`, {
+            const response = await fetch(`https://feedbacksystem-backend-8kxj.onrender.com/api/updateFeedback?token=${token}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(feedbackData)

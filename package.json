@@ -15,7 +15,7 @@
     "buffer": "^6.0.3",
     "chart.js": "^4.4.6",
     "crypto-browserify": "^3.12.1",
-    "dotenv": "^16.4.5",
+    "dotenv": "^16.5.0",
     "express-session": "^1.18.1",
     "framer-motion": "^11.11.17",
     "lucide-react": "^0.454.0",
@@ -63,7 +63,7 @@
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.14"
   },
-  "proxy": "http://localhost:5000",
+  "proxy": "https://feedbacksystem-backend-8kxj.onrender.com",
   "description": "This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).",
   "main": "postcss.config.js",
   "keywords": [],

@@ -18,7 +18,7 @@ const Management = () => {
 
   const fetchAllTeachers = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/api/fetch-all-teachers');
+      const response = await axios.post('https://feedbacksystem-backend-8kxj.onrender.com/api/fetch-all-teachers');
       console.log('Fetched Teachers:', response.data);  // Log to ensure the correct data is received
       setTeachers(response.data);  // Set the state with the list of teachers
     } catch (error) {
@@ -42,7 +42,7 @@ const Management = () => {
 
   useEffect(() => {
     const fetchbranches = async () => {
-      const response = await axios.get('http://localhost:5000/api/fetch-branches');
+      const response = await axios.get('https://feedbacksystem-backend-8kxj.onrender.com/api/fetch-branches');
       setbranches(await response.data[0]);
     }
     fetchbranches();
@@ -56,7 +56,7 @@ const Management = () => {
           console.error('No branches selected');
           return;
         }
-        const response = await axios.post('http://localhost:5000/api/fetch-teacher', { branch });
+        const response = await axios.post('https://feedbacksystem-backend-8kxj.onrender.com/api/fetch-teacher', { branch });
         setTeachers(response.data); // Assuming response.data contains the list of teachers
       } catch (error) {
         console.error('Error fetching teachers:', error);
@@ -74,7 +74,7 @@ const Management = () => {
     e.preventDefault();
     const admin_name = localStorage.getItem('admin_name');
     if (newPassword === confirmPassword) {
-      const response = await axios.post('http://localhost:5000/api/admin-pass-change', { admin_name,newPassword });
+      const response = await axios.post('https://feedbacksystem-backend-8kxj.onrender.com/api/admin-pass-change', { admin_name,newPassword });
       alert("Password Changed");
     } else {
       alert("Passwords do not match");
@@ -86,7 +86,7 @@ const Management = () => {
   const addnewteacher = async () => {
     if (newTeacher && branch.length > 0) {
       try {
-        const response = await axios.post('http://localhost:5000/api/add-new-teacher', { newTeacher, branch });
+        const response = await axios.post('https://feedbacksystem-backend-8kxj.onrender.com/api/add-new-teacher', { newTeacher, branch });
         // Refresh the list of teachers after adding a new one
         alert('Teacher added successfully');
         // Optionally, fetch teachers again
@@ -116,7 +116,7 @@ const Management = () => {
 
   const handleDeleteTeacher = async (teacherId) => {
     try {
-      const response = await axios.delete(`http://localhost:5000/api/delete-teacher/${teacherId}`);
+      const response = await axios.delete(`https://feedbacksystem-backend-8kxj.onrender.com/api/delete-teacher/${teacherId}`);
       if (response.data.success) {
         alert('Teacher deleted successfully');
         setTeachers((prevTeachers) => prevTeachers.filter((teacher) => teacher.teacher_id !== teacherId));
@@ -136,7 +136,7 @@ const Management = () => {
 
   const handleAddValue = async () => {
     if (newbranch && semester && subjectid && subject) {
-      const response = await axios.post('http://localhost:5000/api/add-brach-semester-subject', { newbranch, semester, subjectid, subject });
+      const response = await axios.post('https://feedbacksystem-backend-8kxj.onrender.com/api/add-brach-semester-subject', { newbranch, semester, subjectid, subject });
     } else {
       alert("Enter branch name, semester, subject code and subject name");
     }

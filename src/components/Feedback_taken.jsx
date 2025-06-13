@@ -45,7 +45,7 @@ const Feedback_taken = ({ onUpdate }) => {
   useEffect(() => {
     const fetchBranches = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/fetch-branches");
+        const response = await axios.get("https://feedbacksystem-backend-8kxj.onrender.com/api/fetch-branches");
         // console.log(response.data); // Check the response data
         setBranches(response.data[0]);
       } catch (error) {
@@ -77,7 +77,7 @@ const Feedback_taken = ({ onUpdate }) => {
     if (branch && semester) {
       const fetchStudents = async () => {
         try {
-          const response = await axios.get('http://localhost:5000/api/students', {
+          const response = await axios.get('https://feedbacksystem-backend-8kxj.onrender.com/api/students', {
             params: { branch, semester }
           });
           setStudents(response.data[0]);
@@ -94,7 +94,7 @@ const Feedback_taken = ({ onUpdate }) => {
     e.preventDefault();
     try {
 
-      const response = await axios.post('http://localhost:5000/api/feedback-created', { teacherid, subjectid });
+      const response = await axios.post('https://feedbacksystem-backend-8kxj.onrender.com/api/feedback-created', { teacherid, subjectid });
 
       setfeedbackid(await response.data.insertId);
 
@@ -108,7 +108,7 @@ const Feedback_taken = ({ onUpdate }) => {
     const sendMessage = async () => {
       try {
         const response = await axios.post(
-          "http://localhost:5000/send-feedback-link",
+          "https://feedbacksystem-backend-8kxj.onrender.com/send-feedback-link",
           { feedbackid, students, subject, teacher }
 
         );
@@ -126,7 +126,7 @@ const Feedback_taken = ({ onUpdate }) => {
   const deletestudent = async (rollno) => {
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/delete-student",
+        "https://feedbacksystem-backend-8kxj.onrender.com/api/delete-student",
         { rollno }
       );
       setchange(response.data);

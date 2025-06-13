@@ -21,7 +21,7 @@ const Display_result = () => {
 
   useEffect(() => {
     const fetchFeedbacks = async () => {
-      const response = await axios.get('http://localhost:5000/api/fetch-feedbacks');
+      const response = await axios.get('https://feedbacksystem-backend-8kxj.onrender.com/api/fetch-feedbacks');
       setFeedbacks(response.data[0]);
     };
 

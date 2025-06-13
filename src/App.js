@@ -42,7 +42,7 @@ const App = () => {
     // Handle student data updates
     const handleUpdate = async (updatedData) => {
         try {
-            await axios.post('http://localhost:5000/updateStudent', updatedData);
+            await axios.post('https://feedbacksystem-backend-8kxj.onrender.com/updateStudent', updatedData);
             setStudentData(updatedData);
         } catch (error) {
             console.error("Error updating student data:", error);

@@ -113,7 +113,7 @@ const EvaluationPage = () => {
     useEffect(() => {
         const fetchEvaluationData = async () => {
             try {
-                const response = await axios.post('http://localhost:5000/api/fetchFeedback', { feedback_id: feedback_id });
+                const response = await axios.post('https://feedbacksystem-backend-8kxj.onrender.com/api/fetchFeedback', { feedback_id: feedback_id });
 
                 if (response.data) {
                     const data = response.data;
