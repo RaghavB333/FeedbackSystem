@@ -173,7 +173,7 @@ const Feedback_taken = ({ onUpdate }) => {
             <div className="bg-blue-500 p-3 rounded-full">
               <Users className="w-6 h-6 text-white" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900">Student List</h2>
+            <h2 className="text-2xl font-bold text-gray-900">Student List </h2> <span>(Random email given. Add your own email to check the working of nodemailer to send a feedback form at the email address provided)</span>
           </div>
           {!isEditing && students.length > 0 && (
             <button

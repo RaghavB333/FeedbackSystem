@@ -107,7 +107,7 @@ const Feedback_selection = () => {
             <div className="space-y-2">
               <label className="flex items-center text-sm font-medium text-gray-700">
                 <School className="w-4 h-4 mr-2 text-blue-500" />
-                Select Branch
+                Select Branch (works for BCA only)
               </label>
               <div className="relative">
                 <select
@@ -129,7 +129,7 @@ const Feedback_selection = () => {
             <div className="space-y-2">
               <label className="flex items-center text-sm font-medium text-gray-700">
                 <BookOpen className="w-4 h-4 mr-2 text-blue-500" />
-                Select Semester
+                Select Semester (works for 5th only)
               </label>
               <div className="relative">
                 <select

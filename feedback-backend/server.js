@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -7,7 +9,6 @@ const nodemailer = require('nodemailer');
 const session = require('express-session');
 
 
-require('dotenv').config(); // Load environment variables from .env file
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const saltRounds = 10; // Determines the strength of the hash
@@ -20,22 +21,28 @@ const port = 5000;
 app.use(cors());
 app.use(bodyParser.json());
 
-// MySQL Connection Setup
-const dbConfig = {
-    host: 'localhost',
-    user: 'root',
-    password: '@Tanpreet#07',
-    database: 'registration_db'
-};
+
+const dbUrl = new URL(process.env.DATABASE_URL);
 
 
-
-
-
-// Function to get a database connection
 async function getDbConnection() {
-    return mysql.createConnection(dbConfig);
+    return mysql.createConnection({
+        host: dbUrl.hostname,
+        port: dbUrl.port || 3306,
+        user: dbUrl.username,
+        password: dbUrl.password,
+        database: dbUrl.pathname.replace('/', ''),
+        ssl: {
+            rejectUnauthorized: false 
+        }
+    });
 }
+
+
+
+
+
+
 
 // Register route (without password)
 app.post('/register', async (req, res) => {

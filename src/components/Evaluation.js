@@ -40,7 +40,9 @@ const EvaluationPage = () => {
                 });
 
                 if (response.data.success) {
-                    const roundedScore = parseFloat(response.data.overall_score.toFixed(1));
+                    const roundedScore = response.data.overall_score
+                        ? parseFloat(response.data.overall_score.toFixed(1))
+                        : 0; // Use 0 or another default value if `overall_score` is null/undefined
                     setOverallScore(roundedScore);
                 } else {
                     setError(response.data.message || 'Failed to fetch overall score.');
@@ -328,7 +330,10 @@ const EvaluationPage = () => {
                                     <div className="flex items-center justify-between mb-2">
                                         <strong className="text-lg text-gray-900">{capitalizeWords(parameter)}</strong>
                                         <div className={`flex items-center justify-center px-3 py-1 rounded-full ${getScoreBadgeColor(score)}`}>
-                                            <span className={`text-xl font-bold ${getScoreColor(score)}`}>{score.toFixed(1)}</span>
+                                            <span className={`text-xl font-bold ${getScoreColor(score)}`}>
+                                                {(score ?? 0).toFixed(1)} {/* Default to 0 if score is null/undefined */}
+                                            </span>
+
                                             <span className="text-sm text-gray-500 ml-1">/5</span>
                                         </div>
                                     </div>

@@ -56,7 +56,7 @@ const AdminLogin = () => {
                 Admin Login
               </h1>
               <p className="text-gray-600">
-                Enter your credentials to access the admin panel
+                Enter your credentials to access the admin panel (username - admin pass- admin123)
               </p>
             </div>
   
