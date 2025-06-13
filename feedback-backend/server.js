@@ -18,8 +18,19 @@ const app = express();
 const port = 5000;
 
 // Middleware
+
+const allowedOrigins = [
+  'https://feedback-system-rt.vercel.app',    
+];
+
 app.use(cors({
-  origin: "https://feedbacksystem-frontend.vercel.app", 
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 
