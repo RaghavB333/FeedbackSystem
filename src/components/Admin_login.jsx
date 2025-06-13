@@ -27,7 +27,7 @@ const AdminLogin = () => {
         if (response.ok) {
             localStorage.setItem('isAdmin', 'true');
             localStorage.setItem('admin_name', adminCredentials.username);
-            navigate('https://feedback-system-rt.vercel.app/admin-home');
+            navigate('/admin-home');
         } else {
             setmassge("Invalid Credentials");
             console.error('Admin login failed');
