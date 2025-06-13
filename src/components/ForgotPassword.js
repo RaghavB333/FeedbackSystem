@@ -18,7 +18,7 @@ const ForgotPassword = () => {
     e.preventDefault();
     if(rollno)
     {
-      const response = await axios.post('/api/forgot-fetchstu-data',{rollno});
+      const response = await axios.post('https://feedbacksystem-backend-8kxj.onrender.com/api/forgot-fetchstu-data',{rollno});
       if(response.data[0])
       {
         setemail(response.data[0][0].email);

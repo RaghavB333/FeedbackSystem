@@ -35,7 +35,7 @@ const EvaluationPage = () => {
             setOverallScore(null);
 
             try {
-                const response = await axios.get('/api/getOverallScore', {
+                const response = await axios.get('https://feedbacksystem-backend-8kxj.onrender.com/api/getOverallScore', {
                     params: { feedback_id: feedback_id },
                 });
 

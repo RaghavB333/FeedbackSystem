@@ -17,7 +17,7 @@ const AdminLogin = () => {
 
     const handleAdminLogin = async (e) => {
         e.preventDefault();
-        const response = await fetch('/admin-login', {
+        const response = await fetch('https://feedbacksystem-backend-8kxj.onrender.com/admin-login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(adminCredentials),
