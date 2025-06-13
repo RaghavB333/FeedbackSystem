@@ -58,16 +58,15 @@ const App = () => {
 
     // Protect admin-only routes
     const AdminProtectedRoute = ({ element }) => {
-        const isAdmin = localStorage.getItem('isAdmin') === 'true'; // Check isAdmin from localStorage
-        if (isAdmin) return element;
-        return <Navigate to="/admin-login" replace />;
+        const isAdmin = localStorage.getItem('isAdmin') === 'true';
+        return isAdmin ? element : <Navigate to="/admin-login" replace />;
     };
 
     return (
         <Router>
             <Routes>
                 <Route path="/" element={<Home />} />
-                
+
                 {/* Student Login */}
                 <Route
                     path="/login"

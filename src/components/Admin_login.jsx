@@ -29,7 +29,10 @@ const AdminLogin = () => {
       if (data.isAdmin) {
         localStorage.setItem('isAdmin', 'true');
         localStorage.setItem('admin_name', adminCredentials.username);
-        navigate('/admin-home');
+        setTimeout(() => {
+          navigate('/admin-home');
+        }, 100); // 100ms delay gives React time to catch up
+
       } else {
         setmassge("Not authorized");
       }
