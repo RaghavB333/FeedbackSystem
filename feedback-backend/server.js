@@ -10,7 +10,7 @@ const session = require('express-session');
 
 
 const crypto = require('crypto');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const saltRounds = 10; // Determines the strength of the hash
 
 
