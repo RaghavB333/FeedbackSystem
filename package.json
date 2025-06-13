@@ -30,6 +30,7 @@
     "react-router-dom": "^6.27.0",
     "react-scripts": "5.0.1",
     "sentiment": "^5.0.2",
+    "signal-exit": "^4.1.0",
     "stream-http": "^3.2.0",
     "util": "^0.12.5",
     "web-vitals": "^2.1.4"
