@@ -18,7 +18,11 @@ const app = express();
 const port = 5000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: "https://feedbacksystem-frontend.vercel.app", // <-- your frontend
+  credentials: true
+}));
+
 app.use(bodyParser.json());
 
 
@@ -730,7 +734,7 @@ const sendFeedbackLinks = async (feedbackid, students, subject, teacher) => {
                 })
             );
             // Create the feedback link
-            const feedbackLink = `http://localhost:3000/feedbackForm?feedbackid=${encodeURIComponent(feedbackid)}&name=${encodeURIComponent(student.name)}&subject=${encodeURIComponent(subject)}&teacher=${encodeURIComponent(teacher)}&expiryTime=${expiryTime}&token=${token}&weightage=${weightage}`;
+            const feedbackLink = `https://feedback-system-rt.vercel.app/feedbackForm?feedbackid=${encodeURIComponent(feedbackid)}&name=${encodeURIComponent(student.name)}&subject=${encodeURIComponent(subject)}&teacher=${encodeURIComponent(teacher)}&expiryTime=${expiryTime}&token=${token}&weightage=${weightage}`;
     
             if (student.email) {
                 // Send feedback link via email

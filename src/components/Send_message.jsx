@@ -8,7 +8,7 @@ const Send_message = () => {
   const sendMessage = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:3000/send-feedback-link",
+        "https://feedback-system-rt.vercel.app/send-feedback-link",
         { students }
       );
       alert(response.data.message);

@@ -82,7 +82,7 @@ const Login = ({ onLogin }) => {
                         Login
                     </button>
                     {message && <p className="text-red-600 text-center">{message}</p>}
-                    <p className="text-blue-600 text-end"><a href='http://localhost:3000/forgot-password'>Forgot Password?</a></p>
+                    <p className="text-blue-600 text-end"><a href='https://feedback-system-rt.vercel.app/forgot-password'>Forgot Password?</a></p>
                 </form>
                 <div className='flex justify-center gap-5 mt-2'>
                     <a href="https://ptu.ac.in/" target="_blank" rel="noopener noreferrer">
