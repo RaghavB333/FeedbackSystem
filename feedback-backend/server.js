@@ -23,7 +23,7 @@ app.use(cors({
   credentials: true
 }));
 
-app.use(bodyParser.json());
+app.use(express.json());
 
 
 const dbUrl = new URL(process.env.DATABASE_URL);
