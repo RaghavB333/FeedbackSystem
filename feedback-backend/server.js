@@ -19,7 +19,7 @@ const port = 5000;
 
 // Middleware
 app.use(cors({
-  origin: "https://feedbacksystem-frontend.vercel.app", // <-- your frontend
+  origin: "https://feedbacksystem-frontend.vercel.app", 
   credentials: true
 }));
 
@@ -49,7 +49,7 @@ async function getDbConnection() {
 
 
 // Register route (without password)
-app.post('/register', async (req, res) => {
+app.post('https://feedbacksystem-backend-8kxj.onrender.com/register', async (req, res) => {
 
     const { name, fname, rollNumber, contact, email, address, branch, semester, CGPA } = req.body;
 
@@ -87,7 +87,7 @@ app.post('/register', async (req, res) => {
 });
 
 // Set Password route
-app.post('/set-password', async (req, res) => {
+app.post('https://feedbacksystem-backend-8kxj.onrender.com/set-password', async (req, res) => {
     const { rollNumber, password } = req.body;
 
     if (!rollNumber || !password) {
@@ -112,7 +112,7 @@ app.post('/set-password', async (req, res) => {
 });
 
 // Login Route for Students
-app.post('/login', async (req, res) => {
+app.post('https://feedbacksystem-backend-8kxj.onrender.com/login', async (req, res) => {
     const { rollNumber, password } = req.body;
 
     if (!rollNumber || !password) {
@@ -142,7 +142,7 @@ app.post('/login', async (req, res) => {
 });
 
 
-app.post('/api/forgot-fetchstu-data', async(req,res)=>{
+app.post('https://feedbacksystem-backend-8kxj.onrender.com/api/forgot-fetchstu-data', async(req,res)=>{
     const db = await getDbConnection();
 
     const {rollno} = req.body;
@@ -158,7 +158,7 @@ app.post('/api/forgot-fetchstu-data', async(req,res)=>{
     }
 })
 
-app.post('/updateStudent', async (req, res) => {
+app.post('https://feedbacksystem-backend-8kxj.onrender.com/updateStudent', async (req, res) => {
     const { rollNumber, name, fname, contact, email, address, branch, semester, CGPA } = req.body;
 
 
@@ -189,7 +189,7 @@ app.post('/updateStudent', async (req, res) => {
 
 // change student password
 
-app.post('/stu-pass-change', async (req, res) => {
+app.post('https://feedbacksystem-backend-8kxj.onrender.com/stu-pass-change', async (req, res) => {
 
     const { rollno, newPassword } = req.body;
     const db = await getDbConnection();
@@ -220,7 +220,7 @@ app.post('/stu-pass-change', async (req, res) => {
 });
 
 
-app.post('/api/delete-student',async(req,res)=>{
+app.post('https://feedbacksystem-backend-8kxj.onrender.com/api/delete-student',async(req,res)=>{
     const {rollno} = req.body;
     const db = await getDbConnection();
 
@@ -258,7 +258,7 @@ const sendOTPCode = async(email,otp)=>{
 
 }
 
-app.post('/api/forgot-stu-pass', async(req,res)=>{
+app.post('https://feedbacksystem-backend-8kxj.onrender.com/api/forgot-stu-pass', async(req,res)=>{
 
     const db = await getDbConnection();
 
@@ -287,7 +287,7 @@ app.post('/api/forgot-stu-pass', async(req,res)=>{
 
 
 // Admin Password Change Route
-app.post('/api/admin-pass-change', async (req, res) => {
+app.post('https://feedbacksystem-backend-8kxj.onrender.com/api/admin-pass-change', async (req, res) => {
     const { admin_name,newPassword } = req.body;
 
     if (!newPassword) {
@@ -307,7 +307,7 @@ app.post('/api/admin-pass-change', async (req, res) => {
     }
 });
 
-app.post('/api/feedback-created', async (req, res) => {
+app.post('https://feedbacksystem-backend-8kxj.onrender.com/api/feedback-created', async (req, res) => {
     const { teacherid, subjectid } = req.body;
 
     const db = await getDbConnection();
@@ -328,7 +328,7 @@ VALUES (2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0, 0, NOW());
 
 })
 
-app.post('/api/verify-student', async (req, res) => {
+app.post('https://feedbacksystem-backend-8kxj.onrender.com/api/verify-student', async (req, res) => {
     const { username, password } = req.body;
 
     try {
@@ -354,7 +354,7 @@ app.post('/api/verify-student', async (req, res) => {
 });
 
 
-app.post('/api/updateFeedback', async (req, res) => {
+app.post('https://feedbacksystem-backend-8kxj.onrender.com/api/updateFeedback', async (req, res) => {
     const { feedback_id, ratings, weightage } = req.body;
     const { token } = req.query;
 
@@ -439,7 +439,7 @@ app.post('/api/updateFeedback', async (req, res) => {
 
 
 
-app.get('/api/fetch-feedbacks', async (req, res) => {
+app.get('https://feedbacksystem-backend-8kxj.onrender.com/api/fetch-feedbacks', async (req, res) => {
     const db = await getDbConnection();
 
     const query = `SELECT 
@@ -461,7 +461,7 @@ INNER JOIN
     res.json(rows);
 })
 
-app.post('/api/fetchFeedback', async (req, res) => {
+app.post('https://feedbacksystem-backend-8kxj.onrender.com/api/fetchFeedback', async (req, res) => {
     const db = await getDbConnection();
 
     try {
@@ -549,7 +549,7 @@ app.post('/api/fetchFeedback', async (req, res) => {
 
 
 // Endpoint to fetch the overall score
-app.get('/api/getOverallScore', async (req, res) => {
+app.get('https://feedbacksystem-backend-8kxj.onrender.com/api/getOverallScore', async (req, res) => {
     const { feedback_id } = req.query;
 
     if (!feedback_id) {
@@ -574,7 +574,7 @@ app.get('/api/getOverallScore', async (req, res) => {
 });
 
 // Fetch distinct years
-app.get('/api/years', async (req, res) => {
+app.get('https://feedbacksystem-backend-8kxj.onrender.com/api/years', async (req, res) => {
     try {
         const db = await getDbConnection();
         const query = `
@@ -591,7 +591,7 @@ app.get('/api/years', async (req, res) => {
 });
 
 // Fetch performance data for a specific year
-app.get('/api/overall-performance', async (req, res) => {
+app.get('https://feedbacksystem-backend-8kxj.onrender.com/api/overall-performance', async (req, res) => {
     const { year } = req.query;
 
     if (!year) {
@@ -629,7 +629,7 @@ app.get('/api/overall-performance', async (req, res) => {
 
 // Tanpreet's code 
 
-app.get('/api/students', async (req, res) => {
+app.get('https://feedbacksystem-backend-8kxj.onrender.com/api/students', async (req, res) => {
     const db = await getDbConnection();
 
     const { branch, semester } = req.query;
@@ -750,7 +750,7 @@ const sendFeedbackLinks = async (feedbackid, students, subject, teacher) => {
 };
 
 // Endpoint to trigger sending feedback links
-app.post('/send-feedback-link', async (req, res) => {
+app.post('https://feedbacksystem-backend-8kxj.onrender.com/send-feedback-link', async (req, res) => {
     const db = await getDbConnection();
     const { feedbackid, students, subject, teacher } = req.body; // Expecting an array of students with email or phone
 
@@ -764,7 +764,7 @@ app.post('/send-feedback-link', async (req, res) => {
 });
 
 
-app.post('/admin-login', async (req, res) => {
+app.post('https://feedbacksystem-backend-8kxj.onrender.com/admin-login', async (req, res) => {
     const { username, password } = req.body;
 
     if (!username || !password) {
@@ -795,7 +795,7 @@ app.post('/admin-login', async (req, res) => {
 
 
 // Example API endpoint in Node.js/Express
-app.get('/api/checkFeedbackSubmission', async (req, res) => {
+app.get('https://feedbacksystem-backend-8kxj.onrender.com/api/checkFeedbackSubmission', async (req, res) => {
     const db = await getDbConnection();
     const { token } = req.query;
 
@@ -810,7 +810,7 @@ app.get('/api/checkFeedbackSubmission', async (req, res) => {
 
 
 
-app.post('/api/add-new-teacher', async (req, res) => {
+app.post('https://feedbacksystem-backend-8kxj.onrender.com/api/add-new-teacher', async (req, res) => {
     const db = await getDbConnection();
 
     const { newTeacher, branch } = req.body;
@@ -846,7 +846,7 @@ app.post('/api/add-new-teacher', async (req, res) => {
 })
 
 
-app.post('/api/add-brach-semester-subject', async (req, res) => {
+app.post('https://feedbacksystem-backend-8kxj.onrender.com/api/add-brach-semester-subject', async (req, res) => {
     const db = await getDbConnection();
     const { newbranch, semester, subjectid, subject } = req.body;
 
@@ -889,7 +889,7 @@ app.post('/api/add-brach-semester-subject', async (req, res) => {
 })
 
 
-app.get('/api/fetch-branches', async (req, res) => {
+app.get('https://feedbacksystem-backend-8kxj.onrender.com/api/fetch-branches', async (req, res) => {
     const db = await getDbConnection();
 
 
@@ -901,7 +901,7 @@ app.get('/api/fetch-branches', async (req, res) => {
 });
 
 
-app.get('/api/fetch-student-branches', async (req, res) => {
+app.get('https://feedbacksystem-backend-8kxj.onrender.com/api/fetch-student-branches', async (req, res) => {
     const { rollNumber } = req.query; // Fetch roll number from query parameters
     if (!rollNumber) {
         return res.status(400).json({ error: 'Roll number is required' });
@@ -925,7 +925,7 @@ app.get('/api/fetch-student-branches', async (req, res) => {
 });
 
 // fetch teachers 
-app.post('/fetch-teacher', async (req, res) => {
+app.post('https://feedbacksystem-backend-8kxj.onrender.com/fetch-teacher', async (req, res) => {
     const db = await getDbConnection();
 
     const { branch } = req.body;
@@ -941,7 +941,7 @@ app.post('/fetch-teacher', async (req, res) => {
 
 
 
-app.post('/api/fetch-all-teachers', async (req, res) => {
+app.post('https://feedbacksystem-backend-8kxj.onrender.com/api/fetch-all-teachers', async (req, res) => {
     const db = await getDbConnection();
     try {
         const result = await db.query('SELECT teacher_id, teacher_name FROM teachers');
@@ -961,7 +961,7 @@ app.post('/api/fetch-all-teachers', async (req, res) => {
 
 
 
-app.delete('/api/delete-teacher/:teacherId', async (req, res) => {
+app.delete('https://feedbacksystem-backend-8kxj.onrender.com/api/delete-teacher/:teacherId', async (req, res) => {
     const db = await getDbConnection();
 
     const { teacherId } = req.params;
@@ -976,7 +976,7 @@ app.delete('/api/delete-teacher/:teacherId', async (req, res) => {
 });
 
 
-app.post('/fetch-subjects', async (req, res) => {
+app.post('https://feedbacksystem-backend-8kxj.onrender.com/fetch-subjects', async (req, res) => {
     const db = await getDbConnection();
     const { branch, semester } = req.body;
 
@@ -995,5 +995,5 @@ app.post('/fetch-subjects', async (req, res) => {
 // Start the server
 app.listen(port, () => {
 
-    console.log(`Server is running at http://localhost:${port}`);
+    
 });
