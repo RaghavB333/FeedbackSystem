@@ -83,12 +83,12 @@ const OverallPerformancePage = () => {
                     value={selectedYear}
                     onChange={handleYearChange}
                 >
-                    <option value="">-- Select Year --</option>
-                    {years.map((year) => (
+                    {Array.isArray(years) && years.map((year) => (
                         <option key={year.year} value={year.year}>
                             {year.year}
                         </option>
                     ))}
+
                 </select>
             </div>
 
