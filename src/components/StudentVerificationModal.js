@@ -7,7 +7,7 @@ function VerificationModal() {
     const [isOpen, setIsOpen] = useState(true); // Boolean instead of string
 
     const handleVerification = () => {
-        fetch('/api/verify-student', {
+        fetch('https://feedbacksystem-backend-8kxj.onrender.com/api/verify-student', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })

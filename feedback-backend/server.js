@@ -763,7 +763,7 @@ const sendFeedbackLinks = async (feedbackid, students, subject, teacher) => {
 // Endpoint to trigger sending feedback links
 app.post('/send-feedback-link', async (req, res) => {
     const db = await getDbConnection();
-    const { feedbackid, students, subject, teacher } = req.body; // Expecting an array of students with email or phone
+    const { feedbackid, students, subject, teacher } = req.body; 
 
     try {
         await sendFeedbackLinks(feedbackid, students, subject, teacher);
