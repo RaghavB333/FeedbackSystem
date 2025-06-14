@@ -324,7 +324,7 @@ app.post('/api/feedback-created', async (req, res) => {
     const db = await getDbConnection();
 
     const query = `
-   INSERT INTO TeacherEvaluationSummary 
+   INSERT INTO teacherevaluationsummary 
 (teacher_id, subject_id, avg_subject_knowledge, avg_communication_effectiveness, avg_communication_clarity,
  avg_engagement, avg_participation, avg_responsiveness_approachability, avg_responsiveness_effectiveness,
  avg_punctuality, avg_preparedness, avg_critical_thinking, avg_syllabus_coverage, total_weightage, last_updated) 
