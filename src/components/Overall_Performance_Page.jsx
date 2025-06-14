@@ -12,7 +12,7 @@ const OverallPerformancePage = () => {
         // Fetch distinct years
         const fetchYears = async () => {
             try {
-                const response = await axios.get('/api/years');
+                const response = await axios.get('https://feedbacksystem-backend-8kxj.onrender.com/api/years');
                 setYears(response.data);
             } catch (error) {
                 console.error('Error fetching years:', error);
@@ -25,7 +25,7 @@ const OverallPerformancePage = () => {
         if (selectedYear) {
             const fetchScores = async () => {
                 try {
-                    const response = await axios.get(`/api/overall-performance?year=${selectedYear}`);
+                    const response = await axios.get(`https://feedbacksystem-backend-8kxj.onrender.com/api/overall-performance?year=${selectedYear}`);
                     const scores = response.data;
 
                     setTeacherScores(scores);
