@@ -377,7 +377,7 @@ app.post('/api/updateFeedback', async (req, res) => {
         SELECT avg_subject_knowledge, avg_communication_effectiveness, avg_communication_clarity,
                avg_engagement, avg_participation, avg_responsiveness_approachability, avg_responsiveness_effectiveness,
                avg_punctuality, avg_preparedness, avg_critical_thinking, avg_syllabus_coverage, total_weightage 
-        FROM TeacherEvaluationSummary
+        FROM teacherevaluationsummary
         WHERE feedback_id = ?
     `;
 
@@ -420,7 +420,7 @@ app.post('/api/updateFeedback', async (req, res) => {
              0.10 * updatedData.avg_syllabus_coverage);
 
         const updateQuery = `
-            UPDATE TeacherEvaluationSummary 
+            UPDATE teacherevaluationsummary 
             SET avg_subject_knowledge = ?, avg_communication_effectiveness = ?, avg_communication_clarity = ?, 
                 avg_engagement = ?, avg_participation = ?, avg_responsiveness_approachability = ?, 
                 avg_responsiveness_effectiveness = ?, avg_punctuality = ?, avg_preparedness = ?, 
@@ -482,7 +482,7 @@ app.post('/api/fetchFeedback', async (req, res) => {
             SELECT avg_subject_knowledge, avg_communication_effectiveness, avg_communication_clarity,
                    avg_engagement, avg_participation, avg_responsiveness_approachability, avg_responsiveness_effectiveness,
                    avg_punctuality, avg_preparedness, avg_critical_thinking, avg_syllabus_coverage, overall_score, total_weightage, last_updated
-            FROM TeacherEvaluationSummary
+            FROM teacherevaluationsummary
             WHERE feedback_id = ?
         `;
 
@@ -567,7 +567,7 @@ app.get('/api/getOverallScore', async (req, res) => {
         return res.status(400).json({ success: false, message: 'Feedback ID is required.' });
     }
 
-    const query = `SELECT overall_score FROM TeacherEvaluationSummary WHERE feedback_id = ?`;
+    const query = `SELECT overall_score FROM teacherevaluationsummary WHERE feedback_id = ?`;
 
     try {
         const db = await getDbConnection();
